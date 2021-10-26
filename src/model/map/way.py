@@ -12,10 +12,15 @@ class Way():
     def __init__(self, osm_id, osm_nodes, osm_tags, our_nodes):
         self.id = osm_id
         
-        try:
-            self.nodes = [our_nodes[f"n{node.ref}"] for node in osm_nodes]
-        except KeyError:
-            pass #todo: raise a message in a log file, if possible stating the reason this node is missing (e.g outside simulated area)
+        self.nodes = []
+        for node in osm_nodes:
+            try:
+                self.nodes.append(our_nodes[node.ref])
+            except KeyError:
+                #todo: raise a message in a log file, if possible stating the reason this node is missing (e.g outside simulated area)
+                print(f"skipping node {node.ref}")
+                pass 
+                
         
         self.tags = {tag.k : tag.v for tag in osm_tags}
         
