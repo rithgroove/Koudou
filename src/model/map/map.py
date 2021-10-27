@@ -25,3 +25,10 @@ class Map():
             self.minLon = 0
             self.maxLat = 0
             self.maxLon = 0
+
+    def __str__(self):
+        tempstring = "[Map]\n"
+        tempstring += f"Simulated area = ({self.minLon},{self.minLat}) to ({self.maxLon},{self.maxLat})\n"
+        tempstring += f"Number of nodes = {len(self.d_nodes.keys())}\n"
+        tempstring += f"Number of ways = {len(self.d_ways.keys())}"
+        return tempstring
