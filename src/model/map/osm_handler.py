@@ -59,10 +59,7 @@ class OSMHandler(osmium.SimpleHandler):
 
         self.nodes = []
         self.ways  = []
-        self.minLat = 0
-        self.minLon = 0
-        self.maxLat = 0
-        self.maxLon = 0
+        self.boundingBox = None
 
     def iter_to_list(self, iter):
         values = [self.get_value(i) for i in iter]
@@ -100,7 +97,3 @@ class OSMHandler(osmium.SimpleHandler):
     def setBoundingBox(self,path):
         file = osmium.io.Reader(path, osmium.osm.osm_entity_bits.NOTHING)
         self.boundingBox = file.header().box()
-        self.minLat = self.boundingBox.bottom_left.lat
-        self.minLon = self.boundingBox.bottom_left.lon
-        self.maxLat = self.boundingBox.top_right.lat
-        self.maxLon = self.boundingBox.top_right.lon
