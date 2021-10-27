@@ -12,10 +12,8 @@ class Way():
         - tags : A dictionary of the Map Feature of this object (check Open Street Map - Map Features).
     """
     
-    def __init__(self, osm_id: int, osm_tags: List, nodes: List):
+    def __init__(self, osm_id: int, tags: Dict[str, str], nodes: List):
         self.id = str(osm_id)
-        self.nodes = [n["ref"] for  n in nodes]
-        self.tags = {}
-        for t in osm_tags:
-            self.tags[t[0]] = t[1]
+        self.nodes = nodes
+        self.tags = tags
         
