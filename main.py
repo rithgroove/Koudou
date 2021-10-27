@@ -1,6 +1,11 @@
+import osmium
 from src.model.map.map_manager import build_map
 from os.path import join 
 
-path = join("osmData","TX-To-TU.osm")
-temp = build_map(path)
-print(temp)
+osm_file = join("osm_files","TX-To-TU.osm")
+
+map = build_map(osm_file)
+
+print(map)
+
+
