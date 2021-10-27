@@ -2,7 +2,6 @@ import datetime
 from os import error
 import osmium
 
-
 class OSMHandler(osmium.SimpleHandler):
 
     """
@@ -15,7 +14,11 @@ class OSMHandler(osmium.SimpleHandler):
     Properties:
         - nodes : [Node] array of nodes.
         - ways : [Way] array of ways.
-    
+        - minLat : minimum latitude
+        - minLon : minimum longitude
+        - maxLat : maximum latitude
+        - maxLon : maximum longitude
+
     Nested dictionary as 21/10/27
         - Node:
             changeset: (int)
@@ -56,6 +59,10 @@ class OSMHandler(osmium.SimpleHandler):
 
         self.nodes = []
         self.ways  = []
+        self.minLat = 0
+        self.minLon = 0
+        self.maxLat = 0
+        self.maxLon = 0
 
     def iter_to_list(self, iter):
         values = [self.get_value(i) for i in iter]
@@ -89,3 +96,11 @@ class OSMHandler(osmium.SimpleHandler):
 
     def way(self, osm_way):
         self.ways.append(self.obj_to_dict(osm_way))
+
+    def setBoundingBox(self,path):
+        file = osmium.io.Reader(path, osmium.osm.osm_entity_bits.NOTHING)
+        self.boundingBox = file.header().box()
+        self.minLat = self.boundingBox.bottom_left.lat
+        self.minLon = self.boundingBox.bottom_left.lon
+        self.maxLat = self.boundingBox.top_right.lat
+        self.maxLon = self.boundingBox.top_right.lon

@@ -12,6 +12,7 @@ from .node import Node
 def build_map(path):
 	osm_map = OSMHandler()
 	osm_map.apply_file(path)
+	osm_map.setBoundingBox(path)
 	
 	nodes = []
 	for n in osm_map.nodes:
