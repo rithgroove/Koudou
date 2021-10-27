@@ -1,10 +1,11 @@
-from src.model.map.osm_handler import OSMHandler
+import osmium
+from src.model.map.map_manager import build_map
 from os.path import join 
 
 osm_file = join("osm_files","TX-To-TU.osm")
 
-handler = OSMHandler()
-handler.apply_file(osm_file)
+map = build_map(osm_file)
 
-print(temp)
+print(map)
+
 

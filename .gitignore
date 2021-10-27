@@ -130,3 +130,5 @@ dmypy.json
 
 # osmFilefolder
 osmData/
+osm_data/
+osm_files/

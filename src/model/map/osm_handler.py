@@ -1,19 +1,29 @@
+import datetime
 import osmium
-from .node import Node
-from .way  import Way
+
 
 class OSMHandler(osmium.SimpleHandler):
     def __init__(self):
         osmium.SimpleHandler.__init__(self)
-        
-        self.d_nodes = {}
-        self.d_ways  = {}
-        
+
+        self.nodes = []
+        self.ways  = []
+
+    def obj_to_dict(self, obj):
+        values = {}
+        for k in [name for name in dir(obj) if not name.startswith('__')]:
+            v = getattr(obj, k)
+            if not callable(v):
+                if not isinstance(v, (int, float, str, bool, datetime.datetime)):
+                    if isinstance(v, osmium.osm.TagList):
+                        v = {tag.k : tag.v for tag in v}
+                    else:
+                        v = self.obj_to_dict(v)
+                values[k] = v
+        return values
+
     def node(self, osm_node):
-        new_node = Node(osm_node.id, osm_node.location, osm_node.tags)
-        self.d_nodes[new_node.id] = new_node
-        
+        self.nodes.append(self.obj_to_dict(osm_node))
+
     def way(self, osm_way):
-        new_way = Way(osm_way.id, osm_way.nodes, osm_way.tags, our_nodes=self.d_nodes)
-        self.d_ways[new_way.id] = new_way
-        
+        self.ways.append(self.obj_to_dict(osm_way))

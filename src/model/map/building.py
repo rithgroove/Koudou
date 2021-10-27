@@ -1,3 +1,6 @@
+from .coordinate import Coordinate
+import itertools
+
 class Building:
     """
     [Class] Building
