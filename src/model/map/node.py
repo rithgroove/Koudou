@@ -23,4 +23,5 @@ class Node():
         for t in osm_tags:
             self.tags[t[0]] = t[1]
         self.is_road = True if 'highway' in self.tags.keys() else False
+
         
