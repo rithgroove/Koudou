@@ -14,10 +14,7 @@ class OSMHandler(osmium.SimpleHandler):
     Properties:
         - nodes : [Node] array of nodes.
         - ways : [Way] array of ways.
-        - minLat : minimum latitude
-        - minLon : minimum longitude
-        - maxLat : maximum latitude
-        - maxLon : maximum longitude
+        - boundingBox : the bounding box of the OSM file
 
     Nested dictionary as 21/10/27
         - Node:
