@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 from .coordinate import Coordinate
 
 class Node():
@@ -12,16 +12,15 @@ class Node():
         - is_road           : (boolean) True if part of a road
         - tags              : (dict) of the Map Feature of this object (check Open Street Map - Map Features).
     """    
-    def __init__(self, osm_id: str, tags: Dict, location: Coordinate):
+    def __init__(self, osm_id: int, osm_tags: List, location: Coordinate):
         """
         [Constructor]
         Initialize a node
         """
-        self.id = osm_id 
-        
+        self.id = str(osm_id) 
         self.coordinate = location
-        
-        self.tags = tags
-        
+        self.tags = {}
+        for t in osm_tags:
+            self.tags[t[0]] = t[1]
         self.is_road = True if 'highway' in self.tags.keys() else False
         

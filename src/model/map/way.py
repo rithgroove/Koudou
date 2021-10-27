@@ -1,3 +1,6 @@
+from typing import Dict, List
+
+
 class Way():
     """
     [Class] Way
@@ -9,19 +12,10 @@ class Way():
         - tags : A dictionary of the Map Feature of this object (check Open Street Map - Map Features).
     """
     
-    def __init__(self, osm_id, osm_nodes, osm_tags, our_nodes):
-        self.id = osm_id
-        
-        self.nodes = []
-        for node in osm_nodes:
-            try:
-                self.nodes.append(our_nodes[node.ref])
-            except KeyError:
-                #todo: raise a message in a log file, if possible stating the reason this node is missing (e.g outside simulated area)
-                print(f"skipping node {node.ref}")
-                pass 
-                
-        
-        self.tags = {tag.k : tag.v for tag in osm_tags}
-        
+    def __init__(self, osm_id: int, osm_tags: List, nodes: List):
+        self.id = str(osm_id)
+        self.nodes = [n["ref"] for  n in nodes]
+        self.tags = {}
+        for t in osm_tags:
+            self.tags[t[0]] = t[1]
         
