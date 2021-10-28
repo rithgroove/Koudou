@@ -56,7 +56,7 @@ class OSMHandler(osmium.SimpleHandler):
 
         self.nodes = []
         self.ways  = []
-        self.boundingBox = None
+        self.bounding_box = None
 
     def iter_to_list(self, iter):
         values = [self.get_value(i) for i in iter]
@@ -91,6 +91,6 @@ class OSMHandler(osmium.SimpleHandler):
     def way(self, osm_way):
         self.ways.append(self.obj_to_dict(osm_way))
 
-    def setBoundingBox(self,path):
+    def set_bounding_box(self,path):
         file = osmium.io.Reader(path, osmium.osm.osm_entity_bits.NOTHING)
         self.bounding_box = file.header().box()
