@@ -56,11 +56,11 @@ class Coordinate():
     def __str__(self):
         """
         [Method] __str__
-        Generate the Map Statistic string and return it.
+        Generate the Coordinate info string and return it.
         
         Return: [string] String of summarized map Information.
         """
-        tempstring = f"[Coordinate]\n (lat = {self.lat}, lon = {self.lon})"
+        tempstring = f"[Coordinate]\n\t(lat = {self.lat}, lon = {self.lon})"
         return tempstring
     
     def newCoordinateWithTranslation(self,lat =0,lon = 0):

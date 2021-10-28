@@ -21,5 +21,28 @@ class Node():
         self.coordinate = location
         self.tags = tags
         self.is_road = True if 'highway' in self.tags.keys() else False
+        self.connections = []
 
+    def __str__(self):
+        """
+        [Method] __str__
+        Generate the Node information string and return it.
         
+        Return: [string] String of summarized map Information.
+        """
+        temp_string = "[Node]\n"
+        temp_string += f"\tid = {self.id}\n"
+        temp_string += f"{self.coordinate.__str__()}\n"
+        if len(self.tags) > 0:
+            temp_string += "Tags:\n"
+            for key in self.tags:
+                temp_string += f"\t{key} = {self.tags[key]}\n"
+        if len(self.connections) > 0:
+            temp_string += "Connection:\n"
+            for connection in self.connections:
+                temp_string += f"\t{connection}\n"
+        return(temp_string)
+
+    def addConnection(self,node_osm_id):
+        if (node_osm_id not in self.connections):
+            self.connections.append(node_osm_id)
