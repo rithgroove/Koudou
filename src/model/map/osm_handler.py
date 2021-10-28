@@ -14,7 +14,7 @@ class OSMHandler(osmium.SimpleHandler):
     Properties:
         - nodes : [Node] array of nodes.
         - ways : [Way] array of ways.
-        - boundingBox : the bounding box of the OSM file
+        - bounding_box : the bounding box of the OSM file
 
     Nested dictionary as 21/10/27
         - Node:
