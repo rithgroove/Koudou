@@ -5,7 +5,7 @@ from .way import Way
 
 
 class Map():
-    def __init__(self, nodes: List[Node], ways: List[Way], boundingBox = None):
+    def __init__(self,boundingBox, nodes: List[Node], ways: List[Way]):
         self.d_nodes: Dict[str, Node] = {}
         self.d_ways: Dict[str, Way] = {}
 
@@ -29,6 +29,6 @@ class Map():
     def __str__(self):
         tempstring = "[Map]\n"
         tempstring += f"Simulated area = ({self.minLon},{self.minLat}) to ({self.maxLon},{self.maxLat})\n"
-        tempstring += f"Number of nodes = {len(self.d_nodes.keys())}\n"
-        tempstring += f"Number of ways = {len(self.d_ways.keys())}"
+        tempstring += f"Number of nodes = {len(self.d_nodes)}\n"
+        tempstring += f"Number of ways = {len(self.d_ways)}"
         return tempstring

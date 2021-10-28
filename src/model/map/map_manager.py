@@ -26,5 +26,5 @@ def build_map(path):
 		n = [n["ref"] for  n in w["nodes"]]
 		ways.append(Way(w["id"], tags, n))
 	
-	map = Map(nodes, ways, osm_map.boundingBox)
+	map = Map(osm_map.bounding_box, nodes, ways)
 	return map

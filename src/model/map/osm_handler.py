@@ -93,4 +93,4 @@ class OSMHandler(osmium.SimpleHandler):
 
     def setBoundingBox(self,path):
         file = osmium.io.Reader(path, osmium.osm.osm_entity_bits.NOTHING)
-        self.boundingBox = file.header().box()
+        self.bounding_box = file.header().box()
