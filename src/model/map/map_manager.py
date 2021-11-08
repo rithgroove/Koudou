@@ -12,7 +12,8 @@ from .node import Node
 def build_map(path):
 	osm_map = OSMHandler()
 	osm_map.apply_file(path)
-	
+	osm_map.set_bounding_box(path)
+
 	nodes = []
 	for n in osm_map.nodes:
 		coord = Coordinate(n["location"]["lat"], n["location"]["lon"])
@@ -24,7 +25,6 @@ def build_map(path):
 		tags = {t[0]: t[1] for t in w["tags"]}
 		n = [n["ref"] for  n in w["nodes"]]
 		ways.append(Way(w["id"], tags, n))
-	
 	kd_map = Map(nodes, ways)
 	build_node_connections(kd_map) #generate the connection between nodes
 
