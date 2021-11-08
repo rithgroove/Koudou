@@ -8,13 +8,12 @@ class Map():
     def __init__(self,bounding_box, nodes: List[Node], ways: List[Way]):
         self.d_nodes: Dict[str, Node] = {}
         self.d_ways: Dict[str, Way] = {}
-
+        self.main_road = None
         for node in nodes:
             self.d_nodes[node.id] = node
 
         for way in ways:
             self.d_ways[way.id] = way
-
         if (bounding_box is not None):
             self.min_lat = bounding_box.bottom_left.lat
             self.min_lon = bounding_box.bottom_left.lon
@@ -32,3 +31,6 @@ class Map():
         tempstring += f"Number of nodes = {len(self.d_nodes)}\n"
         tempstring += f"Number of ways = {len(self.d_ways)}"
         return tempstring
+
+    def set_main_road(self,main_road):
+        self.main_road = main_road
