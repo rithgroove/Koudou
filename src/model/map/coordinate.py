@@ -11,7 +11,7 @@ class Coordinate():
         - lon : longitude.
     """
     
-    def __init__(self,lat,lon):
+    def __init__(self, lat: float, lon: float):
         """
         [Constructor]
         Initialize an empty node.

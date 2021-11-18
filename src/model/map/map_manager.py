@@ -25,11 +25,12 @@ def build_map(path):
 		tags = {t[0]: t[1] for t in w["tags"]}
 		n = [n["ref"] for  n in w["nodes"]]
 		ways.append(Way(w["id"], tags, n))
-	kd_map = Map(nodes, ways)
+
+	kd_map = Map(osm_map.bounding_box, nodes, ways)
 	build_node_connections(kd_map) #generate the connection between nodes
 
-	road_nodes,other_nodes = separate_nodes(kd_map)	# separate road and other nodes
-	main_road,disconnected_nodes = clean_road(road_nodes,kd_map) # separate the main_road and disconnected nodes
+	road_nodes, other_nodes = separate_nodes(kd_map)	# separate road and other nodes
+	main_road, disconnected_nodes = clean_road(road_nodes,kd_map) # separate the main_road and disconnected nodes
 
 	kd_map.set_main_road(main_road)
 
@@ -57,7 +58,7 @@ def separate_nodes(kd_map):
 			other_nodes.append(node)
 	return road_nodes,other_nodes
 
-def clean_road(road_nodes,kd_map):
+def clean_road(road_nodes, kd_map):
 	working_node = None
 	results = []
 	while len(road_nodes)>0: #loop until road_nodes empty
@@ -72,6 +73,7 @@ def clean_road(road_nodes,kd_map):
 				if (node not in visited and node not in queue):
 					queue.append(node) #if the node never visited, put it on queue
 		results.append(visited) #append all of the visited road as 1 graph
+
 	main_road = []
 	disconnected_nodes = []
 	largest = 0
@@ -82,4 +84,6 @@ def clean_road(road_nodes,kd_map):
 			main_road = result
 		else:
 			disconnected_nodes.extend(result)
-	return main_road,disconnected_nodes
+			
+	return main_road, disconnected_nodes
+

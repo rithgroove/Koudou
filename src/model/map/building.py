@@ -1,3 +1,4 @@
+from model.map.way import Way
 from .coordinate import Coordinate
 import itertools
 
@@ -11,7 +12,7 @@ class Building:
         - coordinate : the coordinate of the building's centroid
     """
     idCounter = itertools.count().__next__
-    def __init__(self, way):
+    def __init__(self, way: Way):
         """
         [Constructor]
         Initialize the building building

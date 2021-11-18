@@ -21,7 +21,7 @@ class Node():
         self.coordinate = location
         self.tags = tags
         self.is_road = True if 'highway' in self.tags.keys() else False
-        self.connections = []
+        self.connections: List[str] = []
 
     def __str__(self):
         """
@@ -43,6 +43,6 @@ class Node():
                 temp_string += f"\t{connection}\n"
         return(temp_string)
 
-    def addConnection(self,node_osm_id):
+    def addConnection(self, node_osm_id):
         if (node_osm_id not in self.connections):
             self.connections.append(node_osm_id)
