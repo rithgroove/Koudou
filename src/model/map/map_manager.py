@@ -1,8 +1,11 @@
+from model.map.place import Place
+from model.map.render_info import Render_info
 from .coordinate import Coordinate
 from .way import Way
 from .osm_handler import OSMHandler
 from .map import Map
 from .node import Node
+from typing import List
 #list of function here
 
 #def connect_buildings
@@ -34,7 +37,56 @@ def build_map(path):
 
 	kd_map.set_main_road(main_road)
 
+	places = create_places_osm(ways)
+
+	businesses, households = create_types_osm_csv(places, ways)
+
+	repair_places(places, businesses, households)
+
 	return kd_map
+
+
+def create_places_osm(ways: List[Way]):
+	places = {}
+	for w in ways:
+		if 'road' in w.tags:
+			continue
+		centroid = create_centroid()
+		road_connection = create_road_connection()
+		render_info = Render_info()
+		p = Place(True, render_info, centroid.id, road_connection)
+		places[p.id] = p
+
+	return places
+
+
+def create_centroid():
+	pass
+
+
+def create_road_connection():
+	pass
+
+def create_types_osm_csv (places, ways, csv_file_name):
+	# file = open(csv_file_name)
+	# for line in file:
+	# for w in ways:
+	# 		if 'ammenity' in w.tags:
+	# 			b = Business(places[w.id])
+	# 		if 'building' in w.tags and w.tags['building'] == 'restaurant':
+	# 			b = Business(places[w.id], type='restaurant')
+	# 		if 'building' in w.tags and w.tags['building'] == 'apartament':
+	# 			h = Household(places[w.id])
+	# 		if not_interactable:
+	# 			places[w.id].interactable = False
+
+
+	# return households,businesses
+	pass
+
+
+def repair_places():
+	pass
 
 def build_node_connections(kd_map):
 	for key in kd_map.d_ways:
@@ -87,3 +139,17 @@ def clean_road(road_nodes, kd_map):
 			
 	return main_road, disconnected_nodes
 
+
+# def connect_buildings(kd_map: Map, grid_size: int):
+# 	cell_height = (kd_map.max_lon - kd_map.min_lon)/grid_size
+# 	cell_width = (kd_map.max_lon - kd_map.min_lon)/grid_size
+	
+# 	grid = []
+# 	for i in range(grid_size):
+# 		grid.append([])
+# 		for j in range(grid_size):
+# 			grid[i].append([])
+
+# 	for node in kd_map.d_nodes 
+
+# 	pass
