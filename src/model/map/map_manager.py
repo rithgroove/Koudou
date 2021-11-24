@@ -1,5 +1,5 @@
-from model.map.place import Place
-from model.map.render_info import Render_info
+from .place import Place
+from .render_info import Render_info
 from .coordinate import Coordinate
 from .way import Way
 from .osm_handler import OSMHandler
@@ -37,7 +37,7 @@ def build_map(path):
 
 	kd_map.set_main_road(main_road)
 
-	places = create_places_osm(ways)
+	places = create_places_osm(ways, kd_map)
 
 	businesses, households = create_types_osm_csv(places, ways)
 
@@ -46,13 +46,14 @@ def build_map(path):
 	return kd_map
 
 
-def create_places_osm(ways: List[Way]):
+def create_places_osm(ways, kd_map):
 	places = {}
 	for w in ways:
 		if 'road' in w.tags:
 			continue
-		centroid = create_centroid()
-		road_connection = create_road_connection()
+		centroid = create_centroid(w, kd_map.d_nodes)
+		kd_map.add_node(centroid)
+		road_connection = create_road_connection(centroid, w)
 		render_info = Render_info()
 		p = Place(True, render_info, centroid.id, road_connection)
 		places[p.id] = p
@@ -60,11 +61,20 @@ def create_places_osm(ways: List[Way]):
 	return places
 
 
-def create_centroid():
-	pass
+def create_centroid(way, n_dict):
+	lat, lon = 0, 0
+	for n_id in way.nodes:
+		lat += n_dict[n_id].coordinate.lat
+		lon += n_dict[n_id].coordinate.lon
+
+	size = len(way.nodes)-1
+	coord = Coordinate(lat/size, lon/size)
+	new_id = n_dict[way.nodes[-1]].id + "_c"
+	n = Node(new_id, {"centroid": True}, coord)
+	return n
 
 
-def create_road_connection():
+def create_road_connection(centroid, kd_map):
 	pass
 
 def create_types_osm_csv (places, ways, csv_file_name):

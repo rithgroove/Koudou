@@ -1,6 +1,6 @@
 import itertools
 
-from model.map.render_info import Render_info
+from .render_info import Render_info
 
 class Place:
     """

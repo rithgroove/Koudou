@@ -1,4 +1,4 @@
-from model.map.coordinate import Coordinate
+from .coordinate import Coordinate
 
 
 class Render_info:

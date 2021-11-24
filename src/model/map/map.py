@@ -20,6 +20,13 @@ class Map():
         self.max_lat = bounding_box.top_right.lat
         self.max_lon = bounding_box.top_right.lon
 
+    def add_node(self, node):
+        self.d_nodes[node.id] = node
+
+    def add_way(self, way):
+        self.d_ways[way.id] = way
+
+
     def __str__(self):
         tempstring = "[Map]\n"
         tempstring += f"Simulated area = ({self.min_lon},{self.min_lat}) to ({self.max_lon},{self.max_lat})\n"
