@@ -1,5 +1,6 @@
 from typing import Any, Dict, List
 
+from .place import Place
 from .node import Node
 from .way import Way
 
@@ -20,12 +21,16 @@ class Map():
         self.max_lat = bounding_box.top_right.lat
         self.max_lon = bounding_box.top_right.lon
 
+        self.d_places: Dict[str, Place] = {}
+
     def add_node(self, node):
         self.d_nodes[node.id] = node
 
     def add_way(self, way):
         self.d_ways[way.id] = way
 
+    def add_place(self, place):
+        self.d_places[place.id] = place
 
     def __str__(self):
         tempstring = "[Map]\n"
@@ -34,5 +39,5 @@ class Map():
         tempstring += f"Number of ways = {len(self.d_ways)}"
         return tempstring
 
-    def set_main_road(self,main_road):
+    def set_main_road(self, main_road):
         self.main_road = main_road

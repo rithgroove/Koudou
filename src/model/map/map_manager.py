@@ -32,12 +32,12 @@ def build_map(path):
 	kd_map = Map(osm_map.bounding_box, nodes, ways)
 	build_node_connections(kd_map) #generate the connection between nodes
 
-	road_nodes, other_nodes = separate_nodes(kd_map)	# separate road and other nodes
-	main_road, disconnected_nodes = clean_road(road_nodes,kd_map) # separate the main_road and disconnected nodes
+	road_nodes, non_road_nodes = separate_nodes(kd_map)	# separate road and other nodes
+	main_road_graph, disconnected_nodes = clean_road(road_nodes,kd_map) # separate the road_graph and disconnected nodes
 
-	kd_map.set_main_road(main_road)
+	kd_map.set_main_road(main_road_graph)
 
-	places = create_places_osm(ways, kd_map)
+	places = create_places_osm(ways, kd_map, main_road_graph)
 
 	businesses, households = create_types_osm_csv(places, ways)
 
@@ -46,20 +46,24 @@ def build_map(path):
 	return kd_map
 
 
-def create_places_osm(ways, kd_map):
+def create_places_osm(ways, kd_map, main_road_graph, grid_size):
 	places = {}
+	road_grid = create_roades_grid(kd_map, main_road_graph, grid_size)
 	for w in ways:
 		if 'road' in w.tags:
 			continue
+		
 		centroid = create_centroid(w, kd_map.d_nodes)
 		kd_map.add_node(centroid)
-		road_connection = create_road_connection(centroid, w)
+
+		centroid_grid_coord = get_node_grid_coordinate(centroid, kd_map, grid_size)
+		road_connection = create_road_connection(centroid, centroid_grid_coord, road_grid)
+		
 		render_info = Render_info()
-		p = Place(True, render_info, centroid.id, road_connection)
+		p = Place(w.id, True, render_info, centroid.id, road_connection)
 		places[p.id] = p
 
 	return places
-
 
 def create_centroid(way, n_dict):
 	lat, lon = 0, 0
@@ -74,8 +78,26 @@ def create_centroid(way, n_dict):
 	return n
 
 
-def create_road_connection(centroid, kd_map):
-	pass
+def get_node_grid_coordinate(node, kd_map, grid_size):
+	cell_height = (kd_map.max_lon - kd_map.min_lon)/grid_size
+	cell_width = (kd_map.max_lon - kd_map.min_lon)/grid_size
+
+	x = int((node.coordinate.lon - kd_map.min_lon) / cell_width)
+	y = int((node.coordinate.lat - kd_map.min_lat) / cell_height)
+
+	return (x, y)
+
+def create_road_connection(centroid, centroid_grid_coord, road_grid):
+	x = centroid_grid_coord[0]
+	y = centroid_grid_coord[1]
+
+	visited_roads = {{}}
+	for node1 in road_grid[x][y]:
+		for node2 in node1.connections:
+			if node1 in visited_roads and node2 in visited_roads[node1]:
+				continue
+			visited_roads[node1][node2] = True
+			# dist = node_road_dist(centroid, node1, node2)		
 
 def create_types_osm_csv (places, ways, csv_file_name):
 	# file = open(csv_file_name)
@@ -118,7 +140,7 @@ def separate_nodes(kd_map):
 			road_nodes.append(node)
 		else:
 			other_nodes.append(node)
-	return road_nodes,other_nodes
+	return road_nodes, other_nodes
 
 def clean_road(road_nodes, kd_map):
 	working_node = None
@@ -150,16 +172,15 @@ def clean_road(road_nodes, kd_map):
 	return main_road, disconnected_nodes
 
 
-# def connect_buildings(kd_map: Map, grid_size: int):
-# 	cell_height = (kd_map.max_lon - kd_map.min_lon)/grid_size
-# 	cell_width = (kd_map.max_lon - kd_map.min_lon)/grid_size
-	
-# 	grid = []
-# 	for i in range(grid_size):
-# 		grid.append([])
-# 		for j in range(grid_size):
-# 			grid[i].append([])
+def create_roades_grid(kd_map, road_nodes, grid_size: int):
+	grid = []
+	for i in range(grid_size):
+		grid.append([])
+		for _ in range(grid_size):
+			grid[i].append([])
 
-# 	for node in kd_map.d_nodes 
+	for n in road_nodes:
+		x, y = get_node_grid_coordinate(n, kd_map, grid_size)
+		grid[x][y].append(n.id)
 
-# 	pass
+	return grid
