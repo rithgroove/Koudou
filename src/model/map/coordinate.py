@@ -93,7 +93,7 @@ class Coordinate():
         temp = Coordinate(self.lat*scale,self.lon*scale)
         return temp
        
-    def calculateDistance(self,targetCoordinate):
+    def calculateDistance(self,lat, lon):
         """
         [Method] calculateDistance
         calculateDistance to other coordinate
@@ -103,7 +103,7 @@ class Coordinate():
             
         Return: [Double] Distance in Meter
         """
-        return distance.distance(self.getLatLon(), targetCoordinate.getLatLon()).km * 1000
+        return distance.distance(self.getLatLon(), (lat, lon)).km * 1000
     
     def getVectorDistance(self,targetCoordinate):
         """

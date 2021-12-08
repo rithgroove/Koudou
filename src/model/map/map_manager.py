@@ -6,6 +6,7 @@ from .osm_handler import OSMHandler
 from .map import Map
 from .node import Node
 from typing import List
+import math
 #list of function here
 
 #def connect_buildings
@@ -37,7 +38,7 @@ def build_map(path):
 
 	kd_map.set_main_road(main_road_graph)
 
-	places = create_places_osm(ways, kd_map, main_road_graph)
+	places = create_places_osm(ways, kd_map, main_road_graph, 10)
 
 	businesses, households = create_types_osm_csv(places, ways)
 
@@ -56,8 +57,8 @@ def create_places_osm(ways, kd_map, main_road_graph, grid_size):
 		centroid = create_centroid(w, kd_map.d_nodes)
 		kd_map.add_node(centroid)
 
-		centroid_grid_coord = get_node_grid_coordinate(centroid, kd_map, grid_size)
-		road_connection = create_road_connection(centroid, centroid_grid_coord, road_grid)
+		centroid_grid_coord = get_grid_coordinate(centroid.coordinate.lat, centroid.coordinate.lon, kd_map, grid_size)
+		road_connection = create_road_connection(centroid.id, centroid_grid_coord, road_grid, kd_map)
 		
 		render_info = Render_info()
 		p = Place(w.id, True, render_info, centroid.id, road_connection)
@@ -78,26 +79,65 @@ def create_centroid(way, n_dict):
 	return n
 
 
-def get_node_grid_coordinate(node, kd_map, grid_size):
+def get_grid_coordinate(lat, lon, kd_map, grid_size):
 	cell_height = (kd_map.max_lon - kd_map.min_lon)/grid_size
 	cell_width = (kd_map.max_lon - kd_map.min_lon)/grid_size
 
-	x = int((node.coordinate.lon - kd_map.min_lon) / cell_width)
-	y = int((node.coordinate.lat - kd_map.min_lat) / cell_height)
+	x = int((lon - kd_map.min_lon) / cell_width)
+	y = int((lat - kd_map.min_lat) / cell_height)
 
 	return (x, y)
 
-def create_road_connection(centroid, centroid_grid_coord, road_grid):
+def create_road_connection(centroid: Node, centroid_grid_coord, road_grid, kd_map:Map):
 	x = centroid_grid_coord[0]
 	y = centroid_grid_coord[1]
 
-	visited_roads = {{}}
+	visited_roads = {}
+	road_start = None
+	road_destination = None
+	road_dist = math.inf
+
 	for node1 in road_grid[x][y]:
-		for node2 in node1.connections:
-			if node1 in visited_roads and node2 in visited_roads[node1]:
+		n_1 = kd_map.d_nodes[node1]
+		for node2 in n_1.connections:
+			if node2 in visited_roads and node1 in visited_roads[node2]:
 				continue
+
+			if node1 not in visited_roads:
+				visited_roads[node1] = {}
 			visited_roads[node1][node2] = True
-			# dist = node_road_dist(centroid, node1, node2)		
+
+			n_2 = kd_map.d_nodes[node2]
+			dist = distance_road_to_node(centroid, n_1, n_2)
+			if dist < road_dist:
+				road_dist = dist
+				road_start = n_1
+				road_destination = n_2
+
+	if road_start is None or road_destination is None:
+		return None
+
+	new_coordinate = getClosestCoordinate(centroid, road_start, road_destination)
+	new_id = centroid.id + "_entry"
+	new_node = Node(new_id, {"entry_point": True}, new_coordinate)
+
+
+	# I am assuming all connections are 2 ways
+	centroid.add_connection(new_id)
+	road_start.add_connection(new_id)
+	road_destination.add_connection(new_id)
+
+	new_node.add_connection(road_start.id)
+	new_node.add_connection(road_destination.id)
+	new_node.add_connection(centroid.id)
+
+	if road_destination.id in road_start.connections:
+		road_start.connections.remove(road_destination.id)
+	
+	if road_start.id in road_destination.connections:
+		road_destination.connections.remove(road_start.id)
+	
+
 
 def create_types_osm_csv (places, ways, csv_file_name):
 	# file = open(csv_file_name)
@@ -127,8 +167,8 @@ def build_node_connections(kd_map):
 		for node_id in way.nodes:
 			if working_node is not None:
 				connectingNode = kd_map.d_nodes[node_id] 
-				working_node.addConnection(node_id) #add the connection from working_node to the connecting_node
-				connectingNode.addConnection(working_node.id) #add the connection from the connecting_node to the working_node
+				working_node.add_connection(node_id) #add the connection from working_node to the connecting_node
+				connectingNode.add_connection(working_node.id) #add the connection from the connecting_node to the working_node
 			working_node = kd_map.d_nodes[node_id]
 
 def separate_nodes(kd_map):
@@ -174,13 +214,79 @@ def clean_road(road_nodes, kd_map):
 
 def create_roades_grid(kd_map, road_nodes, grid_size: int):
 	grid = []
-	for i in range(grid_size):
+	for i in range(grid_size+1):
 		grid.append([])
-		for _ in range(grid_size):
+		for _ in range(grid_size+1):
 			grid[i].append([])
 
 	for n in road_nodes:
-		x, y = get_node_grid_coordinate(n, kd_map, grid_size)
+		x, y = get_grid_coordinate(n.coordinate.lat, n.coordinate.lon, kd_map, grid_size)
+		if x > grid_size or y > grid_size:
+			continue 
 		grid[x][y].append(n.id)
 
 	return grid
+
+def distance_road_to_node(road_start, road_destination, target_node):
+
+	start_dist = road_start.coordinate.calculateDistance(target_node.coordinate.lat, target_node.coordinate.lon)
+	destination_dist = road_destination.coordinate.calculateDistance(target_node.coordinate.lat, target_node.coordinate.lon)
+	a = max(start_dist, destination_dist)
+	b = min(start_dist, destination_dist)
+
+	c = road_start.coordinate.calculateDistance(road_destination.coordinate)
+	s = (a+b+c)/2
+
+	area =s*(s-a)*(s-b)*(s-c)
+	if (area < 0):
+		print("error, Heron's formula is not working due to very small angle")
+		return math.inf
+	area = math.sqrt(area)
+	height = 2*area/c
+	sinq = height/a
+	q = math.asin(sinq)
+	e = a * math.cos(q)
+	if (e > c or q > math.pi):
+		height = min(a,b)
+	return height
+
+
+def getClosestCoordinate(road_start, road_destination, target_node):
+	"""
+	[Method] getClosestCoordinate
+	Method to get the closest coordinate in this road
+	
+	Parameter:
+		- coordinate: the coordinate that we wanted to find the closest coordinate within road.
+		
+	Return:
+		- [Coordinate] the closest coordinate
+	"""
+	height = distance_road_to_node(road_start, road_destination, target_node)
+
+	start_dist = road_start.coordinate.calculateDistance(target_node.coordinate.lat, target_node.coordinate.lon)
+	destination_dist = road_destination.coordinate.calculateDistance(target_node.coordinate.lat, target_node.coordinate.lon)
+	a = max(start_dist, destination_dist)
+	b = min(start_dist, destination_dist)
+	c = road_start.coordinate.calculateDistance(road_destination.coordinate)
+	
+	sinq = height/a
+	if (sinq > 1):
+		return None
+	q = math.asin(sinq)
+	e = a * math.cos(q)
+
+	if (e > c or q > math.pi):
+		if (a<b):
+			return road_start.coordinate
+		else:
+			return road_destination.coordinate
+
+	if start_dist < destination_dist:
+		distanceVector = road_start.coordinate.getVectorDistance(road_destination.coordinate)  
+		distanceVector = distanceVector.newCoordinateWithScale(e/c)
+		return Coordinate(road_destination.coordinate.lat + distanceVector.lat, road_destination.coordinate.lon + distanceVector.lon)
+
+	distanceVector = road_destination.coordinate.getVectorDistance(road_start.coordinate)  
+	distanceVector = distanceVector.newCoordinateWithScale(e/c)
+	return Coordinate(road_start.coordinate.lat + distanceVector.lat, road_start.coordinate.lon + distanceVector.lon)

@@ -1,3 +1,4 @@
+import math
 from typing import Dict, List, Union
 from .coordinate import Coordinate
 
@@ -43,6 +44,19 @@ class Node():
                 temp_string += f"\t{connection}\n"
         return(temp_string)
 
-    def addConnection(self, node_osm_id):
+    def add_connection(self, node_osm_id):
         if (node_osm_id not in self.connections):
             self.connections.append(node_osm_id)
+
+    def distance_to_coordinate(self, lat, lon):
+        """
+        [Method] distanceToCoordinate
+        Method to get the closest distance from a coordinate to the road
+        
+        Parameter:
+            - coordinate: the coordinate that we wanted to find the closest distance to the road.
+            
+        Return:
+            - [float] the distance
+        """
+        return self.coordinate.calculateDistance(lat, lon)
