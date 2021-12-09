@@ -58,9 +58,9 @@ def create_places_osm(ways, kd_map, main_road_graph, grid_size):
 		kd_map.add_node(centroid)
 
 		centroid_grid_coord = get_grid_coordinate(centroid.coordinate.lat, centroid.coordinate.lon, kd_map, grid_size)
-		road_connection = create_road_connection(centroid.id, centroid_grid_coord, road_grid, kd_map)
+		road_connection = create_road_connection(centroid, centroid_grid_coord, road_grid, kd_map)
 		
-		render_info = Render_info()
+		render_info = Render_info(None, None)
 		p = Place(w.id, True, render_info, centroid.id, road_connection)
 		places[p.id] = p
 
@@ -68,13 +68,15 @@ def create_places_osm(ways, kd_map, main_road_graph, grid_size):
 
 def create_centroid(way, n_dict):
 	lat, lon = 0, 0
-	for n_id in way.nodes:
+	size = len(way.nodes)-1
+
+	for i in range(size):
+		n_id = way.nodes[i]
 		lat += n_dict[n_id].coordinate.lat
 		lon += n_dict[n_id].coordinate.lon
 
-	size = len(way.nodes)-1
 	coord = Coordinate(lat/size, lon/size)
-	new_id = n_dict[way.nodes[-1]].id + "_c"
+	new_id = n_dict[way.nodes[0]].id + "_centroid"
 	n = Node(new_id, {"centroid": True}, coord)
 	return n
 
@@ -86,6 +88,10 @@ def get_grid_coordinate(lat, lon, kd_map, grid_size):
 	x = int((lon - kd_map.min_lon) / cell_width)
 	y = int((lat - kd_map.min_lat) / cell_height)
 
+	if x > grid_size:
+		x = grid_size
+	if y > grid_size:
+		y = grid_size
 	return (x, y)
 
 def create_road_connection(centroid: Node, centroid_grid_coord, road_grid, kd_map:Map):
@@ -102,13 +108,15 @@ def create_road_connection(centroid: Node, centroid_grid_coord, road_grid, kd_ma
 		for node2 in n_1.connections:
 			if node2 in visited_roads and node1 in visited_roads[node2]:
 				continue
+			if node1 == node2:
+				continue
 
 			if node1 not in visited_roads:
 				visited_roads[node1] = {}
 			visited_roads[node1][node2] = True
 
 			n_2 = kd_map.d_nodes[node2]
-			dist = distance_road_to_node(centroid, n_1, n_2)
+			dist = distance_road_to_node(n_1, n_2, centroid)
 			if dist < road_dist:
 				road_dist = dist
 				road_start = n_1
@@ -117,10 +125,20 @@ def create_road_connection(centroid: Node, centroid_grid_coord, road_grid, kd_ma
 	if road_start is None or road_destination is None:
 		return None
 
-	new_coordinate = getClosestCoordinate(centroid, road_start, road_destination)
+	new_coordinate = get_closest_coordinate(road_start, road_destination, centroid)
+	
+	if new_coordinate.getLatLon() == road_start.coordinate.getLatLon():
+		centroid.add_connection(road_start.id)
+		road_start.add_connection(road_start.id)
+		return
+	if new_coordinate.getLatLon() == road_destination.coordinate.getLatLon():
+		centroid.add_connection(road_destination.id)
+		road_destination.add_connection(road_destination.id)
+		return
+	
 	new_id = centroid.id + "_entry"
 	new_node = Node(new_id, {"entry_point": True}, new_coordinate)
-
+	kd_map.add_node(new_node)
 
 	# I am assuming all connections are 2 ways
 	centroid.add_connection(new_id)
@@ -229,14 +247,15 @@ def create_roades_grid(kd_map, road_nodes, grid_size: int):
 
 def distance_road_to_node(road_start, road_destination, target_node):
 
-	start_dist = road_start.coordinate.calculateDistance(target_node.coordinate.lat, target_node.coordinate.lon)
-	destination_dist = road_destination.coordinate.calculateDistance(target_node.coordinate.lat, target_node.coordinate.lon)
+	start_dist = road_start.coordinate.calculateDistance(*target_node.coordinate.getLatLon())
+	destination_dist = road_destination.coordinate.calculateDistance(*target_node.coordinate.getLatLon())
 	a = max(start_dist, destination_dist)
 	b = min(start_dist, destination_dist)
 
-	c = road_start.coordinate.calculateDistance(road_destination.coordinate)
+	c = road_start.coordinate.calculateDistance(*road_destination.coordinate.getLatLon())
 	s = (a+b+c)/2
-
+	if c == 0:
+		print("OI")
 	area =s*(s-a)*(s-b)*(s-c)
 	if (area < 0):
 		print("error, Heron's formula is not working due to very small angle")
@@ -251,9 +270,9 @@ def distance_road_to_node(road_start, road_destination, target_node):
 	return height
 
 
-def getClosestCoordinate(road_start, road_destination, target_node):
+def get_closest_coordinate(road_start, road_destination, target_node):
 	"""
-	[Method] getClosestCoordinate
+	[Method] get_closest_coordinate
 	Method to get the closest coordinate in this road
 	
 	Parameter:
@@ -264,11 +283,11 @@ def getClosestCoordinate(road_start, road_destination, target_node):
 	"""
 	height = distance_road_to_node(road_start, road_destination, target_node)
 
-	start_dist = road_start.coordinate.calculateDistance(target_node.coordinate.lat, target_node.coordinate.lon)
-	destination_dist = road_destination.coordinate.calculateDistance(target_node.coordinate.lat, target_node.coordinate.lon)
+	start_dist = road_start.coordinate.calculateDistance(*target_node.coordinate.getLatLon())
+	destination_dist = road_destination.coordinate.calculateDistance(*target_node.coordinate.getLatLon())
 	a = max(start_dist, destination_dist)
 	b = min(start_dist, destination_dist)
-	c = road_start.coordinate.calculateDistance(road_destination.coordinate)
+	c = road_start.coordinate.calculateDistance(*road_destination.coordinate.getLatLon())
 	
 	sinq = height/a
 	if (sinq > 1):
