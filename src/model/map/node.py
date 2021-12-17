@@ -59,4 +59,4 @@ class Node():
         Return:
             - [float] the distance
         """
-        return self.coordinate.calculateDistance(lat, lon)
+        return self.coordinate.calculate_distance(lat, lon)

@@ -13,10 +13,10 @@ import math
 
 #def clean_up_road
 
-def build_map(path):
+def build_map(osm_file_path):
 	osm_map = OSMHandler()
-	osm_map.apply_file(path)
-	osm_map.set_bounding_box(path)
+	osm_map.apply_file(osm_file_path)
+	osm_map.set_bounding_box(osm_file_path)
 
 	nodes = []
 	for n in osm_map.nodes:
@@ -40,9 +40,9 @@ def build_map(path):
 
 	places = create_places_osm(ways, kd_map, main_road_graph, 10)
 
-	businesses, households = create_types_osm_csv(places, ways)
+	# businesses, households = create_types_osm_csv(places, ways, None)
 
-	repair_places(places, businesses, households)
+	# repair_places(places, businesses, households)
 
 	return kd_map
 
@@ -60,7 +60,7 @@ def create_places_osm(ways, kd_map, main_road_graph, grid_size):
 		centroid_grid_coord = get_grid_coordinate(centroid.coordinate.lat, centroid.coordinate.lon, kd_map, grid_size)
 		road_connection = create_road_connection(centroid, centroid_grid_coord, road_grid, kd_map)
 		
-		render_info = Render_info(None, None)
+		render_info = Render_info([kd_map.d_nodes[n_id].coordinate for n_id in w.nodes], centroid.coordinate, None)
 		p = Place(w.id, True, render_info, centroid.id, road_connection)
 		places[p.id] = p
 
@@ -94,69 +94,56 @@ def get_grid_coordinate(lat, lon, kd_map, grid_size):
 		y = grid_size
 	return (x, y)
 
-def create_road_connection(centroid: Node, centroid_grid_coord, road_grid, kd_map:Map):
+
+def get_closest_road(centroid: Node, centroid_grid_coord, road_grid, kd_map: Map):
 	x = centroid_grid_coord[0]
 	y = centroid_grid_coord[1]
 
 	visited_roads = {}
 	road_start = None
 	road_destination = None
+	closest_coord = None
 	road_dist = math.inf
 
 	for node1 in road_grid[x][y]:
 		n_1 = kd_map.d_nodes[node1]
 		for node2 in n_1.connections:
-			if node2 in visited_roads and node1 in visited_roads[node2]:
+			index = (node1, node2)
+			if node2 < node1:
+				index = (node2, node1)
+			
+			if index in visited_roads:
 				continue
-			if node1 == node2:
-				continue
-
-			if node1 not in visited_roads:
-				visited_roads[node1] = {}
-			visited_roads[node1][node2] = True
+			visited_roads[index] = True
 
 			n_2 = kd_map.d_nodes[node2]
-			dist = distance_road_to_node(n_1, n_2, centroid)
+			dist, closest_coord = get_dist_and_closest_coord(n_1, n_2, centroid)
 			if dist < road_dist:
 				road_dist = dist
 				road_start = n_1
 				road_destination = n_2
+	
+	return road_start, road_destination, closest_coord
+
+def create_road_connection(centroid: Node, centroid_grid_coord, road_grid, kd_map:Map):
+	
+	road_start, road_destination, closest_coord = get_closest_road(centroid, centroid_grid_coord, road_grid, kd_map)
 
 	if road_start is None or road_destination is None:
 		return None
-
-	new_coordinate = get_closest_coordinate(road_start, road_destination, centroid)
 	
-	if new_coordinate.getLatLon() == road_start.coordinate.getLatLon():
+	# Checking if the closest coordinate is one of the nodes of the roades
+	if closest_coord.get_lat_lon() == road_start.coordinate.get_lat_lon():
 		centroid.add_connection(road_start.id)
 		road_start.add_connection(road_start.id)
 		return
-	if new_coordinate.getLatLon() == road_destination.coordinate.getLatLon():
+	if closest_coord.get_lat_lon() == road_destination.coordinate.get_lat_lon():
 		centroid.add_connection(road_destination.id)
 		road_destination.add_connection(road_destination.id)
 		return
 	
-	new_id = centroid.id + "_entry"
-	new_node = Node(new_id, {"entry_point": True}, new_coordinate)
-	kd_map.add_node(new_node)
-
-	# I am assuming all connections are 2 ways
-	centroid.add_connection(new_id)
-	road_start.add_connection(new_id)
-	road_destination.add_connection(new_id)
-
-	new_node.add_connection(road_start.id)
-	new_node.add_connection(road_destination.id)
-	new_node.add_connection(centroid.id)
-
-	if road_destination.id in road_start.connections:
-		road_start.connections.remove(road_destination.id)
+	connect_centroid_to_road(centroid, road_start, road_destination, closest_coord, kd_map)
 	
-	if road_start.id in road_destination.connections:
-		road_destination.connections.remove(road_start.id)
-	
-
-
 def create_types_osm_csv (places, ways, csv_file_name):
 	# file = open(csv_file_name)
 	# for line in file:
@@ -245,67 +232,65 @@ def create_roades_grid(kd_map, road_nodes, grid_size: int):
 
 	return grid
 
-def distance_road_to_node(road_start, road_destination, target_node):
 
-	start_dist = road_start.coordinate.calculateDistance(*target_node.coordinate.getLatLon())
-	destination_dist = road_destination.coordinate.calculateDistance(*target_node.coordinate.getLatLon())
+def connect_centroid_to_road(centroid, road_start, road_destination, closest_coord, kd_map):
+	new_id = centroid.id + "_entry"
+	new_node = Node(new_id, {"entry_point": True}, closest_coord)
+	kd_map.add_node(new_node)
+
+	# I am assuming all connections are 2 ways
+	centroid.add_connection(new_id)
+	road_start.add_connection(new_id)
+	road_destination.add_connection(new_id)
+
+	new_node.add_connection(road_start.id)
+	new_node.add_connection(road_destination.id)
+	new_node.add_connection(centroid.id)
+
+	if road_destination.id in road_start.connections:
+		road_start.connections.remove(road_destination.id)
+
+	if road_start.id in road_destination.connections:
+		road_destination.connections.remove(road_start.id)
+
+# Gets the distance from a road to a node and the closest point on the road
+def get_dist_and_closest_coord(road_start, road_destination, target_node):
+	start_dist = road_start.coordinate.calculate_distance(*target_node.coordinate.get_lat_lon())
+	destination_dist = road_destination.coordinate.calculate_distance(*target_node.coordinate.get_lat_lon())
+
 	a = max(start_dist, destination_dist)
 	b = min(start_dist, destination_dist)
-
-	c = road_start.coordinate.calculateDistance(*road_destination.coordinate.getLatLon())
+	c = road_start.coordinate.calculate_distance(*road_destination.coordinate.get_lat_lon())
 	s = (a+b+c)/2
-	if c == 0:
-		print("OI")
+
 	area =s*(s-a)*(s-b)*(s-c)
 	if (area < 0):
+		# Maybe in this case we should set area = 0, want to test this once we have vizualization
 		print("error, Heron's formula is not working due to very small angle")
-		return math.inf
+		return math.inf, None
 	area = math.sqrt(area)
+
 	height = 2*area/c
+	
 	sinq = height/a
 	q = math.asin(sinq)
 	e = a * math.cos(q)
-	if (e > c or q > math.pi):
-		height = min(a,b)
-	return height
-
-
-def get_closest_coordinate(road_start, road_destination, target_node):
-	"""
-	[Method] get_closest_coordinate
-	Method to get the closest coordinate in this road
 	
-	Parameter:
-		- coordinate: the coordinate that we wanted to find the closest coordinate within road.
-		
-	Return:
-		- [Coordinate] the closest coordinate
-	"""
-	height = distance_road_to_node(road_start, road_destination, target_node)
-
-	start_dist = road_start.coordinate.calculateDistance(*target_node.coordinate.getLatLon())
-	destination_dist = road_destination.coordinate.calculateDistance(*target_node.coordinate.getLatLon())
-	a = max(start_dist, destination_dist)
-	b = min(start_dist, destination_dist)
-	c = road_start.coordinate.calculateDistance(*road_destination.coordinate.getLatLon())
-	
-	sinq = height/a
-	if (sinq > 1):
-		return None
-	q = math.asin(sinq)
-	e = a * math.cos(q)
-
+	closest_coord = None
 	if (e > c or q > math.pi):
-		if (a<b):
-			return road_start.coordinate
+		height = min(a, b)
+		if (a < b):
+			closest_coord = road_start.coordinate
 		else:
-			return road_destination.coordinate
+			closest_coord = road_destination.coordinate
 
 	if start_dist < destination_dist:
-		distanceVector = road_start.coordinate.getVectorDistance(road_destination.coordinate)  
-		distanceVector = distanceVector.newCoordinateWithScale(e/c)
-		return Coordinate(road_destination.coordinate.lat + distanceVector.lat, road_destination.coordinate.lon + distanceVector.lon)
+		dist_vector = road_start.coordinate.get_vector_distance(road_destination.coordinate)
+		dist_vector = dist_vector.new_coordinate_with_scale(e/c)
+		closest_coord = Coordinate(road_destination.coordinate.lat + dist_vector.lat, road_destination.coordinate.lon + dist_vector.lon)
+	else:
+		dist_vector = road_destination.coordinate.get_vector_distance(road_start.coordinate)
+		dist_vector = dist_vector.new_coordinate_with_scale(e/c)
+		closest_coord = Coordinate(road_start.coordinate.lat + dist_vector.lat, road_start.coordinate.lon + dist_vector.lon)
 
-	distanceVector = road_destination.coordinate.getVectorDistance(road_start.coordinate)  
-	distanceVector = distanceVector.newCoordinateWithScale(e/c)
-	return Coordinate(road_start.coordinate.lat + distanceVector.lat, road_start.coordinate.lon + distanceVector.lon)
+	return height, closest_coord
