@@ -118,12 +118,27 @@ class View():
                 self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=2)
             elif "amenity" in place.tags.keys():
                 self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=2)
-            elif 'highway' in place.tags.keys():
-                for (lon_a, lat_a), (lon_b, lat_b) in zip(path[:-1], path[1:]):
-                    self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="grey", width=3)
+            # elif 'highway' in place.tags.keys():
+            #     for (lon_a, lat_a), (lon_b, lat_b) in zip(path[:-1], path[1:]):
+            #         self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="grey", width=3)
             else:
                 pass #note: equivalent to "others" in epidemicon
                 #self.canvas.create_polygon(path_flat, outline=place.outline, fill="pink", width=2)
+
+        print("drawing roads")
+        print(map.main_road)
+        print("====")
+        for road in map.main_road:
+            lon_a, lat_a = road.location.get_lon_lat()
+            lon_a, lat_a = trans_lon(lon_a), trans_lat(lat_a)
+
+            # dont draw twice
+            conn_filtered = road.connections[road.connections>road.id]
+            for conn_id in conn_filtered:
+                lon_b, lat_b = map.d_nodes[conn_id].get_lon_lat()
+                lon_b, lat_lat_ba = trans_lon(lon_b), trans_lat(lat_b)
+                self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="grey", width=3)
+
 
     def draw_path(self, map, vp):
         pass

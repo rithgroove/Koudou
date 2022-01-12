@@ -40,7 +40,7 @@ def build_map(osm_file_path):
 
 	places = create_places_osm(ways, kd_map, main_road_graph, 10)
 
-	kd_map.d_places = places 
+	kd_map.d_places = places
 
 	# businesses, households = create_types_osm_csv(places, ways, None)
 
@@ -53,7 +53,7 @@ def create_places_osm(ways, kd_map, main_road_graph, grid_size):
 	places = {}
 	road_grid = create_roades_grid(kd_map, main_road_graph, grid_size)
 	for w in ways:
-		if 'road' in w.tags:
+		if 'road' in w.tags or 'highway' in w.tags:
 			continue
 
 		centroid = create_centroid(w, kd_map.d_nodes)
