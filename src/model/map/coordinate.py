@@ -23,18 +23,18 @@ class Coordinate():
         self.lat = lat
         self.lon = lon
 
-    def getLatLon(self):
+    def get_lat_lon(self):
         """
-        [Method] getLatLon
+        [Method] get_lat_lon
         return a tuple of lat and lon in that order. (usefull for printing strings)
         
         Return:[(Double,Double)](lat,lon)
         """
         return (self.lat,self.lon)
     
-    def getLonLat(self):
+    def get_lon_lat(self):
         """
-        [Method] getLatLon
+        [Method] get_lat_lon
         return a tuple of lat and lon in that order. (usefull for printing strings)
         
         Return:[(Double,Double)](lon,lat)
@@ -63,9 +63,9 @@ class Coordinate():
         tempstring = f"[Coordinate]\n\t(lat = {self.lat}, lon = {self.lon})"
         return tempstring
     
-    def newCoordinateWithTranslation(self,lat =0,lon = 0):
+    def new_coordinate_with_translation(self,lat =0,lon = 0):
         """
-        [Method] newCoordinateWithTranlation
+        [Method] new_coordinate_with_translation
         create a new coordinate and apply a translation from this coordinate
 
         Parameter:
@@ -78,9 +78,9 @@ class Coordinate():
         temp = Coordinate(self.lat+lat,self.lon+lon)
         return temp
     
-    def newCoordinateWithScale(self,scale):
+    def new_coordinate_with_scale(self,scale):
         """
-        [Method] newCoordinateWithScale
+        [Method] new_coordinate_with_scale
         create a new coordinate which is the scale of this vector
 
         Parameter:
@@ -93,21 +93,21 @@ class Coordinate():
         temp = Coordinate(self.lat*scale,self.lon*scale)
         return temp
        
-    def calculateDistance(self,targetCoordinate):
+    def calculate_distance(self,lat, lon):
         """
-        [Method] calculateDistance
-        calculateDistance to other coordinate
+        [Method] calculate_distance
+        calculate_distance to other coordinate
         
         Parameter:
             - targetCoordinate : [Coordinate] target Coordinate.
             
         Return: [Double] Distance in Meter
         """
-        return distance.distance(self.getLatLon(), targetCoordinate.getLatLon()).km * 1000
+        return distance.distance(self.get_lat_lon(), (lat, lon)).km * 1000
     
-    def getVectorDistance(self,targetCoordinate):
+    def get_vector_distance(self,targetCoordinate):
         """
-        [Method] getVectorDistance
+        [Method] get_vector_distance
         Get distance in vector format. (Will be returned in coordinate object for ease of use)
         
         Parameter:
