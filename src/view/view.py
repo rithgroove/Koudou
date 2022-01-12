@@ -127,34 +127,17 @@ class View():
                 #self.canvas.create_polygon(path_flat, outline=place.outline, fill="pink", width=2)
 
         print("drawing roads")
-        for road in map.main_road[:10]:
+        for road in map.main_road:
             lon_a, lat_a = road.coordinate.get_lon_lat()
             lon_a, lat_a = trans_lon(lon_a), trans_lat(lat_a)
 
-
-            clat=lat_a
-            clon=lon_a
-            r=10
-            self.canvas.create_oval(clat-r, clon-r, clat+r, clon+r, fill="red")
-
             # dont draw twice
             conn_tmp = np.array(road.connections)
-            #conn_filtered = conn_tmp[conn_tmp>road.id]
-            # for conn_id in conn_filtered:
-            for conn_id in road.connections:
-                try:
-                    lon_b, lat_b = map.d_nodes[conn_id].coordinate.get_lon_lat()
-                    lon_b, lat_b = trans_lon(lon_b), trans_lat(lat_b)
-                    #self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="grey", width=3)
-
-                    clat=lat_b
-                    clon=lon_b
-                    r=10
-                    self.canvas.create_oval(clat-r, clon-r, clat+r, clon+r, fill="yellow")
-
-                    map.d_nodes.pop(conn_id)
-                except KeyError:
-                    pass
+            conn_filtered = conn_tmp[conn_tmp>road.id]
+            for conn_id in conn_filtered:
+                lon_b, lat_b = map.d_nodes[conn_id].coordinate.get_lon_lat()
+                lon_b, lat_b = trans_lon(lon_b), trans_lat(lat_b)
+                self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="grey", width=3)
 
         print("end drawing roads")
 
