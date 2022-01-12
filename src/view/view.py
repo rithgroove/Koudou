@@ -91,42 +91,39 @@ class View():
 
     ## drawing methods
     def draw_places(self, map, vp):
-        d_places = map.places #tmp
-        ##  ##
-        i = 0
-        for id, place in d_places.items():
-            p = place.render_info
+        for id, place in map.d_places.items():
+            place = place.render_info
 
+            # path_trans = [vp.apply(*c.get_lon_lat()) for c in p.coords]
+            # path_flat = [e for c in path_trans for e in c]
+            # clat, clon = vp.apply(*p.center.get_lon_lat())
+            trans_lon = lambda lon: (lon - self.canvasOrigin[0]) * self.scale + self.view_port[0]
+            trans_lat = lambda lat: (self.canvasSize[1]-(lat - self.canvasOrigin[1])) * self.scale + self.view_port[1]
 
-            path_trans = [vp.apply(*c.get_lon_lat()) for c in p.coords]
-            path_flat = [e for c in path_trans for e in c]
-            clat, clon = vp.apply(*p.center.get_lon_lat())
-            if i==0:    print("new", path_flat[:2])
-            if 0:
-                scale=self.scale
-                view_port=self.view_port
-                canvasOrigin=self.canvasOrigin
-                canvasSize=self.canvasSize
+            path = [[trans_lon(c.lon), trans_lat(c.lat)] for c in place.coords]
+            path_flat = [e for c in path for e in c]
+            clat, clon = trans_lon(place.center.lon), trans_lat(place.center.lat)
 
-                trans_lon = lambda lon: (lon - canvasOrigin[0]) * scale + view_port[0]
-                trans_lat = lambda lat: (canvasSize[1]-(lat - canvasOrigin[1])) * scale + view_port[1]
-
-                path = [[trans_lon(c.lon), trans_lat(c.lat)] for c in p.coords]
-                path_flat = [e for c in path for e in c]
-                clat, clon = trans_lon(p.center.lon), trans_lat(p.center.lat)
-                if i==0:    print("old", path_flat[:2])
-            if len(path_flat)>=6:
-                #print(f"drawing {id} {path_flat[:4]}")
-                self.canvas.create_polygon(path_flat, outline=p.outline, fill=p.fill, width=2)
-                r=2
-                self.canvas.create_oval(clat-r, clon-r, clat+r, clon+r, fill="black")
+            if "building" in place.tags.keys():
+                if len(path_flat)>=6:
+                    #print(f"drawing {id} {path_flat[:4]}")
+                    self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=2)
+                    r=2
+                    self.canvas.create_oval(clat-r, clon-r, clat+r, clon+r, fill="black")
+                else:
+                    1#print("not renderable")
+            elif "natural" in place.tags.keys():
+                self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=2)
+            elif "leisure" in place.tags.keys():
+                self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=2)
+            elif "amenity" in place.tags.keys():
+                self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=2)
+            elif 'highway' in place.tags.keys():
+                for (lon_a, lat_a), (lon_b, lat_b) in zip(path[:-1], path[1:]):
+                    self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="grey", width=3)
             else:
-                1
-                #print("not renderable")
-
-            i+=1
-        print("done drawing")
-
+                pass #note: equivalent to "others" in epidemicon
+                #self.canvas.create_polygon(path_flat, outline=place.outline, fill="pink", width=2)
 
     def draw_path(self, map, vp):
         pass
