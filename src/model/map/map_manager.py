@@ -39,7 +39,7 @@ def build_map(osm_file_path):
 	kd_map.set_main_road(main_road_graph)
 
 	places = create_places_osm(ways, kd_map, main_road_graph, 10)
-
+	kd_map.places = places ##??
 	# businesses, households = create_types_osm_csv(places, ways, None)
 
 	# repair_places(places, businesses, households)
@@ -53,14 +53,14 @@ def create_places_osm(ways, kd_map, main_road_graph, grid_size):
 	for w in ways:
 		if 'road' in w.tags:
 			continue
-		
+
 		centroid = create_centroid(w, kd_map.d_nodes)
 		kd_map.add_node(centroid)
 
 		centroid_grid_coord = get_grid_coordinate(centroid.coordinate.lat, centroid.coordinate.lon, kd_map, grid_size)
 		road_connection = create_road_connection(centroid, centroid_grid_coord, road_grid, kd_map)
-		
-		render_info = Render_info([kd_map.d_nodes[n_id].coordinate for n_id in w.nodes], centroid.coordinate, None)
+
+		render_info = Render_info([kd_map.d_nodes[n_id].coordinate for n_id in w.nodes], centroid.coordinate, w.tags)
 		p = Place(w.id, True, render_info, centroid.id, road_connection)
 		places[p.id] = p
 
@@ -111,7 +111,7 @@ def get_closest_road(centroid: Node, centroid_grid_coord, road_grid, kd_map: Map
 			index = (node1, node2)
 			if node2 < node1:
 				index = (node2, node1)
-			
+
 			if index in visited_roads:
 				continue
 			visited_roads[index] = True
@@ -122,16 +122,16 @@ def get_closest_road(centroid: Node, centroid_grid_coord, road_grid, kd_map: Map
 				road_dist = dist
 				road_start = n_1
 				road_destination = n_2
-	
+
 	return road_start, road_destination, closest_coord
 
 def create_road_connection(centroid: Node, centroid_grid_coord, road_grid, kd_map:Map):
-	
+
 	road_start, road_destination, closest_coord = get_closest_road(centroid, centroid_grid_coord, road_grid, kd_map)
 
 	if road_start is None or road_destination is None:
 		return None
-	
+
 	# Checking if the closest coordinate is one of the nodes of the roades
 	if closest_coord.get_lat_lon() == road_start.coordinate.get_lat_lon():
 		centroid.add_connection(road_start.id)
@@ -141,9 +141,9 @@ def create_road_connection(centroid: Node, centroid_grid_coord, road_grid, kd_ma
 		centroid.add_connection(road_destination.id)
 		road_destination.add_connection(road_destination.id)
 		return
-	
+
 	connect_centroid_to_road(centroid, road_start, road_destination, closest_coord, kd_map)
-	
+
 def create_types_osm_csv (places, ways, csv_file_name):
 	# file = open(csv_file_name)
 	# for line in file:
@@ -171,7 +171,7 @@ def build_node_connections(kd_map):
 		working_node = None
 		for node_id in way.nodes:
 			if working_node is not None:
-				connectingNode = kd_map.d_nodes[node_id] 
+				connectingNode = kd_map.d_nodes[node_id]
 				working_node.add_connection(node_id) #add the connection from working_node to the connecting_node
 				connectingNode.add_connection(working_node.id) #add the connection from the connecting_node to the working_node
 			working_node = kd_map.d_nodes[node_id]
@@ -213,7 +213,7 @@ def clean_road(road_nodes, kd_map):
 			main_road = result
 		else:
 			disconnected_nodes.extend(result)
-			
+
 	return main_road, disconnected_nodes
 
 
@@ -227,7 +227,7 @@ def create_roades_grid(kd_map, road_nodes, grid_size: int):
 	for n in road_nodes:
 		x, y = get_grid_coordinate(n.coordinate.lat, n.coordinate.lon, kd_map, grid_size)
 		if x > grid_size or y > grid_size:
-			continue 
+			continue
 		grid[x][y].append(n.id)
 
 	return grid
@@ -271,11 +271,11 @@ def get_dist_and_closest_coord(road_start, road_destination, target_node):
 	area = math.sqrt(area)
 
 	height = 2*area/c
-	
+
 	sinq = height/a
 	q = math.asin(sinq)
 	e = a * math.cos(q)
-	
+
 	closest_coord = None
 	if (e > c or q > math.pi):
 		height = min(a, b)
