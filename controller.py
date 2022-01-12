@@ -1,6 +1,6 @@
 import osmium
 from pathlib import Path
-from os.path import join
+from os import path, mkdir#join, exists
 
 from src.view.view import View
 from src.model.map.map_manager import build_map
@@ -92,7 +92,10 @@ class Controller():
             self.map = build_map(filepath)
 
             ## temp pickling it here since loading takes time
-            file = open(join("cache",f"{filename}.pkl"), "wb")
+            if not path.exists("cache"):
+                mkdir("cache")
+
+            file = open(path.join("cache",f"{filename}.pkl"), "wb")
             pickle.dump(self.map, file)
             file.close()
         elif fileext==".pkl":
@@ -106,15 +109,15 @@ class Controller():
 
         ## temp
         map = self.map
-        self.view.canvasOrigin=map.min_lon, map.min_lat
-        canvasMax=map.max_lon, map.max_lat
-        a,b = map.max.get_vector_distance(map.min).get_lat_lon()
+        self.view.canvasOrigin=map.min_coord.get_lon_lat()
+        canvasMax=map.max_coord.get_lon_lat()
+        a,b = map.max_coord.get_vector_distance(map.min_coord).get_lat_lon()
         self.view.canvasSize=b,a
 
         self.ViewPort = ViewPort(h=self.view.canvas.winfo_height(),
                                  w=self.view.canvas.winfo_width(),
-                                 pmin=(map.min_lon, map.min_lat),
-                                 pmax=(map.max_lon, map.max_lat))
+                                 pmin=map.min_coord.get_lon_lat(),
+                                 pmax=map.max_coord.get_lon_lat())
         self.view.draw_places(self.map, self.ViewPort)
         self.view.draw_path(self.map, self.ViewPort)
 

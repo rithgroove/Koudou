@@ -40,7 +40,7 @@ def build_map(osm_file_path):
 
 	places = create_places_osm(ways, kd_map, main_road_graph, 10)
 
-	kd_map.d_places = places 
+	kd_map.d_places = places
 
 	# businesses, households = create_types_osm_csv(places, ways, None)
 
@@ -53,7 +53,7 @@ def create_places_osm(ways, kd_map, main_road_graph, grid_size):
 	places = {}
 	road_grid = create_roades_grid(kd_map, main_road_graph, grid_size)
 	for w in ways:
-		if 'road' in w.tags:
+		if 'road' in w.tags or 'highway' in w.tags:
 			continue
 
 		centroid = create_centroid(w, kd_map.d_nodes)
@@ -241,19 +241,19 @@ def connect_centroid_to_road(centroid, road_start, road_destination, closest_coo
 	kd_map.add_node(new_node)
 
 	# I am assuming all connections are 2 ways
-	centroid.add_connection(new_id)
-	road_start.add_connection(new_id)
-	road_destination.add_connection(new_id)
-
-	new_node.add_connection(road_start.id)
-	new_node.add_connection(road_destination.id)
-	new_node.add_connection(centroid.id)
-
-	if road_destination.id in road_start.connections:
-		road_start.connections.remove(road_destination.id)
-
-	if road_start.id in road_destination.connections:
-		road_destination.connections.remove(road_start.id)
+	# centroid.add_connection(new_id)
+	# road_start.add_connection(new_id)
+	# road_destination.add_connection(new_id)
+	#
+	# new_node.add_connection(road_start.id)
+	# new_node.add_connection(road_destination.id)
+	# new_node.add_connection(centroid.id)
+	#
+	# if road_destination.id in road_start.connections:
+	# 	road_start.connections.remove(road_destination.id)
+	#
+	# if road_start.id in road_destination.connections:
+	# 	road_destination.connections.remove(road_start.id)
 
 # Gets the distance from a road to a node and the closest point on the road
 def get_dist_and_closest_coord(road_start, road_destination, target_node):
