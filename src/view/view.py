@@ -1,18 +1,24 @@
 import tkinter as tk
 from tkinter import ttk
 import tkinter.filedialog as tk_fdialog
-
-from .draw import Draw
+#
+# from .draw import ViewPort
 
 class View():
     def __init__(self, window_size=(1024, 768)):
-        ### todo: move widget styles to style_config ###
+        ### todo: move widget styles to style_config file ###
         my_style = {"bg_btn": "white",
                     "font_btn": "sans 10 bold",
                     "bg_log": "white",
                     "font_log": "sans 10 bold"}
         bg_btn,font_btn,bg_log,font_log ="white","sans 10 bold","white","sans 10 bold"
         ### ###
+
+        ## todo redo ##
+        self.scale         = 100000
+        self.view_port     = (0,0)
+        self.prev_position = None
+        ## ##
 
         self.window_size = self.get_window_resolution(window_size[0], window_size[1])
 
@@ -68,13 +74,62 @@ class View():
     def close(self):
         self.root.destroy()
     def load_drawing_methods(self):
-        #self.draw = Draw()
+        #self.draw = Draw(canvas=self.canvas)
+        #self.draw_map = self.draw.draw_map(map)
         pass
 
     ## dialog methods
     def ask_load_file(self):
         filename = tk_fdialog.askopenfilename()
         return filename
+
+    # canvas zooming and mouse_hold (temp)
+    def zoom(self, scale):
+        self.scale *=  scale
+        self.canvas.scale('all', 0, 0, scale, scale)
+
+
+    ## drawing methods
+    def draw_places(self, map, vp):
+        d_places = map.places #tmp
+        ##  ##
+        i = 0
+        for id, place in d_places.items():
+            p = place.render_info
+
+
+            path_trans = [vp.apply(*c.get_lon_lat()) for c in p.coords]
+            path_flat = [e for c in path_trans for e in c]
+            clat, clon = vp.apply(*p.center.get_lon_lat())
+            if i==0:    print("new", path_flat[:2])
+            if 0:
+                scale=self.scale
+                view_port=self.view_port
+                canvasOrigin=self.canvasOrigin
+                canvasSize=self.canvasSize
+
+                trans_lon = lambda lon: (lon - canvasOrigin[0]) * scale + view_port[0]
+                trans_lat = lambda lat: (canvasSize[1]-(lat - canvasOrigin[1])) * scale + view_port[1]
+
+                path = [[trans_lon(c.lon), trans_lat(c.lat)] for c in p.coords]
+                path_flat = [e for c in path for e in c]
+                clat, clon = trans_lon(p.center.lon), trans_lat(p.center.lat)
+                if i==0:    print("old", path_flat[:2])
+            if len(path_flat)>=6:
+                #print(f"drawing {id} {path_flat[:4]}")
+                self.canvas.create_polygon(path_flat, outline=p.outline, fill=p.fill, width=2)
+                r=2
+                self.canvas.create_oval(clat-r, clon-r, clat+r, clon+r, fill="black")
+            else:
+                1
+                #print("not renderable")
+
+            i+=1
+        print("done drawing")
+
+
+    def draw_path(self, map, vp):
+        pass
 
     ## log ##
     def update_log(self, txt):

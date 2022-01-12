@@ -3,13 +3,14 @@ from typing import Any, Dict, List
 from .place import Place
 from .node import Node
 from .way import Way
+from .coordinate import Coordinate
 
 
 class Map():
     def __init__(self, bounding_box: Any, nodes: List[Node], ways: List[Way]):
         self.d_nodes: Dict[str, Node] = {}
         self.d_ways: Dict[str, Way] = {}
-        self.main_road = None
+        self.main_road: List[Node] = []
         for node in nodes:
             self.d_nodes[node.id] = node
 
@@ -20,6 +21,9 @@ class Map():
         self.min_lon = bounding_box.bottom_left.lon
         self.max_lat = bounding_box.top_right.lat
         self.max_lon = bounding_box.top_right.lon
+
+        self.min = Coordinate(self.min_lat, self.min_lon)
+        self.max = Coordinate(self.max_lat, self.max_lon)
 
         self.d_places: Dict[str, Place] = {}
 
