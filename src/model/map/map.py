@@ -17,13 +17,8 @@ class Map():
         for way in ways:
             self.d_ways[way.id] = way
 
-        self.min_lat = bounding_box.bottom_left.lat
-        self.min_lon = bounding_box.bottom_left.lon
-        self.max_lat = bounding_box.top_right.lat
-        self.max_lon = bounding_box.top_right.lon
-
-        self.min = Coordinate(self.min_lat, self.min_lon)
-        self.max = Coordinate(self.max_lat, self.max_lon)
+        self.min_coord = Coordinate(bounding_box.bottom_left.lat, bounding_box.bottom_left.lon)
+        self.max_coord = Coordinate(bounding_box.top_right.lat, bounding_box.top_right.lon)
 
         self.d_places: Dict[str, Place] = {}
 
@@ -38,7 +33,7 @@ class Map():
 
     def __str__(self):
         tempstring = "[Map]\n"
-        tempstring += f"Simulated area = ({self.min_lon},{self.min_lat}) to ({self.max_lon},{self.max_lat})\n"
+        tempstring += f"Simulated area = ({self.min_coord.lon},{self.min_coord.lat}) to ({self.max_coord.lon},{self.max_coord.lat})\n"
         tempstring += f"Number of nodes = {len(self.d_nodes)}\n"
         tempstring += f"Number of ways = {len(self.d_ways)}"
         return tempstring

@@ -39,7 +39,9 @@ def build_map(osm_file_path):
 	kd_map.set_main_road(main_road_graph)
 
 	places = create_places_osm(ways, kd_map, main_road_graph, 10)
-	kd_map.places = places ##??
+
+	kd_map.d_places = places 
+
 	# businesses, households = create_types_osm_csv(places, ways, None)
 
 	# repair_places(places, businesses, households)
@@ -82,11 +84,11 @@ def create_centroid(way, n_dict):
 
 
 def get_grid_coordinate(lat, lon, kd_map, grid_size):
-	cell_height = (kd_map.max_lon - kd_map.min_lon)/grid_size
-	cell_width = (kd_map.max_lon - kd_map.min_lon)/grid_size
+	cell_height = (kd_map.max_coord.lon - kd_map.min_coord.lon)/grid_size
+	cell_width = (kd_map.max_coord.lon - kd_map.min_coord.lon)/grid_size
 
-	x = int((lon - kd_map.min_lon) / cell_width)
-	y = int((lat - kd_map.min_lat) / cell_height)
+	x = int((lon - kd_map.min_coord.lon) / cell_width)
+	y = int((lat - kd_map.min_coord.lat) / cell_height)
 
 	if x > grid_size:
 		x = grid_size
