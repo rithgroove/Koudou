@@ -15,12 +15,6 @@ class View():
         bg_btn,font_btn,bg_log,font_log ="white","sans 10 bold","white","sans 10 bold"
         ### ###
 
-        ## todo redo ##
-        self.scale         = 100000
-        self.view_port     = (0,0)
-        self.prev_position = None
-        ## ##
-
         self.window_size = self.get_window_resolution(window_size[0], window_size[1])
 
         # root
@@ -86,24 +80,16 @@ class View():
 
     # canvas zooming and mouse_hold (temp)
     def zoom(self, scale):
-        self.scale *=  scale
         self.canvas.scale('all', 0, 0, scale, scale)
 
-
     ## drawing methods
-    def draw_places(self, map, vp):
-        for id, place in map.d_places.items():
+    def draw_places(self, d_places, viewport):
+        for id, place in d_places.items():
             place = place.render_info
 
-            # path_trans = [vp.apply(*c.get_lon_lat()) for c in p.coords]
-            # path_flat = [e for c in path_trans for e in c]
-            # clat, clon = vp.apply(*p.center.get_lon_lat())
-            trans_lon = lambda lon: (lon - self.canvasOrigin[0]) * self.scale + self.view_port[0]
-            trans_lat = lambda lat: (self.canvasSize[1]-(lat - self.canvasOrigin[1])) * self.scale + self.view_port[1]
-
-            path = [[trans_lon(c.lon), trans_lat(c.lat)] for c in place.coords]
-            path_flat = [e for c in path for e in c]
-            clat, clon = trans_lon(place.center.lon), trans_lat(place.center.lat)
+            path_trans = [viewport.apply(*c.get_lon_lat()) for c in place.coords]
+            path_flat = [e for c in path_trans for e in c]
+            clat, clon = viewport.apply(*place.center.get_lon_lat())
 
             if "building" in place.tags.keys():
                 if len(path_flat)>=6:
@@ -122,28 +108,18 @@ class View():
             # elif 'highway' in place.tags.keys():
             #     for (lon_a, lat_a), (lon_b, lat_b) in zip(path[:-1], path[1:]):
             #         self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="grey", width=3)
-            else:
-                pass #note: equivalent to "others" in epidemicon
+            else:#note: equivalent to "others" in epidemicon
                 #self.canvas.create_polygon(path_flat, outline=place.outline, fill="pink", width=2)
+                pass
+    def draw_roads(self, roads, d_nodes, viewport):
+        for road in roads:
+            lon_a, lat_a = viewport.apply(*road.coordinate.get_lon_lat())
 
-        print("drawing roads")
-        for road in map.main_road:
-            lon_a, lat_a = road.coordinate.get_lon_lat()
-            lon_a, lat_a = trans_lon(lon_a), trans_lat(lat_a)
-
-            # dont draw twice
-            conn_tmp = np.array(road.connections)
-            conn_filtered = conn_tmp[conn_tmp>road.id]
+            conn_tmp = np.array(road.connections) #maybe refactor all lists to numpy array?
+            conn_filtered = conn_tmp[conn_tmp>road.id] #dont draw twice
             for conn_id in conn_filtered:
-                lon_b, lat_b = map.d_nodes[conn_id].coordinate.get_lon_lat()
-                lon_b, lat_b = trans_lon(lon_b), trans_lat(lat_b)
+                lon_b, lat_b = viewport.apply(*d_nodes[conn_id].coordinate.get_lon_lat())
                 self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="grey", width=3)
-
-        print("end drawing roads")
-
-
-    def draw_path(self, map, vp):
-        pass
 
     ## log ##
     def update_log(self, txt):
