@@ -119,11 +119,12 @@ def get_closest_road(centroid: Node, centroid_grid_coord, road_grid, kd_map: Map
 			visited_roads[index] = True
 
 			n_2 = kd_map.d_nodes[node2]
-			dist, closest_coord = get_dist_and_closest_coord(n_1, n_2, centroid)
+			dist, c = get_dist_and_closest_coord(n_1, n_2, centroid)
 			if dist < road_dist:
 				road_dist = dist
 				road_start = n_1
 				road_destination = n_2
+				closest_coord = c
 
 	return road_start, road_destination, closest_coord
 
@@ -235,26 +236,27 @@ def create_roades_grid(kd_map, road_nodes, grid_size: int):
 	return grid
 
 
-def connect_centroid_to_road(centroid, road_start, road_destination, closest_coord, kd_map):
+def connect_centroid_to_road(centroid, road_start, road_destination, closest_coord, kd_map:Map):
 	new_id = centroid.id + "_entry"
 	new_node = Node(new_id, {"entry_point": True}, closest_coord)
-	kd_map.add_node(new_node)
+
+	if road_destination.id in road_start.connections:
+		road_start.connections.remove(road_destination.id)
+	
+	if road_start.id in road_destination.connections:
+		road_destination.connections.remove(road_start.id)
 
 	# I am assuming all connections are 2 ways
-	# centroid.add_connection(new_id)
-	# road_start.add_connection(new_id)
-	# road_destination.add_connection(new_id)
-	#
-	# new_node.add_connection(road_start.id)
-	# new_node.add_connection(road_destination.id)
-	# new_node.add_connection(centroid.id)
-	#
-	# if road_destination.id in road_start.connections:
-	# 	road_start.connections.remove(road_destination.id)
-	#
-	# if road_start.id in road_destination.connections:
-	# 	road_destination.connections.remove(road_start.id)
+	centroid.add_connection(new_id)
+	road_start.add_connection(new_id)
+	road_destination.add_connection(new_id)
+	new_node.add_connection(road_start.id)
+	new_node.add_connection(road_destination.id)
+	new_node.add_connection(centroid.id)
 
+	kd_map.add_node(new_node)
+	kd_map.main_road.append(new_node)
+	
 # Gets the distance from a road to a node and the closest point on the road
 def get_dist_and_closest_coord(road_start, road_destination, target_node):
 	start_dist = road_start.coordinate.calculate_distance(*target_node.coordinate.get_lat_lon())
