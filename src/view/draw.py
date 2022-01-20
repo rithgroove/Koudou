@@ -1,4 +1,9 @@
 import numpy as np
+
+class Draw():
+    def __init__(self):
+        pass
+
 class Transform():
     def __init__(self):
         self.mat = np.identity(3)
@@ -31,35 +36,37 @@ class Transform():
         return np.matmul(self.mat, [x, y, 1])[:2]
 
 class ViewPort():
-    def __init__(self, h, w, pmin, pmax, x=0, y=0, s=100000):
+    def __init__(self, height, width, wmin, wmax, x=0, y=0, s=100000):
         # todo proper python  get/set
         self.x = x
         self.y = y
 
-        self.h = h
-        self.w = w
+        self.height = height
+        self.width = width
 
-        self.pmin = pmin
-        self.pmax = pmax
+        self.wmin = wmin
+        self.wmax = wmax
 
         self.s = s
 
         self.__transform = Transform()
         self.__compute()
-        print(self.__transform.mat)
 
     def __compute(self):
         self.__transform.reset()
-        self.__transform.translate(-self.pmin[0], -self.pmin[1])
+        self.__transform.translate(-self.wmin[0], -self.wmin[1])
+        self.__transform.scale(1, -1)
 
-        # self.__transform.scale(self.s, self.s)
+        self.__transform.scale(self.s, self.s)
         # fit map
-        cw = self.w/(self.pmax[1]-self.pmin[1])
-        ch = self.h/(self.pmax[0]-self.pmin[0])
-        self.__transform.scale(cw, ch)
+        # cw = self.width/(self.wmax[1]-self.wmin[1])
+        # ch = self.height/(self.wmax[0]-self.wmin[0])
+        # self.__transform.scale(cw, ch)
 
+        # self.__transform.translate(self.x, self.y)
+        self.__transform.translate(500, 4000) #hack, adjust later
 
-        self.__transform.translate(self.x, self.y)
+        #print(self.x, self.y)
 
     def change_scale(self, s):
         self.s = s
@@ -75,21 +82,26 @@ class ViewPort():
         self.__compute()
 
     def update_center(self, dx, dy):
-        vx, vy = self.x, self.y
-
-        tx, ty = vx-dx, vy-dy
+        # deprecated
         # tx = min(0, tx) #if(self.view_port[0] > 0):  self.view_port = (0, self.view_port[1])
         # ty = min(0, ty) #if(self.view_port[1] > 0): self.view_port = (self.view_port[0], 0)
+        # deprecated, equivalent to
+        # tx = max(tx, -1*self.s*self.wmax[0] + self.width)
+        # ty = max(ty, -1*self.s*self.wmax[1] + self.height)
 
-        # tx = max(tx, -1*self.s*self.pmax[0] + self.w)
-        # ty = max(ty, -1*self.s*self.pmax[1] + self.h)
-
-        self.x = tx
-        self.y = ty
+        self.x = self.x - dx
+        self.y = self.y - dy
         self.__compute()
 
     def apply(self, x, y):
         return self.__transform.apply(x, y)
+
+    def __deprecated_trans_lon(self, lon):
+        # trans_lon = lambda lon: (lon - self.canvasOrigin[0]) * self.scale + self.view_port[0]
+        return (lon - self.wmin[0])*self.s + self.x
+    def __deprecated_trans_lat(self, lat):
+        # trans_lat = lambda lat: (self.canvasSize[1]-(lat - self.canvasOrigin[1])) * self.scale + self.view_port[1]
+        return (self.wmax[1]-(lat-self.wmin[1])) * (self.s+self.y)
 
 class Camera():
     def __init__(self):
