@@ -23,8 +23,8 @@ class Controller():
         self.OS = system()
         # scroll
         self.on_mouse_scroll = self.__scroll_mouse_wheel
-        # if self.OS == "Linux":
-        #     self.on_mouse_scroll = self.__scroll_linux
+        if self.OS == "Linux":
+            self.on_mouse_scroll = self.__scroll_linux
 
         # parameters related to the view
         self.zoom_in_param  = 1.1
@@ -118,11 +118,11 @@ class Controller():
     ## ZOOM ##
     def on_mouse_scroll(self, event):   pass
 
-    # def __scroll_linux(self, event):
-    #     if event.num == 4:
-    #         self.on_zoom_in()
-    #     elif event.num == 5:
-            # self.on_zoom_out()
+    def __scroll_linux(self, event):
+        if event.num == 4:
+            self.on_zoom_in()
+        elif event.num == 5:
+            self.on_zoom_out()
 
     def __scroll_mouse_wheel(self, event):
         if event.delta < 0:

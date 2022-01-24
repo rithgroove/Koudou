@@ -116,10 +116,14 @@ class View():
             lon_a, lat_a = viewport.apply(*road.coordinate.get_lon_lat())
 
             conn_tmp = np.array(road.connections) #maybe refactor all lists to numpy array?
-            conn_filtered = conn_tmp[conn_tmp>road.id] #dont draw twice
+            conn_filtered = conn_tmp[conn_tmp<road.id] #dont draw twice
             for conn_id in conn_filtered:
-                lon_b, lat_b = viewport.apply(*d_nodes[conn_id].coordinate.get_lon_lat())
-                self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="grey", width=3)
+                conn = d_nodes[conn_id]
+                lon_b, lat_b = viewport.apply(*conn.coordinate.get_lon_lat())
+                if "centroid" in conn.tags:
+                    self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="black", width=1)
+                else:
+                    self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="grey", width=3)
 
     ## log ##
     def update_log(self, txt):
