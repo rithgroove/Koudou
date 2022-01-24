@@ -21,7 +21,6 @@ class Node():
         self.id = str(osm_id) 
         self.coordinate = location
         self.tags = tags
-        self.is_road = True if 'highway' in self.tags.keys() else False
         self.connections: List[str] = []
 
     def __str__(self):
@@ -60,3 +59,8 @@ class Node():
             - [float] the distance
         """
         return self.coordinate.calculate_distance(lat, lon)
+
+    @property
+    def is_road(self):
+        # Do something if you want
+        return True if 'highway' in self.tags.keys() and not 'building' in self.tags.keys() else False

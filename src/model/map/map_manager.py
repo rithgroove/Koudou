@@ -177,6 +177,10 @@ def build_node_connections(kd_map):
 				connectingNode = kd_map.d_nodes[node_id]
 				working_node.add_connection(node_id) #add the connection from working_node to the connecting_node
 				connectingNode.add_connection(working_node.id) #add the connection from the connecting_node to the working_node
+
+				for k, v in way.tags.items():
+					connectingNode.tags[k] = v
+					working_node.tags[k] = v
 			working_node = kd_map.d_nodes[node_id]
 
 def separate_nodes(kd_map):
