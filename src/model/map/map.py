@@ -1,10 +1,12 @@
+import time
 from typing import Any, Dict, List
+import numpy as np
 
 from .place import Place
 from .node import Node
 from .way import Way
 from .coordinate import Coordinate
-
+from .a_star import a_star_search, parallel_a_star
 
 class Map():
     def __init__(self, bounding_box: Any, nodes: List[Node], ways: List[Way]):
@@ -40,3 +42,22 @@ class Map():
 
     def set_main_road(self, main_road):
         self.main_road = main_road
+
+    def test_a_star(self, n_tests):
+        t = time.time()
+        for i in range(n_tests):
+            start = np.random.choice(self.main_road)
+            goal = np.random.choice(self.main_road)
+            path = a_star_search(self, start.id, goal.id)
+        print(f"{n_tests} tests: {time.time()-t}s")
+
+    def test_parallel_a_star(self, n_tests, n_threads):
+        paths = []
+        for _ in range(n_tests):
+            start = np.random.choice(self.main_road)
+            goal = np.random.choice(self.main_road)
+            paths.append((start.id, goal.id))
+
+        t = time.time()
+        res = parallel_a_star(self, paths, n_threads)
+        print(f"{n_tests} tests in {n_threads} threads: {time.time()-t}s")
