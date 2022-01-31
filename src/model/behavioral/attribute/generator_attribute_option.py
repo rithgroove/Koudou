@@ -5,3 +5,4 @@ class generator_attribute_option:
 		self.default_value = None
 
 	def add_options(self,value,probability):
+		
