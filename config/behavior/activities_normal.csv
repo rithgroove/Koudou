@@ -1,0 +1,6 @@
+priority,name,conditions,conditions type
+1,go_to_work,work,NONE
+2,eat_at_restaurant,"hungry,eat_out",AND
+3,go_home,not_at_home,NONE
+4,eat_at_home,hungry,NONE
+5,sleep,sleepy,NONE

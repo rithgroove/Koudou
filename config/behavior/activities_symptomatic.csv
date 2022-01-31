@@ -1,0 +1,4 @@
+priority,name,conditions,conditions type
+1,go_home,not_at_home,NONE
+2,eat_at_home,hungry,NONE
+3,sleep,sleepy,NONE

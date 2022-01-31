@@ -1,0 +1,9 @@
+name,default,rand,options
+gender,FALSE,0.5,Male
+gender,FALSE,0.5,Female
+symptoms,TRUE,0,Asymptomatic
+symptoms,FALSE,0,Symptomatic
+symptoms,FALSE,0,Severe
+risk,FALSE,0.4,Low
+risk,FALSE,0.3,Medium
+risk,FALSE,0.3,High
