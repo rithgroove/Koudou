@@ -138,3 +138,6 @@ osm_files/
 .DS_Store
 
 cache/
+
+# debug code
+test.py
