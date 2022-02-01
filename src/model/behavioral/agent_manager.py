@@ -1,8 +1,8 @@
 import csv
-from .attribute import generator_attribute as ga
+from .attribute.generator_attribute import GeneratorAttribute
 
-def load_attributes_generator(file_names):
-	ga.GeneratorAttribute(file_names)
+def load_attributes_generator(file_names,rng):
+	return GeneratorAttribute(file_names,rng)
 
 def test():
 	print("test")

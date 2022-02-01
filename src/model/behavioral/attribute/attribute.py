@@ -4,6 +4,7 @@ class Attribute:
 		self.name = name
 		self.value = value
 
+	@property
 	def get_value(self):
 		return self.value
 
