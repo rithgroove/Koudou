@@ -1,7 +1,7 @@
 import heapq
-import threading
 import numpy as np
 from typing import List, Tuple, Dict, Optional
+from multiprocessing import Process, Manager, Pool
 
 # Base code and good resource: https://www.redblobgames.com/pathfinding/a-star/implementation.html#optimizations
 
@@ -66,12 +66,14 @@ def a_star_search(kd_map, start_node_id: str, goal_node_id: str):
     return reconstruct_path(came_from, start_node_id, goal_node_id)
 
 
-def a_star_thread(thread_id, kd_map, start_goals_arr, append_dict: Dict[Tuple[str, str], List[str]], report):
-    for cont, start_goal in enumerate(start_goals_arr):
+def a_star_thread(args):
+    thread_id, kd_map, thread_paths, report, results_dict = args
+    print("starting thread ", thread_id)
+    for cont, start_goal in enumerate(thread_paths):
         start = start_goal[0] 
         goal = start_goal[1]
         path = a_star_search(kd_map, start, goal)
-        append_dict[(start, goal)] = path
+        results_dict[(start, goal)] = path
         if report is not None and cont%report == 0:
             print(f"Thread {thread_id} finished {cont} paths")
 
@@ -80,20 +82,25 @@ def a_star_thread(thread_id, kd_map, start_goals_arr, append_dict: Dict[Tuple[st
     return 
 
 
-def parallel_a_star(kd_map, start_goals_arr, n_threads=1, report=None):
-    path_dict = {}
-    thread_paths = np.array_split(start_goals_arr, n_threads)
+def parallel_a_star(kd_map, start_goals_arr, n_workers=1, report=None):
+    response = {}
+    thread_paths = np.array_split(start_goals_arr, n_workers)
 
-    threads = []
-    for t_id, t_path in enumerate(thread_paths):
-        thread = threading.Thread(target=a_star_thread, args=(t_id, kd_map, t_path, path_dict, report))
-        threads.append(thread)
-        if report is not None: 
-            print("Starting thread", t_id)
-        thread.start()
+    with Manager() as manager:
+        path_dict = manager.dict()
+        pool = Pool()
 
-    for thread in threads:
-        thread.join()
+        tasks = []
+        for i in range(n_workers):
+            tasks.append((i, kd_map, thread_paths[i], report, path_dict))
 
-    if report is not None:
-        print("threads finished, total paths: ", len(path_dict))
+        pool.map(a_star_thread, tasks)
+        pool.close()
+
+        if report is not None:
+            print("workers finished, total paths: ", len(path_dict))
+        
+        for k, v in path_dict:
+            response[k] = v
+            
+    return response

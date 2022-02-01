@@ -49,6 +49,8 @@ class Map():
             start = np.random.choice(self.main_road)
             goal = np.random.choice(self.main_road)
             path = a_star_search(self, start.id, goal.id)
+            if i%100 == 0:
+                print(i)
         print(f"{n_tests} tests: {time.time()-t}s")
 
     def test_parallel_a_star(self, n_tests, n_threads):
@@ -59,5 +61,5 @@ class Map():
             paths.append((start.id, goal.id))
 
         t = time.time()
-        res = parallel_a_star(self, paths, n_threads)
+        res = parallel_a_star(self, paths, n_threads, 100)
         print(f"{n_tests} tests in {n_threads} threads: {time.time()-t}s")
