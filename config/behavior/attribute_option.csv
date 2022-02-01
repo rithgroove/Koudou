@@ -1,4 +1,4 @@
-name,default,rand,options
+name,default,rand,value
 gender,FALSE,0.5,Male
 gender,FALSE,0.5,Female
 symptoms,TRUE,0,Asymptomatic
