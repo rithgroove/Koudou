@@ -1,7 +1,7 @@
 import heapq
 import numpy as np
 from typing import List, Tuple, Dict, Optional
-from multiprocessing import Process, Manager, Pool
+from multiprocessing import Manager, Pool
 
 # Base code and good resource: https://www.redblobgames.com/pathfinding/a-star/implementation.html#optimizations
 
@@ -66,8 +66,7 @@ def a_star_search(kd_map, start_node_id: str, goal_node_id: str):
     return reconstruct_path(came_from, start_node_id, goal_node_id)
 
 
-def a_star_thread(args):
-    thread_id, kd_map, thread_paths, report, results_dict = args
+def a_star_thread(thread_id, kd_map, thread_paths, report, results_dict):
     print("starting thread ", thread_id)
     for cont, start_goal in enumerate(thread_paths):
         start = start_goal[0] 
@@ -94,7 +93,7 @@ def parallel_a_star(kd_map, start_goals_arr, n_workers=1, report=None):
         for i in range(n_workers):
             tasks.append((i, kd_map, thread_paths[i], report, path_dict))
 
-        pool.map(a_star_thread, tasks)
+        pool.starmap(a_star_thread, tasks)
         pool.close()
 
         if report is not None:
