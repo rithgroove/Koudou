@@ -8,6 +8,18 @@ class Attribute:
 	def get_value(self):
 		return self.value
 
+	def set_value(self,value):
+		self.value = value
+
+	def update_value(self,value):
+		self.value+=value
+
+	def set_max(self):
+		pass
+
+	def set_min(self):
+		pass
+		
 	#interface for validating the value is within correct range
 	#def validation(self):
 

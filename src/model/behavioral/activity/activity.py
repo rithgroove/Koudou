@@ -13,3 +13,4 @@ class Activity:
 		for x in self.condition:
 			tempstring += f"   {x.math_string}\n"
 		return tempstring
+

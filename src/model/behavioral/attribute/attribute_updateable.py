@@ -9,4 +9,8 @@ class AttributeUpdateable(Attribute):
 		self.step_reduction = step_reduction
 
 
-	
+	def set_max(self):
+		self.value = self.max_val
+
+	def set_min(self):
+		self.value = self.min_val

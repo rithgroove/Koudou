@@ -7,3 +7,9 @@ class AttributeOption(Attribute):
 
 	def get_options(self):
 		return options
+
+	def set_max(self):
+		pass
+
+	def set_min(self):
+		pass
