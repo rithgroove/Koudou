@@ -1,4 +1,4 @@
-class reward:
+class Reward:
 	def __init__(self,string):
 		temp = string.split(":")		
 		self.attribute_name = temp[0]
@@ -13,3 +13,12 @@ class reward:
 
 	def apply_reward(self,agent):
 		agent.update_attribute(self.attribute_name,self.value)
+
+	@property
+	def short_string(self):
+		return f"{self.attribute_name} = {self.value}\n"
+
+	def __str__(self):
+		tempstring = "[Reward]\n"
+		tempstring += f"{self.attribute_name} = {self.value}"
+		return tempstring

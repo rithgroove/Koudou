@@ -1,6 +1,6 @@
-"priority","name","conditions","conditions type","actions","reward"
+"priority","name","conditions","conditions type","actions","rewards"
 1,"go_to_work","work","NONE","move:work, wait:work","N/A"
 2,"eat_at_restaurant","hungry,eat_out","AND","move:restaurant, wait:20-40","hunger:max"
 3,"go_home","not_at_home","NONE","move:home","N/A"
-4,"eat_at_home","hungry","NONE","wait:20-60","hunger:max, house.food:-1"
+4,"eat_at_home","hungry","NONE","wait:20-60","hunger:max"
 5,"sleep","sleepy","NONE","wait:360-480","energy:max"
