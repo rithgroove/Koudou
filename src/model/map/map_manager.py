@@ -5,6 +5,8 @@ from .way import Way
 from .osm_handler import OSMHandler
 from .map import Map
 from .node import Node
+from .business import Business
+from .household import Household
 from typing import List
 import math
 #list of function here
@@ -148,21 +150,30 @@ def create_road_connection(centroid: Node, centroid_grid_coord, road_grid, kd_ma
 	connect_centroid_to_road(centroid, road_start, road_destination, closest_coord, kd_map)
 
 def create_types_osm_csv (places, ways, csv_file_name):
+	businesses = []
+	households = []
+	comercial_buildings = ['commercial','industrial','kiosk', 'office', 'retail', 'supermarket', 'warehouse']
+	residential_buildings = ['apartments', 'bungalow', 'cabin', 'detached', 'dormitory', 'farm', 'ger', 'hotel', 'house', 'houseboat', 'residential', 'semidetached_house', 'static_caravan', 'terrace']
+
 	# file = open(csv_file_name)
 	# for line in file:
-	# for w in ways:
-	# 		if 'ammenity' in w.tags:
-	# 			b = Business(places[w.id])
-	# 		if 'building' in w.tags and w.tags['building'] == 'restaurant':
-	# 			b = Business(places[w.id], type='restaurant')
-	# 		if 'building' in w.tags and w.tags['building'] == 'apartament':
-	# 			h = Household(places[w.id])
-	# 		if not_interactable:
-	# 			places[w.id].interactable = False
+	for w in ways:
+		if 'ammenity' in w.tags:
+			if 'opening_hours' in w.tags:
+				businesses.append(Business(w.id, w.tags['amenity'], w.tags['opening_hours']))
+			else:
+				businesses.append(Business(w.id, w.tags['amenity'], ""))
+
+		if 'building' in w.tags and w.tags['building'] in comercial_buildings:
+			if 'opening_hours' in w.tags:
+				businesses.append(Business(w.id, w.tags['building'], w.tags['opening_hours']))
+			else:
+				businesses.append(Business(w.id, w.tags['building'], ""))
+		if 'building' in w.tags and w.tags['building'] in residential_buildings:
+			households.append(Household(w.id))
 
 
-	# return households,businesses
-	pass
+	return households,businesses
 
 
 def repair_places():
