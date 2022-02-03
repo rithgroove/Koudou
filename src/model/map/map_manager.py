@@ -44,7 +44,7 @@ def build_map(osm_file_path):
 
 	kd_map.d_places = places
 
-	# businesses, households = create_types_osm_csv(places, ways, None)
+	businesses, households = create_types_osm_csv(places, ways, None)
 
 	# repair_places(places, businesses, households)
 
