@@ -50,8 +50,10 @@ def a_star_search(kd_map, start_node_id: str, goal_node_id: str):
         for conn in c_node.connections:
             conn_node = kd_map.d_nodes[conn]
             conn_lat_lon = conn_node.coordinate.get_lat_lon()
-            # When we have the Road obj, this value will be stored in the object
-            dist = c_node.coordinate.calculate_distance(*conn_lat_lon)
+
+            t = (c_node.id, conn_node.id) if c_node.id < conn_node.id else (conn_node.id, c_node.id)
+            dist = kd_map.d_roads[t].length
+
             new_cost = cost_so_far[current] + dist
             if conn not in cost_so_far or new_cost < cost_so_far[conn]:
                 cost_so_far[conn] = new_cost
