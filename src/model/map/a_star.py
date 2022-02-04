@@ -1,4 +1,5 @@
 import heapq
+from os import path
 import numpy as np
 from typing import List, Tuple, Dict, Optional
 from multiprocessing import Manager, Pool
@@ -29,12 +30,12 @@ def reconstruct_path(came_from: Dict[str, str], start: str, goal: str):
     path.reverse()  # optional
     return path
 
-def a_star_search(kd_map, start_node_id: str, goal_node_id: str):
+def a_star_search(kd_map, start_node_id: str, goal_node_id: str, cache_dict = {}):
     frontier = PriorityQueue()
     frontier.push(start_node_id, 0)
 
-    came_from: Dict[str, Optional[str]] = {}
-    cost_so_far: Dict[str, float] = {}
+    came_from = {}
+    cost_so_far = {}
     came_from[start_node_id] = None
     cost_so_far[start_node_id] = 0
 
@@ -45,7 +46,14 @@ def a_star_search(kd_map, start_node_id: str, goal_node_id: str):
 
         if current == goal_node_id:
             break
-        
+
+        t = (current, goal_node_id) if current < goal_node_id else (goal_node_id, current)
+        if t in cache_dict:
+            print("found in cache")
+            for previous, step in zip(cache_dict[t][:], cache_dict[t][1:]):
+                came_from[step] = previous
+            break
+
         c_node = kd_map.d_nodes[current]
         for conn in c_node.connections:
             conn_node = kd_map.d_nodes[conn]
@@ -65,15 +73,20 @@ def a_star_search(kd_map, start_node_id: str, goal_node_id: str):
     if goal_node_id not in came_from:
         return None
 
-    return reconstruct_path(came_from, start_node_id, goal_node_id)
+    path = reconstruct_path(came_from, start_node_id, goal_node_id)
+    
+    t = (start_node_id, goal_node_id) if start_node_id < goal_node_id else (goal_node_id, start_node_id)
+    cache_dict[t] = path
+    
+    return path
 
 
-def a_star_thread(thread_id, kd_map, thread_paths, report, results_dict):
+def a_star_thread(thread_id, kd_map, thread_paths, report, results_dict, cache_dict={}):
     print("starting thread ", thread_id)
     for cont, start_goal in enumerate(thread_paths):
         start = start_goal[0] 
         goal = start_goal[1]
-        path = a_star_search(kd_map, start, goal)
+        path = a_star_search(kd_map, start, goal, cache_dict)
         results_dict[(start, goal)] = path
         if report is not None and cont%report == 0:
             print(f"Thread {thread_id} finished {cont} paths")
@@ -89,11 +102,12 @@ def parallel_a_star(kd_map, start_goals_arr, n_workers=1, report=None):
 
     with Manager() as manager:
         path_dict = manager.dict()
+        cache_dict = manager.dict()
         pool = Pool()
 
         tasks = []
         for i in range(n_workers):
-            tasks.append((i, kd_map, thread_paths[i], report, path_dict))
+            tasks.append((i, kd_map, thread_paths[i], report, path_dict, cache_dict))
 
         pool.starmap(a_star_thread, tasks)
         pool.close()

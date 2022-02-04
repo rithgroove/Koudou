@@ -184,19 +184,19 @@ def create_road_sorted(kd_map, node1, node2):
 def build_node_connections(kd_map: Map):
 	for key in kd_map.d_ways:
 		way = kd_map.d_ways[key]
-		working_node = None
-		for node_id in way.nodes:
-			if working_node is not None:
-				connectingNode = kd_map.d_nodes[node_id]
-				working_node.add_connection(node_id) #add the connection from working_node to the connecting_node
-				connectingNode.add_connection(working_node.id) #add the connection from the connecting_node to the working_node
+		# working_node = None
+		for current_node_id, next_node_id in zip(way.nodes, way.nodes[1:]):
+			current_node = kd_map.d_nodes[current_node_id]
+			
+			connectingNode = kd_map.d_nodes[next_node_id]
+			current_node.add_connection(next_node_id) #add the connection from current_node to the connecting_node
+			connectingNode.add_connection(current_node.id) #add the connection from the connecting_node to the current_node
 
-				create_road_sorted(kd_map, working_node, connectingNode)
+			create_road_sorted(kd_map, current_node, connectingNode)
 
-				for k, v in way.tags.items():
-					connectingNode.tags[k] = v
-					working_node.tags[k] = v
-			working_node = kd_map.d_nodes[node_id]
+			for k, v in way.tags.items():
+				connectingNode.tags[k] = v
+				current_node.tags[k] = v
 
 def separate_nodes(kd_map):
 	road_nodes = []

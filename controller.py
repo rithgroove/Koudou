@@ -117,7 +117,7 @@ class Controller():
         # print("starting single thread test")
         # self.map.test_a_star(100)
         print("starting multiprocess test")
-        self.map.test_parallel_a_star(120, 4)
+        self.map.test_parallel_a_star(600, 4)
 
     ## ZOOM ##
     def on_mouse_scroll(self, event):   pass
