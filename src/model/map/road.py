@@ -11,5 +11,5 @@ class Road:
 
         self.length = distance
 
-        self.one_way = False # This si not used right now
+        self.one_way = False # This is not used right now
 

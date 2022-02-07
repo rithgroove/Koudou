@@ -180,7 +180,7 @@ def create_road_sorted(kd_map, node1, node2):
 
 	kd_map.add_road(road)
 
-def build_node_connections(kd_map: Map):
+def build_node_connections(kd_map):
 	for key in kd_map.d_ways:
 		way = kd_map.d_ways[key]
 		# working_node = None
