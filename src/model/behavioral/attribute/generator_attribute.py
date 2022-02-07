@@ -1,8 +1,10 @@
 import src.util.csv_reader as csv_reader
-
+import numpy as np
 from .attribute import Attribute
 from .attribute_updateable import AttributeUpdateable
 from .attribute_option import AttributeOption
+from .attribute_profession import AttributeProfession
+from .attribute_schedule import AttributeSchedule
 
 class GeneratorAttribute:
 
@@ -76,26 +78,62 @@ class GeneratorAttribute:
 			profession["off_map"] = attr["off_map"]
 			profession["schedule"] = []
 			if attr["schedule"] == "weekday": 
-				profession["schedule"] = ["Mon","Tue","wed","Thu","Fri"]
+				profession["schedule"] = ["Mon","Tue","Wed","Thu","Fri"]
 			elif attr["schedule"] == "weekend": 
 				profession["schedule"] = ["Sat","Sun"]
 			elif attr["schedule"] == "everyday": 
-				profession["schedule"] = ["Mon","Tue","wed","Thu","Fri","Sat","Sun"]
+				profession["schedule"] = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
 			else: 
 				profession["schedule"] = attr["schedule"].split(",")
+			profession["schedule"]= np.array(profession["schedule"])
 			self.professions.append(profession)
 
 	def generate_attribute(self,agent):
 		#add attribute to the agent
 		for attr in self.basic:
-			agent.add_attribute(Attribute(x,self.basic[attr]))
+			agent.add_attribute(Attribute(attr,self.basic[attr]))
 		for key in self.updateable:
 			attr = self.updateable[key]
 			agent.add_attribute(AttributeUpdateable(key, self.rng.uniform(attr["default_min"],attr["default_max"],1)[0], attr["min"], attr["max"], attr["step_update"]))
 		for key in self.option:
-			value = np.random.choice(self.option[key]["value"],self.option[key]["weights"],1)
-			print(value)
+			value = self.rng.choice(self.option[key]["value"],1,p=self.option[key]["weights"])
 			agent.add_attribute(AttributeOption(key,value,self.option[key]["options"]))
+		#agent profession
+
+		temp = self.professions[0]
+		start_time = self.rng.integers(temp["min_start_hour"],temp["max_start_hour"]+1,1)[0]
+		workhour = self.rng.integers(temp["min_workhour"],temp["max_workhour"]+1,1)[0]
+		end_time = (start_time + workhour)%24
+		workday = self.rng.integers(temp["min_workday"],temp["max_workday"]+1,1)[0]
+
+		### randomize day
+
+		workdays = temp["schedule"]
+		self.rng.shuffle(workdays,axis = 0)
+		workdays = workdays[:workday]
+		
+		###---just for sorting from mon to sun--
+		temp2 = []
+		for x in ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]:
+			if x in workdays:
+				temp2.append(x)
+		workdays =temp2
+		
+		###---sorting done---
+
+		agent.add_attribute(Attribute("profession",temp["name"]))
+		agent.add_attribute(Attribute("workplace_type",temp["place"]))
+		agent.add_attribute(Attribute("start_time",start_time))
+		agent.add_attribute(Attribute("end_time",end_time))
+		agent.add_attribute(Attribute("workhour",workhour))
+		agent.add_attribute(Attribute("workday",workday))
+		agent.add_attribute(Attribute("schedule", ",".join(workdays)))
+		profession = AttributeProfession("is_working_hour")
+
+		for x in workdays:
+			profession.add_schedule(AttributeSchedule(f"work-{x}", start_time*3600,end_time*3600, day_str = x,repeat = True))
+		agent.add_attribute(profession)
+
 
 		return agent
 

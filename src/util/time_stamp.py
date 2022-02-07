@@ -17,7 +17,7 @@ class TimeStamp:
         return self.step_count%60
     
     def get_day_of_week_str(self):
-        temp = self.getDayOfWeek()
+        temp = self.get_day_of_week()
         if (temp == 0):
             return "Mon"
         if (temp == 1):
@@ -46,13 +46,13 @@ class TimeStamp:
         self.step_count += step_length
     
     def __str__(self):        
-        week = self.getWeek()
-        tempString = "{}, Week = {} Day = {}\n".format(self.getDayOfWeekStr(), self.getWeek(), self.getDay())
-        tempString += "Current Time = {:02d}:{:02d}:{:02d}".format(self.getHour(),self.getMinute(),self.getSecond())
+        week = self.get_week()
+        tempString = "{}, Week = {} Day = {}\n".format(self.get_day_of_week_str(), self.get_week(), self.get_day())
+        tempString += "Current Time = {:02d}:{:02d}:{:02d}".format(self.get_hour(),self.get_minute(),self.get_second())
         return tempString
 
     def is_after(self,target_time_stamp):
         return target_time_stamp.step_count > self.step_count
 
     def get_time_only(self):
-        return TimeStamp(self.step_count%(24*60*60))
+        return self.step_count%(24*60*60)
