@@ -172,11 +172,10 @@ def repair_places():
 	pass
 
 def create_road_sorted(kd_map, node1, node2):
-
 	start_id = min(node1.id, node2.id)
 	goal_id = max(node1.id, node2.id)
-	dist = node1.distance_to_coordinate(*node2.coordinate.get_lat_lon())
 
+	dist = node1.distance_to_coordinate(*node2.coordinate.get_lat_lon())
 	road = Road(start_id, goal_id, dist)
 
 	kd_map.add_road(road)

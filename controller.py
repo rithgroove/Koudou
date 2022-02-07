@@ -114,10 +114,6 @@ class Controller():
 
         self.view.draw_places(d_places=self.map.d_places, viewport=self.ViewPort)
         self.view.draw_roads (roads=self.map.main_road, d_nodes=self.map.d_nodes, viewport=self.ViewPort)
-        # print("starting single thread test")
-        # self.map.test_a_star(100)
-        print("starting multiprocess test")
-        self.map.test_parallel_a_star(600, 4)
 
     ## ZOOM ##
     def on_mouse_scroll(self, event):   pass
