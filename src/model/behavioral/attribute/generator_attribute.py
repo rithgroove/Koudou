@@ -9,37 +9,47 @@ class GeneratorAttribute:
 	def __init__(self,attribute_files,rng):
 		self.attributes = []		
 		self.rng = rng
-		self.load_basic_attribute(attribute_files["basic"])
+		self.basic = {}
+		self.option = {}	
+		self.updateable = {}
+		self.profession = {}
 
-		self.load_option_based_attribute(attribute_files["option"])
+		for filepath in attribute_files["basic"]:
+			self.load_basic_attribute(filepath)
+
+		for filepath in attribute_files["option"]:
+			self.load_option_based_attribute(filepath)
 		
 		#self.option = csv_reader.read_csv_as_dict(attribute_files["option"])
-		self.load_updatable_attribute(attribute_files["updateable"])
+		for filepath in attribute_files["updateable"]:
+			self.load_updatable_attribute(filepath)
+
+		for filepath in attribute_files["profession"]:
+			self.load_profession(filepath)
 
 	def load_basic_attribute(self,file):
 		basic_attributes  = csv_reader.read_csv_as_dict(file)
-		self.basic = {}
 		for attr in basic_attributes:
 			self.basic[attr["name"]] = attr["value"]
 
 	def load_option_based_attribute(self,file):
 		option_based_attributes  = csv_reader.read_csv_as_dict(file)
-		self.option = {}	
 		for attr in option_based_attributes:
 			if (self.option.get(attr["name"]) is None):
 				self.option[attr["name"]] = {}
+				self.option[attr["name"]]["weights"] = []
+				self.option[attr["name"]]["value"] = []
 				self.option[attr["name"]]["options"] = []
-				#self.option[attr["name"]]["default"] = None
-			if (attr["default"].lower() == "true"):
-				self.option[attr["name"]]["default"] = attr["value"]
+			self.option[attr["name"]]["weights"].append(float(attr["weight"]))
+			self.option[attr["name"]]["value"].append(attr["value"])
 			option = {}
-			option["rand"] = float(attr["rand"])
-			option["value"] = attr["value"]
+			option["value"]= attr["value"]
+			option["weight"]= float(attr["weight"])
 			self.option[attr["name"]]["options"].append(option)
+
 
 	def load_updatable_attribute(self,file):
 		updateable_attributes  = csv_reader.read_csv_as_dict(file)
-		self.updateable = {}
 		for attr in updateable_attributes:
 			temp  = {}
 			temp["name"] = attr["name"]
@@ -50,23 +60,22 @@ class GeneratorAttribute:
 			temp["step_update"] = float(attr["step_update"])
 			self.updateable[attr["name"]] = temp
 
+	def load_profession(self,file):
+		profession  = csv_reader.read_csv_as_dict(file)
+		for attr in profession:
+			print(attr)
+
 	def generate_attribute(self,agent):
 		#add attribute to the agent
-		for x in self.basic:
-			agent.add_attribute(Attribute(x,self.basic[x]))
+		for attr in self.basic:
+			agent.add_attribute(Attribute(x,self.basic[attr]))
 		for key in self.updateable:
-			x = self.updateable[key]
-			agent.add_attribute(AttributeUpdateable(key, self.rng.uniform(x["default_min"],x["default_max"],1)[0], x["min"], x["max"], x["step_update"]))
-		for x in self.option:
-			default = self.option[x].get("default")
-			if (default is None):
-				random_number = self.rng.uniform(0,1,1)[0]
-				temp = 0
-				for opt in self.option[x]["options"]:
-					temp += opt['rand']
-					if (temp > random_number):
-						default = opt['value']
-			agent.add_attribute(AttributeOption(x,default,self.option[x]["options"]))
+			attr = self.updateable[key]
+			agent.add_attribute(AttributeUpdateable(key, self.rng.uniform(attr["default_min"],attr["default_max"],1)[0], attr["min"], attr["max"], attr["step_update"]))
+		for key in self.option:
+			value = np.random.choice(self.option[key]["value"],self.option[key]["weights"],1)
+			print(value)
+			agent.add_attribute(AttributeOption(key,value,self.option[key]["options"]))
 
 		return agent
 
@@ -83,7 +92,7 @@ class GeneratorAttribute:
 			if self.option[x].get("default") is not None:
 				tempstring+= f"     - Default Value = {self.option[x]['default']}\n"
 			for option in self.option[x]["options"]:
-				tempstring+= f"     - {option['value']} : {option['rand']}\n"
+				tempstring+= f"     - {option['value']} : {option['weight']}\n"
 		tempstring += f"\n"
 		tempstring += f" Updateable attributes = {len(self.updateable)}\n"
 		for key in self.updateable:

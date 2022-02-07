@@ -5,7 +5,7 @@ from src.model.behavioral.activity.condition import Condition
 from src.model.behavioral.activity.activity import Activity
 from src.model.behavioral.activity.action_move import ActionMove
 from src.model.behavioral.activity.action_wait import ActionWait
-from src.model.behavioral.activity.reward import Reward
+#from src.model.behavioral.activity.reward import Reward
 def load_attributes_generator(file_names,rng):
 	return GeneratorAttribute(file_names,rng)
 
