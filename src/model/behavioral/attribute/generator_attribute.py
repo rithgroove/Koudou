@@ -12,7 +12,7 @@ class GeneratorAttribute:
 		self.basic = {}
 		self.option = {}	
 		self.updateable = {}
-		self.profession = {}
+		self.professions = []
 
 		for filepath in attribute_files["basic"]:
 			self.load_basic_attribute(filepath)
@@ -61,9 +61,29 @@ class GeneratorAttribute:
 			self.updateable[attr["name"]] = temp
 
 	def load_profession(self,file):
-		profession  = csv_reader.read_csv_as_dict(file)
-		for attr in profession:
-			print(attr)
+		professions  = csv_reader.read_csv_as_dict(file)
+		for attr in professions:
+			profession = {}
+			profession["name"] = attr["name"]
+			profession["place"] = attr["place"]
+			profession["min_workhour"] = int(attr["min_workhour"])
+			profession["max_workhour"] = int(attr["max_workhour"])
+			profession["min_workday"] = int(attr["min_workday"])
+			profession["max_workday"] = int(attr["max_workday"])
+			profession["min_start_hour"] = int(attr["min_start_hour"])
+			profession["max_start_hour"] = int(attr["max_start_hour"])
+			profession["weight"] = attr["weight"]
+			profession["off_map"] = attr["off_map"]
+			profession["schedule"] = []
+			if attr["schedule"] == "weekday": 
+				profession["schedule"] = ["Mon","Tue","wed","Thu","Fri"]
+			elif attr["schedule"] == "weekend": 
+				profession["schedule"] = ["Sat","Sun"]
+			elif attr["schedule"] == "everyday": 
+				profession["schedule"] = ["Mon","Tue","wed","Thu","Fri","Sat","Sun"]
+			else: 
+				profession["schedule"] = attr["schedule"].split(",")
+			self.professions.append(profession)
 
 	def generate_attribute(self,agent):
 		#add attribute to the agent
@@ -103,4 +123,18 @@ class GeneratorAttribute:
 			tempstring+= f"     - update (seconds) : {x['step_update']}\n"
 			if (x.get("notes") is not None):
 				tempstring+= f"     - notes            : {x['notes']}\n"
+		tempstring += f"\n"
+		tempstring += f" Professions = {len(self.professions)}\n"
+		for profession in self.professions:
+			tempstring += f"   + {profession['name']} :\n"
+			tempstring += f"     - place         : {profession['place']}\n"
+			tempstring += f"     - working days  : {profession['min_workday']} - {profession['max_workday']} days\n"
+			tempstring += f"     - duration      : {profession['min_workhour']} - {profession['max_workhour']} hours\n"
+			tempstring += f"     - starting hour : {profession['min_start_hour']} - {profession['max_start_hour']} o'clock\n"
+			tempstring += f"     - weight        : {profession['weight']}\n"
+			if profession["off_map"].lower() == "true":
+				tempstring += f"     - off_map        : True\n"
+			else:
+				tempstring += f"     - off_map        : False\n"
+			tempstring += f"     - schedule      : {','.join(profession['schedule'])}\n"
 		return tempstring
