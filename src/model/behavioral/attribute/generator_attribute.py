@@ -13,10 +13,8 @@ class GeneratorAttribute:
 
 		self.load_option_based_attribute(attribute_files["option"])
 		
-
 		#self.option = csv_reader.read_csv_as_dict(attribute_files["option"])
 		self.load_updatable_attribute(attribute_files["updateable"])
-
 
 	def load_basic_attribute(self,file):
 		basic_attributes  = csv_reader.read_csv_as_dict(file)

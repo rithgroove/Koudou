@@ -1,5 +1,6 @@
-class Reward:
-	def __init__(self,string):
+class ActionReward(Action):	
+	def __init__(self,name,string):
+        super(ActionMove,self).__init__(name)
 		temp = string.split(":")		
 		self.attribute_name = temp[0]
 		if (temp[1].lower() == "max"):
