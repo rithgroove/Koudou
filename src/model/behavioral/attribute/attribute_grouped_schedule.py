@@ -1,18 +1,18 @@
 from .attribute import Attribute
 
-class AttributeProfession(Attribute):
+class AttributeGroupedSchedule(Attribute):
     """
-    [Class] AttributeSchedule
+    [Class] AttributeGroupedSchedule
     A class that represent agent's schedule. 
     Think of it as the agent have an appointment.
     
     Properties:
-        - name      : (string-inherited) "Profession"
+        - name      : (string-inherited) "is_working"/ "is_praying" etc
         - value     : (string) the profession name e.g "Student"
         - schedules : (list-AttributeSchedule) list of work schedule
     """
     def __init__(self, name):
-        super(AttributeProfession,self).__init__(name, "False") 
+        super(AttributeGroupedSchedule,self).__init__(name, "False") 
         self.schedules = []
         self.active_schedule = None
 

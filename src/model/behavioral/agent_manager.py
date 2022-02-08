@@ -18,6 +18,13 @@ def load_condition(condition_file,rng):
 		else:
 			conditions[x["name"]] = Condition(x["name"],x["attribute"],x["value"],x["operator"])
 	return conditions
+	
+def generate_agent(attribute_generator,count):
+	agents = []
+	for x in range(0,count):
+		agent = Agent(x)
+		attribute_generator.generate_attribute(agent)
+		agents.append(agent)
 
 def load_activities(activity_file,conditions_dict, rng):
 	data = read_csv_as_dict(activity_file)

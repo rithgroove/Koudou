@@ -11,3 +11,4 @@
 "at_evac_point","location","equal","evac_point","N/A","N/A"
 "asymptomatic","symptoms","equal","Asymptomatic","N/A","N/A"
 "work","working_status","equal","working","N/A","N/A"
+"has_schedule","friend_appointment","equal",TRUE,"N/A","N/A"

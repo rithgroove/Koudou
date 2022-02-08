@@ -3,7 +3,7 @@ import numpy as np
 from .attribute import Attribute
 from .attribute_updateable import AttributeUpdateable
 from .attribute_option import AttributeOption
-from .attribute_profession import AttributeProfession
+from .attribute_grouped_schedule import AttributeGroupedSchedule
 from .attribute_schedule import AttributeSchedule
 
 class GeneratorAttribute:
@@ -15,7 +15,8 @@ class GeneratorAttribute:
 		self.option = {}	
 		self.updateable = {}
 		self.professions = []
-
+		self.counter = 0
+		self.max_weight = 0
 		for filepath in attribute_files["basic"]:
 			self.load_basic_attribute(filepath)
 
@@ -49,7 +50,6 @@ class GeneratorAttribute:
 			option["weight"]= float(attr["weight"])
 			self.option[attr["name"]]["options"].append(option)
 
-
 	def load_updatable_attribute(self,file):
 		updateable_attributes  = csv_reader.read_csv_as_dict(file)
 		for attr in updateable_attributes:
@@ -74,7 +74,8 @@ class GeneratorAttribute:
 			profession["max_workday"] = int(attr["max_workday"])
 			profession["min_start_hour"] = int(attr["min_start_hour"])
 			profession["max_start_hour"] = int(attr["max_start_hour"])
-			profession["weight"] = attr["weight"]
+			profession["weight"] = int(attr["weight"])
+			self.max_weight += profession["weight"]
 			profession["off_map"] = attr["off_map"]
 			profession["schedule"] = []
 			if attr["schedule"] == "weekday": 
@@ -96,11 +97,19 @@ class GeneratorAttribute:
 			attr = self.updateable[key]
 			agent.add_attribute(AttributeUpdateable(key, self.rng.uniform(attr["default_min"],attr["default_max"],1)[0], attr["min"], attr["max"], attr["step_update"]))
 		for key in self.option:
-			value = self.rng.choice(self.option[key]["value"],1,p=self.option[key]["weights"])
+			value = self.rng.choice(self.option[key]["value"],1,p=self.option[key]["weights"])[0]
 			agent.add_attribute(AttributeOption(key,value,self.option[key]["options"]))
 		#agent profession
 
-		temp = self.professions[0]
+		counter = self.counter % self.max_weight
+		temp = None
+		for prof in self.professions:
+			if prof["weight"] > counter:
+				temp = prof
+				break
+			else:
+				counter -= prof["weight"]
+		self.counter+=1
 		start_time = self.rng.integers(temp["min_start_hour"],temp["max_start_hour"]+1,1)[0]
 		workhour = self.rng.integers(temp["min_workhour"],temp["max_workhour"]+1,1)[0]
 		end_time = (start_time + workhour)%24
@@ -128,7 +137,8 @@ class GeneratorAttribute:
 		agent.add_attribute(Attribute("workhour",workhour))
 		agent.add_attribute(Attribute("workday",workday))
 		agent.add_attribute(Attribute("schedule", ",".join(workdays)))
-		profession = AttributeProfession("is_working_hour")
+		agent.add_attribute(Attribute("off_map", temp["off_map"]))
+		profession = AttributeGroupedSchedule("is_working_hour")
 
 		for x in workdays:
 			profession.add_schedule(AttributeSchedule(f"work-{x}", start_time*3600,end_time*3600, day_str = x,repeat = True))
