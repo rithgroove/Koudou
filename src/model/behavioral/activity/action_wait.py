@@ -8,10 +8,10 @@ class ActionWait(Action):
     
     Properties:
         - name      : (string-inherited)
-        - duration  : (int) duration of wait
+        - duration  : (int) duration of wait in seconds
         - current   : (int) time spent waiting
     """   
-    def __init__(self,name,duration):
+    def __init__(self,command_string,rng):
         """
         [Constructor]
         Initialize a wait action
@@ -20,11 +20,17 @@ class ActionWait(Action):
         - name     : (string) the name of action (e.g : Eating, Sleeping)
         - duration : (int) the duration of the action in seconds
         """
-        super(ActionWait,self).__init__(name)
+        super(ActionWait,self).__init__()
+        if "$" in command_string:
+
+        elif "-" in command_string:
+
+        else:
+            self.duration = int
+
         temp = duration.split("-")
-        self.min = temp[0]
-        self.max = temp[1]
-        self.duration = duration
+        min = temp[0]
+        max = temp[1]
         self.current = 0
 
     def update(self,step_length):
@@ -48,7 +54,7 @@ class ActionWait(Action):
         return f"Wait for {self.min}-{self.max}minutes"
 
     def __str__(self):
-        tempstring = "[ActionWait]\n"
+        tempstring = "[Action-Wait]\n"
         tempstring += f"   Duration = {self.min}-{self.max}minutes"
 
 
@@ -62,3 +68,15 @@ class ActionWait(Action):
         - (bool) true if finished, false otherwise
         """
         return self.current >= self.duration
+
+def _fetch_operator(operator_string):
+    if(operator_string = "*"):
+        return operator.mul
+    elif(operator_string = "/"):
+        return operator.div
+    elif(operator_string = "%"):
+        return operator.modulo
+    elif(operator_string = "+"):
+        return operator.add
+    elif(operator_string = "-"):
+        return operator.add

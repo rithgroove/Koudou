@@ -9,17 +9,7 @@ class Action(ABC):
 		- name	  : (string) name of the action
 
 	can 
-	"""   
-	def __init__(self,name):
-		"""
-		[Constructor]
-		Initialize a wait action
-
-		parameter:
-		- name	 : (string) the name of action (e.g : Eating, Sleeping)
-		"""
-		self.name = name
-	
+	"""   	
 	@abstractmethod
 	def update(self,step_length):
 		"""
@@ -32,6 +22,11 @@ class Action(ABC):
 		return:
 		- (int) the remainder of the step_length that was not consumed by this action
 		"""
+		pass
+
+	@property
+	@abstractmethod
+	def short_string(self):
 		pass
 
 	@property

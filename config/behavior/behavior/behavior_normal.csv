@@ -1,7 +1,0 @@
-"priority","name","conditions","conditions type","actions"
-1,"go_to_work","work","NONE","move:work, wait:work"
-2,"meetup_with friends","meeting_schedule_friend","has_schedule","move:mall, wait:240-360, modify_attribute:social-max"
-3,"eat_at_restaurant","hungry,eat_out","AND","move:restaurant, wait:20-40, modify_attribute:hunger-max"
-4,"go_home","not_at_home","NONE","move:home"
-5,"eat_at_home","hungry","NONE","wait:20-60,modify_attribute:hunger-max"
-6,"sleep","sleepy","NONE","wait:360-480,modify_attribute:energy-max"

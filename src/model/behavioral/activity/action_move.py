@@ -8,7 +8,7 @@ class ActionMove(Action):
     Properties:
         - name      : (string-inherited)
     """
-    def __init__(self,name,destination_string):
+    def __init__(self,destination_string):
         """
         [Constructor]
         Initialize a wait action
@@ -17,7 +17,7 @@ class ActionMove(Action):
         - name     : (string) the name of action (e.g : Eating, Sleeping)
         - duration : (int) the duration of the action in seconds
         """
-        super(ActionMove,self).__init__(name)
+        super(ActionMove,self).__init__()
         self.destination_string = destination_string
         self.sequence = []
 
