@@ -18,6 +18,8 @@ def main():
         osm_file = join("osm_files","TX-To-TU.osm")
         crtl.load_map(osm_file)
         crtl.print_map()
+        # print(crtl.map)
+        # print(crtl.map.d_places)
 
 if __name__ == "__main__":
     main()

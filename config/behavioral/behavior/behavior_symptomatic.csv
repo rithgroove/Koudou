@@ -1,0 +1,4 @@
+"priority","name","conditions","conditions type","actions","rewards"
+1,"go_home","not_at_home","NONE","move:home","N/A"
+2,"eat_at_home","hungry","NONE","wait:20-60","hunger:max"
+3,"sleep","sleepy","NONE","wait:360-480","energy:max"

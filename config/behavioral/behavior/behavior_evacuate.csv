@@ -1,0 +1,3 @@
+priority,name,conditions,conditions type
+1,go_to_hospital,"not_at_hospital,symptomatic",AND
+2,go_to_evacuation_point,"not_at_evac_point,asymptomatic",AND
