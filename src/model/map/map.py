@@ -1,10 +1,9 @@
-from typing import Any, Dict, List
-
+from typing import Any, Dict, List, Tuple
+from .road import Road
 from .place import Place
 from .node import Node
 from .way import Way
 from .coordinate import Coordinate
-
 
 class Map():
     def __init__(self, bounding_box: Any, nodes: List[Node], ways: List[Way]):
@@ -21,6 +20,7 @@ class Map():
         self.max_coord = Coordinate(bounding_box.top_right.lat, bounding_box.top_right.lon)
 
         self.d_places: Dict[str, Place] = {}
+        self.d_roads: Dict[Tuple[str, str], Road] = {} # the tuple of id is ordered, NOT start, goal
 
     def add_node(self, node):
         self.d_nodes[node.id] = node
@@ -30,6 +30,13 @@ class Map():
 
     def add_place(self, place):
         self.d_places[place.id] = place
+
+    def add_road(self, road):
+        t = (road.start_id, road.goal_id)
+        self.d_roads[t] = road
+
+    def remove_road(self, start_id, goal_id):
+        del self.d_roads[(start_id, goal_id)]
 
     def __str__(self):
         tempstring = "[Map]\n"

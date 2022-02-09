@@ -1,3 +1,4 @@
+from src.model.map.road import Road
 from .place import Place
 from .render_info import Render_info
 from .coordinate import Coordinate
@@ -139,10 +140,12 @@ def create_road_connection(centroid: Node, centroid_grid_coord, road_grid, kd_ma
 	if closest_coord.get_lat_lon() == road_start.coordinate.get_lat_lon():
 		centroid.add_connection(road_start.id)
 		road_start.add_connection(road_start.id)
+		create_road_sorted(kd_map, centroid, road_start)
 		return
 	if closest_coord.get_lat_lon() == road_destination.coordinate.get_lat_lon():
 		centroid.add_connection(road_destination.id)
 		road_destination.add_connection(road_destination.id)
+		create_road_sorted(kd_map, centroid, road_destination)
 		return
 
 	connect_centroid_to_road(centroid, road_start, road_destination, closest_coord, kd_map)
@@ -168,20 +171,31 @@ def create_types_osm_csv (places, ways, csv_file_name):
 def repair_places():
 	pass
 
+def create_road_sorted(kd_map, node1, node2):
+	start_id = min(node1.id, node2.id)
+	goal_id = max(node1.id, node2.id)
+
+	dist = node1.distance_to_coordinate(*node2.coordinate.get_lat_lon())
+	road = Road(start_id, goal_id, dist)
+
+	kd_map.add_road(road)
+
 def build_node_connections(kd_map):
 	for key in kd_map.d_ways:
 		way = kd_map.d_ways[key]
-		working_node = None
-		for node_id in way.nodes:
-			if working_node is not None:
-				connectingNode = kd_map.d_nodes[node_id]
-				working_node.add_connection(node_id) #add the connection from working_node to the connecting_node
-				connectingNode.add_connection(working_node.id) #add the connection from the connecting_node to the working_node
+		# working_node = None
+		for current_node_id, next_node_id in zip(way.nodes, way.nodes[1:]):
+			current_node = kd_map.d_nodes[current_node_id]
+			
+			connectingNode = kd_map.d_nodes[next_node_id]
+			current_node.add_connection(next_node_id) #add the connection from current_node to the connecting_node
+			connectingNode.add_connection(current_node.id) #add the connection from the connecting_node to the current_node
 
-				for k, v in way.tags.items():
-					connectingNode.tags[k] = v
-					working_node.tags[k] = v
-			working_node = kd_map.d_nodes[node_id]
+			create_road_sorted(kd_map, current_node, connectingNode)
+
+			for k, v in way.tags.items():
+				connectingNode.tags[k] = v
+				current_node.tags[k] = v
 
 def separate_nodes(kd_map):
 	road_nodes = []
@@ -250,6 +264,11 @@ def connect_centroid_to_road(centroid, road_start, road_destination, closest_coo
 	if road_start.id in road_destination.connections:
 		road_destination.connections.remove(road_start.id)
 
+	if road_start.id < road_destination.id:
+		kd_map.remove_road(road_start.id, road_destination.id)
+	else:
+		kd_map.remove_road(road_destination.id, road_start.id)
+
 	# I am assuming all connections are 2 ways
 	centroid.add_connection(new_id)
 	road_start.add_connection(new_id)
@@ -257,6 +276,10 @@ def connect_centroid_to_road(centroid, road_start, road_destination, closest_coo
 	new_node.add_connection(road_start.id)
 	new_node.add_connection(road_destination.id)
 	new_node.add_connection(centroid.id)
+
+	create_road_sorted(kd_map, new_node, road_start)
+	create_road_sorted(kd_map, new_node, road_destination)
+	create_road_sorted(kd_map, new_node, centroid)
 
 	kd_map.add_node(new_node)
 	kd_map.main_road.append(new_node)
