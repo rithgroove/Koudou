@@ -21,12 +21,12 @@ class ActionWait(Action):
         - duration : (int) the duration of the action in seconds
         """
         super(ActionWait,self).__init__()
-        if "$" in command_string:
+        # if "$" in command_string:
 
-        elif "-" in command_string:
+        # elif "-" in command_string:
 
-        else:
-            self.duration = int
+        # else:
+        #     self.duration = int
 
         temp = duration.split("-")
         min = temp[0]
@@ -70,13 +70,13 @@ class ActionWait(Action):
         return self.current >= self.duration
 
 def _fetch_operator(operator_string):
-    if(operator_string = "*"):
+    if(operator_string == "*"):
         return operator.mul
-    elif(operator_string = "/"):
+    elif(operator_string == "/"):
         return operator.div
-    elif(operator_string = "%"):
+    elif(operator_string == "%"):
         return operator.modulo
-    elif(operator_string = "+"):
+    elif(operator_string == "+"):
         return operator.add
-    elif(operator_string = "-"):
+    elif(operator_string == "-"):
         return operator.add

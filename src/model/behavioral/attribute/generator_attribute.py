@@ -93,15 +93,18 @@ class GeneratorAttribute:
 		#add attribute to the agent
 		for attr in self.basic:
 			agent.add_attribute(Attribute(attr,self.basic[attr]))
+
 		for key in self.updateable:
 			attr = self.updateable[key]
 			agent.add_attribute(AttributeUpdateable(key, self.rng.uniform(attr["default_min"],attr["default_max"],1)[0], attr["min"], attr["max"], attr["step_update"]))
+
 		for key in self.option:
 			value = self.rng.choice(self.option[key]["value"],1,p=self.option[key]["weights"])[0]
 			agent.add_attribute(AttributeOption(key,value,self.option[key]["options"]))
 		#agent profession
 
 		counter = self.counter % self.max_weight
+
 		temp = None
 		for prof in self.professions:
 			if prof["weight"] > counter:
