@@ -8,7 +8,7 @@ class ActionMove(Action):
     Properties:
         - name      : (string-inherited)
     """
-    def __init__(self,destination_string):
+    def __init__(self,agent,map,destination_string):
         """
         [Constructor]
         Initialize a wait action
@@ -18,7 +18,24 @@ class ActionMove(Action):
         - duration : (int) the duration of the action in seconds
         """
         super(ActionMove,self).__init__()
-        self.destination_string = destination_string
+        destination = ""
+        temp = destination_string
+        temp.replace(")", "")
+        typing = "destination_type"
+        if ("(" in temp):
+            temp2 = temp.split("(")
+            temp = temp2[0]
+            if (temp2[1].lower() == "destination_id" || temp2[1].lower() == "id"):
+                typing = "destination_id"
+            elif (temp2[1].lower() == "destination_type" || temp2[1].lower() == "type"):
+                typing = "destination_type"
+            else:
+                raise ValueError("Unknown destination type")
+
+        if typing == "destination_type":
+            self.destination = map.get_random_place(temp[0])
+        else typing == "destination_id":
+            self.destination = map.get_place_by_id(temp[0])  
         self.sequence = []
 
     def update(self,step_length):
