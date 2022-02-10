@@ -25,16 +25,16 @@ class ActionMove(Action):
         if ("(" in temp):
             temp2 = temp.split("(")
             temp = temp2[0]
-            if (temp2[1].lower() == "destination_id" || temp2[1].lower() == "id"):
+            if (temp2[1].lower() == "destination_id" or temp2[1].lower() == "id"):
                 typing = "destination_id"
-            elif (temp2[1].lower() == "destination_type" || temp2[1].lower() == "type"):
+            elif (temp2[1].lower() == "destination_type" or temp2[1].lower() == "type"):
                 typing = "destination_type"
             else:
                 raise ValueError("Unknown destination type")
 
         if typing == "destination_type":
             self.destination = map.get_random_place(temp[0])
-        else typing == "destination_id":
+        elif typing == "destination_id":
             self.destination = map.get_place_by_id(temp[0])  
         self.sequence = []
 

@@ -2,6 +2,7 @@ class Agent:
 	def __init__(self,agent_id):
 		self.agent_id = agent_id
 		self.attributes = {}
+		self.defaultBehavior = None
 
 	def add_attribute(self,attr):
 		self.attributes[attr.name] = attr

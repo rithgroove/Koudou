@@ -29,7 +29,7 @@ class ActionWait(Action):
         if "-" in command_string:
             # we detect "-" which for example "30:min-50:min"
             # This means the action will have duration between 30 minutes to 50 minutes
-            temp = command_string.split(-)
+            temp = command_string.split("-")
             min_duration = temp[0]
             max_duration = temp[1]
         else:
@@ -110,7 +110,7 @@ def _fetch_time_modifier(modifier):
     hours = ["h","hou","hour","hours"]
     days = ["d","day","days"]
     weeks = ["w","week","weeks"]
-    if modifier is None || modifier == "" || modifier.lower() in seconds:
+    if modifier is None or modifier == "" or modifier.lower() in seconds:
         return 1
     elif modifier.lower() in minutes:
         return 60
