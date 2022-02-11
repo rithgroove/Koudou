@@ -1,3 +1,4 @@
+import time
 from src.model.map.road import Road
 from .place import Place
 from .residence import Residence
@@ -8,6 +9,7 @@ from .way import Way
 from .osm_handler import OSMHandler
 from .map import Map
 from .node import Node
+import numpy as np
 from typing import List
 import math
 import csv
@@ -18,6 +20,9 @@ import csv
 #def clean_up_road
 
 def build_map(osm_file_path):
+	print("starting building Map")
+	st = time.time()
+	
 	osm_map = OSMHandler()
 	osm_map.apply_file(osm_file_path)
 	osm_map.set_bounding_box(osm_file_path)
@@ -35,17 +40,31 @@ def build_map(osm_file_path):
 		ways.append(Way(w["id"], tags, n))
 
 	kd_map = Map(osm_map.bounding_box, nodes, ways)
+	
+	print(f"Finished getting nodes and ways ({time.time() - st}s) ")
+	st = time.time()
+
 	build_node_connections(kd_map) #generate the connection between nodes
 
 	road_nodes, non_road_nodes = separate_nodes(kd_map)	# separate road and other nodes
 	main_road_graph, disconnected_nodes = clean_road(road_nodes,kd_map) # separate the road_graph and disconnected nodes
-
 	kd_map.set_main_road(main_road_graph)
+
+	print(f"Finished creating roads ({time.time() - st}s) ")
+	st = time.time()
 
 	places = create_places_osm(ways, kd_map, main_road_graph, 10)
 	kd_map.d_places = places
 
+	print(f"Finished creating places ({time.time() - st}s) ")
+	st = time.time()
+
 	bussinesses, residences = create_types_from_csv(kd_map, 10, "config/map/tsukuba-tu-building-data.csv")
+	print(f"Finished creating businesses and residences ({time.time() - st}s) ")
+	st = time.time()
+
+	generate_businesses_hours(bussinesses, "config/map/business.csv")
+	print(f"Finished setting work hours ({time.time() - st}s) ")
 
 	kd_map.d_businesses = bussinesses
 	kd_map.d_residences = residences
@@ -166,7 +185,7 @@ def create_types_from_csv (kd_map: Map, grid_size, csv_file_name):
 		csv_reader = csv.DictReader(csv_file, delimiter=',')
 		for row in csv_reader:
 			x, y, number, p_type = int(row["x"]), int(row["y"]), row["number"], row["type"]
-			
+
 			to_create = []
 			if number == "All":
 				to_create = grid[x][y]
@@ -179,7 +198,7 @@ def create_types_from_csv (kd_map: Map, grid_size, csv_file_name):
 					r = Residence(c, p.road_connection, 1)
 					residences[r.id] = r
 				else:
-					b = Business(c, p.road_connection)
+					b = Business(c, p.road_connection, p_type)
 					businesses[b.id] = b
 
 	return businesses, residences
@@ -341,3 +360,45 @@ def get_dist_and_closest_coord(road_start, road_destination, target_node):
 		closest_coord = Coordinate(road_start.coordinate.lat + dist_vector.lat, road_start.coordinate.lon + dist_vector.lon)
 
 	return height, closest_coord
+
+
+def generate_businesses_hours(businesses_dict, csv_file_name):
+	csv_info = {}
+	with open(csv_file_name) as csv_file:
+		csv_reader = csv.DictReader(csv_file, delimiter=',')
+		for row in csv_reader:
+			csv_info[row["building_type"]] = row
+
+	for _, business in businesses_dict.items():
+		if business.type not in csv_info:
+			continue
+		b_info = csv_info[business.type]
+		min_workhour = int(b_info["min_workhour"])
+		max_workhour = int(b_info["max_workhour"])
+		min_start_hour = int(b_info["min_start_hour"])
+		max_start_hour = int(b_info["max_start_hour"])
+		min_activity_per_week = int(b_info["min_activity_per_week"])
+		max_activity_per_week = int(b_info["max_activity_per_week"])
+		open_24h_chance = float(b_info["open_24_hours_chance"])
+
+		start_hour = np.random.randint(min_workhour, max_workhour+1)
+		workHours = np.random.randint(min_start_hour, max_start_hour+1)
+		finish_hour = (start_hour + workHours) % 24
+
+		if np.random.random() < open_24h_chance:
+			start_hour = 0
+			finish_hour = 0
+
+		workdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+		if b_info["day"] == "weekday":
+			workdays = ["Mon", "Tue", "Wed", "Thu", "Fri"]
+		elif b_info["day"] == "weekend":
+			workdays = ["Sat", "Sun"]
+			
+		activity = np.random.randint(min_activity_per_week, max_activity_per_week+1)
+
+		activity = np.min([activity, len(workdays)])
+		workdays = np.random.choice(workdays, activity, replace=False)
+
+		for day in workdays:
+			business.add_working_hour(day, f"{start_hour}:00", f"{finish_hour}:00")
