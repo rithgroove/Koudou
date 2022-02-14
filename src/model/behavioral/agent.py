@@ -27,3 +27,7 @@ class Agent:
 		for x in self.attributes:
 			tempstring +=  f"  - {x} = {self.attributes[x].get_value}\n"
 		return tempstring
+
+	def step(self,sim,kd_map,ts):
+		for attr in self.attributes:
+			attr.step(sim,kd_map,ts)

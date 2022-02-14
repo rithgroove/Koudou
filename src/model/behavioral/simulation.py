@@ -21,3 +21,7 @@ class Simulation:
 		for x in self.agents:
 
 			print(x)
+
+	def step(self,kd_map,ts):
+		for agent in self.agents:
+			agent.step(self,kd_map,ts):
