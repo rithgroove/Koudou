@@ -38,7 +38,7 @@ class ActionMove(Action):
             self.destination = map.get_place_by_id(temp[0])  
         self.sequence = []
 
-    def update(self,step_length):
+    def update(self,kd_sim,kd_map,ts,step_length,rng):
         """
         [Method]
         Update method

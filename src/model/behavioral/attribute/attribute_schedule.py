@@ -18,7 +18,7 @@ class AttributeSchedule(Attribute):
                       + If set as false, the schedule will be treated as one off from start and end date (day_str not used)
     """
     def __init__(self, name, start,end, day_str = None,repeat = False):
-        super(AttributeSchedule,self).__init__(name,False)
+        super(AttributeSchedule,self).__init__(name,"False")
         self.start = start
         self.end = end
         self.repeat = repeat
@@ -28,10 +28,14 @@ class AttributeSchedule(Attribute):
 
     @property
     def get_value(self):
+        return self.value
+
+    def step(self,kd_sim,kd_map,ts,step_length,rng,agent):
         #maybe have a global timestamp variable? 
+        self.value = "False"
         if self.repeat and global_variable.timestamp.get_day_of_week_str() == self.day_str and self.start <= global_variable.timestamp.get_time_only() < self.end:
-            return "True"
+            self.value = "True"
         elif self.start <= global_variable.timestamp.step_count < self.end:
-            return "True"
+            self.value = "True"
         else:
             return "False"

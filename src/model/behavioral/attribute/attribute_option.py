@@ -13,3 +13,6 @@ class AttributeOption(Attribute):
 
     def set_min(self):
         pass
+
+    def step(self,kd_sim,kd_map,ts,step_length,rng,agent):
+        pass

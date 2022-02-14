@@ -24,16 +24,16 @@ class Activity:
 			result = result and x.check(agent)
 		return result
 
-	def generate_actions(self,agent,map,rng):
+	def generate_actions(self,agent,kd_map,rng):
 		actions = []
 		for x in self.actions:
 			temp = x.split(":")
 			if (temp[0].lower() == "wait"):
-				actions.append(ActionWait(temp[1]),agent,map,rng)
+				actions.append(ActionWait(agent,temp[1],rng))
 			elif (temp[0].lower()=="move"):
-				actions.append(ActionMove(agent,map,temp[1]))
+				actions.append(ActionMove(agent,kd_map,temp[1]))
 			elif (temp[0].lower()=="modify_attribute"):
-				actions.append(ActionModifyAttribute(temp[1]))
+				actions.append(ActionModifyAttribute(agent,temp[1]))
 		return actions
 
 	def __str__(self):

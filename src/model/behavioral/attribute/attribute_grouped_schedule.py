@@ -21,14 +21,13 @@ class AttributeGroupedSchedule(Attribute):
 
     @property
     def get_value(self):
-        #maybe have a global timestamp variable? 
-        self.check_active_schedule()
-        if (self.active_schedule is not None):
-            return self.active_schedule.get_value
-        return "False"
+        return self.value
 
-    def check_active_schedule(self):
+    def step(self,kd_sim,kd_map,ts,step_length,rng,agent):
+        self.check_active_schedule()
+        self.value = "False"
         for x in self.schedules:
             if (x.get_value == "True"):
-                self.active_schedule = x
+                self.value = "True"
                 break
+    

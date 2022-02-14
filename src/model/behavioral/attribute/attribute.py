@@ -26,5 +26,5 @@ class Attribute:
 	#interfact for generating the value randomly (correct range & distribution)
 	#def generation(self):
 
-	def update(self):
-		return True
+	def update(self,kd_sim,kd_map,ts,step_length):
+		pass

@@ -11,7 +11,7 @@ class Action(ABC):
 	can 
 	"""   	
 	@abstractmethod
-	def update(self,step_length):
+	def update(self,kd_sim,kd_map,ts,step_length,rng):
 		"""
 		[Method]
 		Update method

@@ -1,7 +1,7 @@
 from .action import Action
 
 class ActionModifyAttribute(Action):    
-    def __init__(self,command):
+    def __init__(self,agent,command):
         super(ActionModifyAttribute,self).__init__()
         temp = command.split(":")        
         self.attribute_name = temp[0]
@@ -13,9 +13,10 @@ class ActionModifyAttribute(Action):
             self.value = temp[1]
         else:
             self.value = float(temp[1])
-        self.is_finished = False
+        self.finished = False
+        self.agent = agent
 
-    def update(self,step_length):
+    def update(self,kd_sim,kd_map,ts,step_length,rng):
         """
         [Method]
         Update method
@@ -27,7 +28,7 @@ class ActionModifyAttribute(Action):
         - (int) the remainder of the step_length that was not consumed by this action
         """
         agent.update_attribute(self.attribute_name,self.value)
-        self.is_finished = True
+        self.finished = True
         return step_length #return the left over time 
 
     @property
@@ -49,4 +50,4 @@ class ActionModifyAttribute(Action):
         return:
         - (bool) true if finished, false otherwise
         """
-        return self.is_finished
+        return self.finished

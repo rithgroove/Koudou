@@ -2,7 +2,9 @@ class Agent:
 	def __init__(self,agent_id):
 		self.agent_id = agent_id
 		self.attributes = {}
-		self.defaultBehavior = None
+		self.default_behavior = None
+		self.actions = []
+		self.active_action = None
 
 	def add_attribute(self,attr):
 		self.attributes[attr.name] = attr
@@ -20,6 +22,7 @@ class Agent:
 		else:
 			self.attributes.update_value(value)
 
+
 	def __str__(self):
 		tempstring = "[Agent]\n"
 		tempstring += f" Agent ID = {self.agent_id}\n"
@@ -28,6 +31,23 @@ class Agent:
 			tempstring +=  f"  - {x} = {self.attributes[x].get_value}\n"
 		return tempstring
 
-	def step(self,sim,kd_map,ts):
+	def attribute_step(self,kd_sim,kd_map,ts,step_length,rng):
+		#update attribute
 		for attr in self.attributes:
-			attr.step(sim,kd_map,ts)
+			attr.step(kd_sim,kd_map,ts,step_length,rng,self)
+
+	def behavior_step(self,kd_sim,kd_map,ts,step_length,rng):
+		# if idle check action
+		if len(self.actions) == 0:
+			return self.active_behavior.step(kd_sim,kd_map,ts,step_length,rng,self) #get actions
+		return []
+
+	def action_step(self,kd_sim,kd_map,ts,step_length,rng):
+		for action in self.actions
+		# if have action do it
+		leftover = step_length
+		while len(self.actions) > 0:
+			act = self.actions[0]
+			leftover = act.step(kd_sim,kd_map,ts,step_length,rng)
+			if not act.is_finished:
+				break
