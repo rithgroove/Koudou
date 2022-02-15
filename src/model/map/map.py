@@ -1,4 +1,6 @@
 from typing import Any, Dict, List, Tuple
+from .residence import Residence
+from .business import Business
 from .road import Road
 from .place import Place
 from .node import Node
@@ -21,6 +23,8 @@ class Map():
 
         self.d_places: Dict[str, Place] = {}
         self.d_roads: Dict[Tuple[str, str], Road] = {} # the tuple of id is ordered, NOT start, goal
+        self.d_businesses: Dict[str, Business] = {}
+        self.d_residences: Dict[str, Residence] = {}
 
     def add_node(self, node):
         self.d_nodes[node.id] = node

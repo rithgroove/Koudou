@@ -1,13 +1,18 @@
+import time
 from src.model.map.road import Road
 from .place import Place
+from .residence import Residence
+from .business import Business
 from .render_info import Render_info
 from .coordinate import Coordinate
 from .way import Way
 from .osm_handler import OSMHandler
 from .map import Map
 from .node import Node
+import numpy as np
 from typing import List
 import math
+import csv
 #list of function here
 
 #def connect_buildings
@@ -15,6 +20,9 @@ import math
 #def clean_up_road
 
 def build_map(osm_file_path):
+	print("starting building Map")
+	st = time.time()
+	
 	osm_map = OSMHandler()
 	osm_map.apply_file(osm_file_path)
 	osm_map.set_bounding_box(osm_file_path)
@@ -32,19 +40,34 @@ def build_map(osm_file_path):
 		ways.append(Way(w["id"], tags, n))
 
 	kd_map = Map(osm_map.bounding_box, nodes, ways)
+	
+	print(f"Finished getting nodes and ways ({time.time() - st}s) ")
+	st = time.time()
+
 	build_node_connections(kd_map) #generate the connection between nodes
 
 	road_nodes, non_road_nodes = separate_nodes(kd_map)	# separate road and other nodes
 	main_road_graph, disconnected_nodes = clean_road(road_nodes,kd_map) # separate the road_graph and disconnected nodes
-
 	kd_map.set_main_road(main_road_graph)
 
-	places = create_places_osm(ways, kd_map, main_road_graph, 10)
+	print(f"Finished creating roads ({time.time() - st}s) ")
+	st = time.time()
 
+	places = create_places_osm(ways, kd_map, main_road_graph, 10)
 	kd_map.d_places = places
 
-	# businesses, households = create_types_osm_csv(places, ways, None)
+	print(f"Finished creating places ({time.time() - st}s) ")
+	st = time.time()
 
+	bussinesses, residences = create_types_from_csv(kd_map, 10, "config/map/tsukuba-tu-building-data.csv")
+	print(f"Finished creating businesses and residences ({time.time() - st}s) ")
+	st = time.time()
+
+	generate_businesses_hours(bussinesses, "config/map/business.csv")
+	print(f"Finished setting work hours ({time.time() - st}s) ")
+
+	kd_map.d_businesses = bussinesses
+	kd_map.d_residences = residences
 	# repair_places(places, businesses, households)
 
 	return kd_map
@@ -52,7 +75,7 @@ def build_map(osm_file_path):
 
 def create_places_osm(ways, kd_map, main_road_graph, grid_size):
 	places = {}
-	road_grid = create_roades_grid(kd_map, main_road_graph, grid_size)
+	road_grid = create_node_grid(kd_map, main_road_graph, grid_size)
 	for w in ways:
 		if 'road' in w.tags or 'highway' in w.tags:
 			continue
@@ -91,10 +114,10 @@ def get_grid_coordinate(lat, lon, kd_map, grid_size):
 	x = int((lon - kd_map.min_coord.lon) / cell_width)
 	y = int((lat - kd_map.min_coord.lat) / cell_height)
 
-	if x > grid_size:
-		x = grid_size
-	if y > grid_size:
-		y = grid_size
+	if x >= grid_size:
+		x = grid_size-1
+	if y >= grid_size:
+		y = grid_size-1
 	return (x, y)
 
 
@@ -150,23 +173,35 @@ def create_road_connection(centroid: Node, centroid_grid_coord, road_grid, kd_ma
 
 	connect_centroid_to_road(centroid, road_start, road_destination, closest_coord, kd_map)
 
-def create_types_osm_csv (places, ways, csv_file_name):
-	# file = open(csv_file_name)
-	# for line in file:
-	# for w in ways:
-	# 		if 'ammenity' in w.tags:
-	# 			b = Business(places[w.id])
-	# 		if 'building' in w.tags and w.tags['building'] == 'restaurant':
-	# 			b = Business(places[w.id], type='restaurant')
-	# 		if 'building' in w.tags and w.tags['building'] == 'apartament':
-	# 			h = Household(places[w.id])
-	# 		if not_interactable:
-	# 			places[w.id].interactable = False
+def create_types_from_csv (kd_map: Map, grid_size, csv_file_name):
+	businesses = {}
+	residences = {}
 
+	places = {p.centroid: p for _, p in kd_map.d_places.items()}
+	centroids = [kd_map.d_nodes[p] for p in places]
+	grid = create_node_grid(kd_map, centroids, grid_size)
 
-	# return households,businesses
-	pass
+	with open(csv_file_name) as csv_file:
+		csv_reader = csv.DictReader(csv_file, delimiter=',')
+		for row in csv_reader:
+			x, y, number, p_type = int(row["x"]), int(row["y"]), row["number"], row["type"]
 
+			to_create = []
+			if number == "All":
+				to_create = grid[x][y]
+			else:
+				to_create = [grid[x][y].pop() for _ in range(int(number)) if len(grid[x][y]) > 0]
+			
+			for c in to_create:
+				p = places[c]
+				if p_type == "residential":
+					r = Residence(c, p.road_connection, 1)
+					residences[r.id] = r
+				else:
+					b = Business(c, p.road_connection, p_type)
+					businesses[b.id] = b
+
+	return businesses, residences
 
 def repair_places():
 	pass
@@ -238,14 +273,14 @@ def clean_road(road_nodes, kd_map):
 	return main_road, disconnected_nodes
 
 
-def create_roades_grid(kd_map, road_nodes, grid_size: int):
+def create_node_grid(kd_map, nodes, grid_size: int):
 	grid = []
-	for i in range(grid_size+1):
+	for i in range(grid_size):
 		grid.append([])
-		for _ in range(grid_size+1):
+		for _ in range(grid_size):
 			grid[i].append([])
 
-	for n in road_nodes:
+	for n in nodes:
 		x, y = get_grid_coordinate(n.coordinate.lat, n.coordinate.lon, kd_map, grid_size)
 		if x > grid_size or y > grid_size:
 			continue
@@ -325,3 +360,45 @@ def get_dist_and_closest_coord(road_start, road_destination, target_node):
 		closest_coord = Coordinate(road_start.coordinate.lat + dist_vector.lat, road_start.coordinate.lon + dist_vector.lon)
 
 	return height, closest_coord
+
+
+def generate_businesses_hours(businesses_dict, csv_file_name):
+	csv_info = {}
+	with open(csv_file_name) as csv_file:
+		csv_reader = csv.DictReader(csv_file, delimiter=',')
+		for row in csv_reader:
+			csv_info[row["building_type"]] = row
+
+	for _, business in businesses_dict.items():
+		if business.type not in csv_info:
+			continue
+		b_info = csv_info[business.type]
+		min_workhour = int(b_info["min_workhour"])
+		max_workhour = int(b_info["max_workhour"])
+		min_start_hour = int(b_info["min_start_hour"])
+		max_start_hour = int(b_info["max_start_hour"])
+		min_activity_per_week = int(b_info["min_activity_per_week"])
+		max_activity_per_week = int(b_info["max_activity_per_week"])
+		open_24h_chance = float(b_info["open_24_hours_chance"])
+
+		start_hour = np.random.randint(min_workhour, max_workhour+1)
+		workHours = np.random.randint(min_start_hour, max_start_hour+1)
+		finish_hour = (start_hour + workHours) % 24
+
+		if np.random.random() < open_24h_chance:
+			start_hour = 0
+			finish_hour = 0
+
+		workdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+		if b_info["day"] == "weekday":
+			workdays = ["Mon", "Tue", "Wed", "Thu", "Fri"]
+		elif b_info["day"] == "weekend":
+			workdays = ["Sat", "Sun"]
+			
+		activity = np.random.randint(min_activity_per_week, max_activity_per_week+1)
+
+		activity = np.min([activity, len(workdays)])
+		workdays = np.random.choice(workdays, activity, replace=False)
+
+		for day in workdays:
+			business.add_working_hour(day, f"{start_hour}:00", f"{finish_hour}:00")
