@@ -62,6 +62,9 @@ class Coordinate():
         """
         tempstring = f"[Coordinate]\n\t(lat = {self.lat}, lon = {self.lon})"
         return tempstring
+
+    def clone(self):
+        return Coordinate(self.lat,self.lon)
     
     def new_coordinate_with_translation(self,lat =0,lon = 0):
         """

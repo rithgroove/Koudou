@@ -31,6 +31,7 @@ class ActionMove(Action):
                 typing = "destination_type"
             else:
                 raise ValueError("Unknown destination type")
+        self.vectors = []
 
         if typing == "destination_type":
             self.destination = kd_map.get_random_place(temp[0])
@@ -38,7 +39,14 @@ class ActionMove(Action):
             self.destination = kd_map.get_place_by_id(temp[0])  
         self.sequence = []
 
-    def update(self,kd_sim,kd_map,ts,step_length,rng):
+    def step(self,kd_sim,kd_map,ts,step_length,rng):
+        # if have action do it
+        leftover = step_length
+        while len(self.actions) > 0:
+            act = self.actions[0]
+            leftover = act.step(kd_sim,kd_map,ts,step_length,rng)
+            if not act.is_finished:
+                break
         """
         [Method]
         Update method

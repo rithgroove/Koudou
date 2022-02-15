@@ -19,11 +19,11 @@ def load_conditions(condition_file):
 			conditions[x["name"]] = Condition(x["name"],x["attribute"],x["value"],x["operator"])
 	return conditions
 	
-def generate_agents(attribute_generator,count):
+def generate_agents(kd_map,attribute_generator,count):
 	agents = []
 	for x in range(0,count):
 		agent = Agent(x)
-		attribute_generator.generate_attribute(agent)
+		attribute_generator.generate_attribute(agent,kd_map)
 		agents.append(agent)
 	return agents
 

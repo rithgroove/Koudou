@@ -46,3 +46,8 @@ class Business:
                 return True
                 
         return False
+
+    def __str__(self):
+        tempstring = "[Business]\n"
+        return tempstring
+        

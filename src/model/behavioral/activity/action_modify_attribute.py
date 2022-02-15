@@ -16,7 +16,7 @@ class ActionModifyAttribute(Action):
         self.finished = False
         self.agent = agent
 
-    def update(self,kd_sim,kd_map,ts,step_length,rng):
+    def step(self,kd_sim,kd_map,ts,step_length,rng):
         """
         [Method]
         Update method

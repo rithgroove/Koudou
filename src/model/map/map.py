@@ -23,11 +23,14 @@ class Map():
 
         self.d_places: Dict[str, Place] = {}
         self.d_roads: Dict[Tuple[str, str], Road] = {} # the tuple of id is ordered, NOT start, goal
-        self.d_businesses: Dict[str, Business] = {}
+        self.d_businesses: Dict[str, Business] = {} 
         self.d_residences: Dict[str, Residence] = {}
 
     def add_node(self, node):
         self.d_nodes[node.id] = node
+
+    def get_node(self,node_id):
+        return self.d_nodes[node_id]
 
     def add_way(self, way):
         self.d_ways[way.id] = way
@@ -51,3 +54,11 @@ class Map():
 
     def set_main_road(self, main_road):
         self.main_road = main_road
+
+    def get_random_residence(self,rng):
+        key = rng.choice(list(self.d_residences.keys()),1)[0]
+        return self.d_residences[key]
+
+    def get_random_business(self,rng):
+        key = rng.choice(list(self.d_businesses.keys()),1)[0]
+        return self.d_businesses[key]
