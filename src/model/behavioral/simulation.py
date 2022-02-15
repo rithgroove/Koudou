@@ -9,7 +9,7 @@ class Simulation:
 		self.conditions = agent_manager.load_conditions(config["condition"])
 		self.behavior = agent_manager.load_behavior("normal", config["behavior"], self.conditions, rng)
 		for x in self.agents:
-			x.defaultBehavior = self.behavior
+			x.default_behavior = self.behavior
 		self.rng = rng
 		self.ts = TimeStamp(0)
 		self.threads = threads
@@ -33,11 +33,11 @@ class Simulation:
 		for agent in self.agents:
 			agent.attribute_step(self,self.kd_map,self.ts,step_length,self.rng)
 
-		# check for activities
-		# move_action_pool = []
-		# for agent in self.agents:
-		# 	move_actions = agent.behavior_step(self,kd_map,self.ts,step_length,self.rng)
-		# 	move_action_pool.extend(move_actions)
+		#check for activities
+		move_action_pool = []
+		for agent in self.agents:
+			move_actions = agent.behavior_step(self,self.kd_map,self.ts,step_length,self.rng)
+			move_action_pool.extend(move_actions)
 
 
 

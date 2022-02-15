@@ -21,7 +21,9 @@ class Activity:
 	def check_conditions(self,agent):
 		result = True
 		for x in self.condition:
-			result = result and x.check(agent)
+			result = result and x.check_value(agent)
+		if result:
+			print(f"Action Triggered: {self.name}\n")
 		return result
 
 	def generate_actions(self,agent,kd_map,rng):

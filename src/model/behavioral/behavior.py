@@ -20,3 +20,9 @@ class Behavior:
 				break
 		return move_action_pool
 
+
+	def __str__(self):
+		tempstring = "[Behavior]\n"
+		tempstring += f"   Name = {self.name}"
+
+		return tempstring

@@ -332,7 +332,7 @@ def get_dist_and_closest_coord(road_start, road_destination, target_node):
 	area =s*(s-a)*(s-b)*(s-c)
 	if (area < 0):
 		# Maybe in this case we should set area = 0, want to test this once we have vizualization
-		print("error, Heron's formula is not working due to very small angle")
+		print("Warning, Heron's formula is not working due to very small angle")
 		return math.inf, None
 	area = math.sqrt(area)
 

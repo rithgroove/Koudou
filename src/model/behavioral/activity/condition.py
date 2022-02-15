@@ -8,7 +8,11 @@ class Condition:
         self.operator = _fetch_operator(operator_string)
 
     def check_value(self,agent):
-        return self.operator(agent.get_attribute(self.attribute_name), self.value)
+        value = self.value
+        if ("$" in value):
+            value = agent.get_attribute(value.replace("$",""))
+        print(f"{agent.get_attribute(self.attribute_name)} {_fetch_symbols(self.operator_string)} {value}")
+        return self.operator(agent.get_attribute(self.attribute_name), value)
 
     @property
     def short_string(self):

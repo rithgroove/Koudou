@@ -29,14 +29,12 @@ class AttributeGroupedSchedule(Attribute):
             x.step(kd_sim,kd_map,ts,step_length,rng,agent)
             if (x.get_value == "True"):
                 self.value = "True"
-                print("set true")
                 break
-        print(self)
 
     def __str__(self):
         tempstring = "[AttributeGroupedSchedule]\n"
         tempstring += f"   name      : {self.name}\n"
         tempstring += f"   schedules :\n"
         for x in self.schedules:
-            tempstring += f"   {x.short_string}\n"
+            tempstring += f"   - {x.short_string}\n"
         return tempstring

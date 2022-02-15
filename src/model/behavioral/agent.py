@@ -13,7 +13,7 @@ class Agent:
 		self.attributes[attr.name] = attr
 
 	def get_attribute(self,name):
-		self.attributes[name].get_value
+		return self.attributes[name].get_value
 	
 	def update_attribute(self,attribute_name,value):
 		if (value == "max"):
@@ -42,7 +42,7 @@ class Agent:
 	def behavior_step(self,kd_sim,kd_map,ts,step_length,rng):
 		# if idle check action
 		if len(self.actions) == 0:
-			return self.active_behavior.step(kd_sim,kd_map,ts,step_length,rng,self) #get actions
+			return self.default_behavior.step(kd_sim,kd_map,ts,step_length,rng,self) #get actions
 		return []
 
 	def action_step(self,kd_sim,kd_map,ts,step_length,rng):
