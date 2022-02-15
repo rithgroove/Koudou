@@ -18,25 +18,30 @@ class ActionMove(Action):
         - duration : (int) the duration of the action in seconds
         """
         super(ActionMove,self).__init__()
-        destination = ""
+        self.destination = ""
         temp = destination_string
-        temp.replace(")", "")
+        temp =temp.replace(")", "")
+        self.destination_string = destination_string
         typing = "destination_type"
+        self.origin = agent.get_attribute("current_node_id")
         if ("(" in temp):
             temp2 = temp.split("(")
             temp = temp2[0]
-            if (temp2[1].lower() == "destination_id" or temp2[1].lower() == "id"):
+            if (temp2[1].lower() == "destination_id") or (temp2[1].lower() == "id"):
                 typing = "destination_id"
-            elif (temp2[1].lower() == "destination_type" or temp2[1].lower() == "type"):
+            elif (temp2[1].lower() == "destination_type") or (temp2[1].lower() == "type"):
                 typing = "destination_type"
             else:
-                raise ValueError("Unknown destination type")
+                raise ValueError(f"Unknown destination type : {temp2[1].lower()}")
         self.vectors = []
 
+        if ("$" in temp):
+            temp = agent.get_attribute(temp.replace("$",""))
+
         if typing == "destination_type":
-            self.destination = kd_map.get_random_place(temp[0])
+            self.destination = kd_map.get_random_business(temp).node_id
         elif typing == "destination_id":
-            self.destination = kd_map.get_place_by_id(temp[0])  
+            self.destination = temp
         self.sequence = []
 
     def step(self,kd_sim,kd_map,ts,step_length,rng):
@@ -75,4 +80,8 @@ class ActionMove(Action):
         return f"Move to {self.destination_string}"
 
     def __str__(self):
-        return f"[ActionMove]\n   Destination = {self.destination_string}"
+        tempString = f"[ActionMove]\n"
+        tempString += f"   Origin = {self.origin}\n"
+        tempString += f"   Destination = {self.destination}\n"
+        tempString += f"   Destination String = {self.destination_string}"
+        return tempString

@@ -29,6 +29,7 @@ class Agent:
 		tempstring = "[Agent]\n"
 		tempstring += f" Agent ID = {self.agent_id}\n"
 		tempstring += f" Current location = (lat = {self.coordinate.lat}, lon {self.coordinate.lon})\n"
+		tempstring += f" Current Actions = {len(self.actions)}\n"
 		tempstring += f" Attributes:\n"
 		for x in self.attributes:
 			tempstring +=  f"  - {x} = {self.attributes[x].get_value}\n"

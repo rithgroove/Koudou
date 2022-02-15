@@ -39,16 +39,24 @@ class Simulation:
 			move_actions = agent.behavior_step(self,self.kd_map,self.ts,step_length,self.rng)
 			move_action_pool.extend(move_actions)
 
+		for x in move_action_pool:
+			print(x)
 
 
-		# self.pathfind(move_action_pool,kd_map)
+		self.pathfind(move_action_pool)
 
 		# #need code to generate actions here
 		# for agent in self.agents:
 		# 	agent.attribute_step(self,kd_map,self.ts,step_length,self.rng)
 
-	def pathfind(self,move_actions,kd_map):
-		a_star.parallel_a_star(kd_map, start_goals_arr, n_threads=self.threads, cache_file_name = self.cache_file_name, report = self.report)
-
+	def pathfind(self,move_actions):
+		pool = []
+		for x in move_actions:
+			pool.append((x.origin ,x.destination))
+		print(pool)
+		results = a_star.parallel_a_star(self.kd_map, pool, n_threads=self.threads, cache_file_name = self.cache_file_name, report = self.report)
+		print(results)
+		for move_action, path in zip(move_actions,results):
+			print(path)
 
 

@@ -92,7 +92,6 @@ class GeneratorAttribute:
 	def generate_attribute(self,agent,kd_map):
 		#add attribute to the agent
 		residence = kd_map.get_random_residence(self.rng)
-		print(residence)
 		agent.add_attribute(Attribute("home_id",residence.id))
 		agent.add_attribute(Attribute("home_node_id",residence.node_id))
 		agent.add_attribute(Attribute("current_node_id",residence.node_id))
@@ -151,8 +150,8 @@ class GeneratorAttribute:
 		agent.add_attribute(Attribute("off_map", temp["off_map"]))
 		profession = AttributeGroupedSchedule("is_working_hour")
 		business = kd_map.get_random_business(self.rng)
-		agent.add_attribute(Attribute("worplace_id",business.id))
-		agent.add_attribute(Attribute("worplace_node_id",business.node_id))
+		agent.add_attribute(Attribute("workplace_id",business.id))
+		agent.add_attribute(Attribute("workplace_node_id",business.node_id))
 		#business_node = kd_map.get_node(business.node_id)
 
 		for x in workdays:

@@ -11,11 +11,12 @@ class Behavior:
 	def step(self,kd_sim,kd_map,ts,step_length,rng,agent):
 		move_action_pool = []
 		for act in self.activities:
-			if (act.check_conditions(agent)):
+			if (act.check_conditions(agent) == True):
 				actions = act.generate_actions(agent,kd_map,rng)
 				agent.actions.extend(actions)
 				for action in actions:
-					if (isinstance(actions,ActionMove)):
+					if action.__class__ is ActionMove:
+						print("\n\n\nWTF IT WORKS!!!\n\n\n")
 						move_action_pool.append(action)
 				break
 		return move_action_pool

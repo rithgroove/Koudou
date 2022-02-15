@@ -1,3 +1,3 @@
 "priority","name","conditions","conditions type","actions"
-1,"go_to_work","is_working","NONE","move:$workplace(id), wait:$workhour(hours)"
-2,"go_home","not_at_home","NONE","move:$home(id)"
+1,"go_to_work","is_working","NONE","move:$workplace_node_id(id), wait:$workhour(hours)"
+2,"go_home","not_at_home","NONE","move:$home_node_id(id)"

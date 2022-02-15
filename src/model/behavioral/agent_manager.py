@@ -35,8 +35,7 @@ def load_activities(activity_file,conditions_dict, rng):
 		for y in x["conditions"].split(","):
 			act.add_condition(conditions_dict[y])
 		for y in x["actions"].split(","):
-			temp = y.split(":")
-			act.activities = temp
+			act.add_action(y)
 		activities.append(act)
 	return activities
 

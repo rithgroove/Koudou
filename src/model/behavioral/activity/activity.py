@@ -29,6 +29,7 @@ class Activity:
 	def generate_actions(self,agent,kd_map,rng):
 		actions = []
 		for x in self.actions:
+			print(x)
 			temp = x.split(":")
 			if (temp[0].lower() == "wait"):
 				actions.append(ActionWait(agent,temp[1],rng))
@@ -36,6 +37,7 @@ class Activity:
 				actions.append(ActionMove(agent,kd_map,temp[1]))
 			elif (temp[0].lower()=="modify_attribute"):
 				actions.append(ActionModifyAttribute(agent,temp[1]))
+		print(f"length = {len(actions)}")
 		return actions
 
 	def __str__(self):
