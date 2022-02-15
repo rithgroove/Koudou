@@ -5,10 +5,11 @@ from src.util.time_stamp import TimeStamp
 class Business:
     idCounter = itertools.count().__next__
 
-    def __init__(self, node_id: str, road_connection_id: str, business_type: str):
+    def __init__(self, node_id: str, place_id:str, road_connection_id: str, business_type: str):
         self.id = self.idCounter()
         self.road_connection_id: str = road_connection_id
         self.node_id: str = node_id
+        self.place_id: str = place_id
         self.type: str = business_type
 
         self.workers_ids: List[str] = []

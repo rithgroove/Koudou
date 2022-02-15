@@ -1,3 +1,4 @@
+import json
 import time
 from src.model.map.road import Road
 from .place import Place
@@ -70,7 +71,47 @@ def build_map(osm_file_path):
 	kd_map.d_residences = residences
 	# repair_places(places, businesses, households)
 
+	generate_evacuation_centers(kd_map, "config/map/evacuation_center.json")
+
 	return kd_map
+
+def generate_evacuation_centers(kd_map: Map, file_path):
+	evacuation_dict = {}
+	with open(file_path) as file:
+		evacuation_dict = json.load(file)["evacuation_centers"]
+	
+	for location in evacuation_dict:
+		try:
+			rules = location["rules"]
+			attr = location["attributes"]
+			selection = location["selection"]
+			places = []
+			if  selection == "by_id":
+				p = kd_map.d_places[rules["place_id"]]
+				places.append(p)
+			else:
+				qtd = rules["qtd"] 
+				allowed_places = [p for p in kd_map.d_places.values()]
+				if "place_types" in rules:
+					allowed_places = [p for p in kd_map.d_places.values() if p.type in rules["place_types"]]
+				
+				if selection == "by_type" and len(allowed_places) >= qtd:
+					places = np.random.choice(allowed_places, qtd, replace=False)
+				elif selection == "by_grid":
+					grid = create_places_grid(kd_map, allowed_places, rules["grid_size"])
+					x, y = rules["cell"]
+					if len(grid[x][y]) >= qtd:
+						places = np.random.choice(grid[x][y], qtd, replace=False)
+
+		except KeyError as e:
+			print("Warning: Key error when processing evacuation center file ", file_path)
+			print("Error on entry: ", location)
+			print("Tried to access key ", e, " but it does not exist")
+
+		if len(places) > 0:
+			for place in places:
+				place.evacuation_center = True
+				place.evacuation_attr = attr
 
 
 def create_places_osm(ways, kd_map, main_road_graph, grid_size):
@@ -177,9 +218,8 @@ def create_types_from_csv (kd_map: Map, grid_size, csv_file_name):
 	businesses = {}
 	residences = {}
 
-	places = {p.centroid: p for _, p in kd_map.d_places.items()}
-	centroids = [kd_map.d_nodes[p] for p in places]
-	grid = create_node_grid(kd_map, centroids, grid_size)
+	places = [p for p in kd_map.d_places.values()]
+	grid = create_places_grid(kd_map, places, grid_size)
 
 	with open(csv_file_name) as csv_file:
 		csv_reader = csv.DictReader(csv_file, delimiter=',')
@@ -190,15 +230,17 @@ def create_types_from_csv (kd_map: Map, grid_size, csv_file_name):
 			if number == "All":
 				to_create = grid[x][y]
 			else:
-				to_create = [grid[x][y].pop() for _ in range(int(number)) if len(grid[x][y]) > 0]
+				n = int(number)
+				to_create = [grid[x][y].pop() for _ in range(n) if len(grid[x][y]) > 0]
 			
-			for c in to_create:
-				p = places[c]
-				if p_type == "residential":
-					r = Residence(c, p.road_connection, 1)
+			for place_id in to_create:
+				place = kd_map.d_places[place_id]
+				place.type = p_type
+				if p_type == "residential" or p_type == "apartments":
+					r = Residence(place.centroid, place.id, place.road_connection, 1)
 					residences[r.id] = r
 				else:
-					b = Business(c, p.road_connection, p_type)
+					b = Business(place.centroid, place.id, place.road_connection, p_type)
 					businesses[b.id] = b
 
 	return businesses, residences
@@ -289,6 +331,23 @@ def create_node_grid(kd_map, nodes, grid_size: int):
 	return grid
 
 
+def create_places_grid(kd_map, places, grid_size: int):
+	grid = []
+	for i in range(grid_size):
+		grid.append([])
+		for _ in range(grid_size):
+			grid[i].append([])
+
+	for p in places:
+		n = kd_map.d_nodes[p.centroid]
+		x, y = get_grid_coordinate(n.coordinate.lat, n.coordinate.lon, kd_map, grid_size)
+		if x > grid_size or y > grid_size:
+			continue
+		grid[x][y].append(p.id)
+
+	return grid
+
+
 def connect_centroid_to_road(centroid, road_start, road_destination, closest_coord, kd_map:Map):
 	new_id = centroid.id + "_entry"
 	new_node = Node(new_id, {"entry_point": True}, closest_coord)
@@ -369,7 +428,7 @@ def generate_businesses_hours(businesses_dict, csv_file_name):
 		for row in csv_reader:
 			csv_info[row["building_type"]] = row
 
-	for _, business in businesses_dict.items():
+	for business in businesses_dict.values():
 		if business.type not in csv_info:
 			continue
 		b_info = csv_info[business.type]
