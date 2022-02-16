@@ -22,15 +22,17 @@ class Activity:
 		result = True
 		for x in self.condition:
 			result = result and x.check_value(agent)
-		if result:
-			print(f"Action Triggered: {self.name}\n")
 		return result
 
 	def generate_actions(self,agent,kd_map,rng):
 		actions = []
+		print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+		print(self.actions)
+		print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+
 		for x in self.actions:
-			print(x)
 			temp = x.split(":")
+			temp[0] = temp[0].replace(" ","")
 			if (temp[0].lower() == "wait"):
 				actions.append(ActionWait(agent,temp[1],rng))
 			elif (temp[0].lower()=="move"):

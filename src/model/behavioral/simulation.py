@@ -11,7 +11,7 @@ class Simulation:
 		for x in self.agents:
 			x.default_behavior = self.behavior
 		self.rng = rng
-		self.ts = TimeStamp(0)
+		self.ts = TimeStamp(9*3600)
 		self.threads = threads
 		self.kd_map = kd_map
 		self.cache_file_name = cache_file_name
@@ -29,11 +29,15 @@ class Simulation:
 
 	def step(self,step_length):
 		self.ts.step(step_length)
-		#update all agents attribute
+		##############################################################################
+		# update all agents attribute
+		##############################################################################
 		for agent in self.agents:
 			agent.attribute_step(self,self.kd_map,self.ts,step_length,self.rng)
 
-		#check for activities
+		##############################################################################
+		# check for activities
+		##############################################################################
 		move_action_pool = []
 		for agent in self.agents:
 			move_actions = agent.behavior_step(self,self.kd_map,self.ts,step_length,self.rng)
@@ -42,21 +46,34 @@ class Simulation:
 		for x in move_action_pool:
 			print(x)
 
+		##############################################################################
+		# pathfind
+		##############################################################################
+		if (len(move_action_pool) > 0):
+			self.pathfind(move_action_pool)
 
-		self.pathfind(move_action_pool)
+		##############################################################################
+		# action step
+		##############################################################################
+		for agent in self.agents:
+			agent.action_step(self,self.kd_map,self.ts,step_length,self.rng)
 
-		# #need code to generate actions here
-		# for agent in self.agents:
-		# 	agent.attribute_step(self,kd_map,self.ts,step_length,self.rng)
+		##############################################################################
+		# evacuation
+		##############################################################################
+
+		##############################################################################
+		# epidemicon
+		##############################################################################
 
 	def pathfind(self,move_actions):
 		pool = []
 		for x in move_actions:
-			pool.append((x.origin ,x.destination))
-		print(pool)
+			temp = (x.origin ,x.destination)
+			if (temp not in pool):
+				pool.append(temp)
 		results = a_star.parallel_a_star(self.kd_map, pool, n_threads=self.threads, cache_file_name = self.cache_file_name, report = self.report)
-		print(results)
-		for move_action, path in zip(move_actions,results):
-			print(path)
-
+		for x in move_actions:
+			temp = (x.origin ,x.destination)
+			x.generate_vector(self.kd_map, results[temp])
 

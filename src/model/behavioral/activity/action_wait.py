@@ -39,8 +39,8 @@ class ActionWait(Action):
             max_duration = command_string
 
         # process min 
-        min_duration = _process_time(min_duration)
-        max_duration = _process_time(max__duration)+1 #plus 1 second for rng later
+        min_duration = _process_time(min_duration,agent)
+        max_duration = _process_time(max_duration,agent)+1 #plus 1 second for rng later
 
         self.duration = rng.integers(min_duration,max_duration,1)[0]
         self.current = 0
@@ -59,7 +59,7 @@ class ActionWait(Action):
         self.current += step_length #add step length to the executable
         self.remainder = max(0,self.current - self.duration) #check is time passed is bigger than the wait duration 
         self.current = min(self.current, self.duration) #if current is bigger than duration set the value of current to duration
-        return remainder #return the left over time 
+        return self.remainder #return the left over time 
 
     @property
     def short_string(self):
@@ -88,8 +88,8 @@ def _process_time(variable_string, agent):
 
     if "(" in variable_string:
         # if have ":" means that the duration might not in seconds
-        temp = temp.replace(")","")
-        temp = variable_string.split("(")
+        temp = variable_string.replace(")","")
+        temp = temp.split("(")
         modifier = _fetch_time_modifier(temp[1])
         value = temp[0]
 

@@ -16,7 +16,6 @@ class Behavior:
 				agent.actions.extend(actions)
 				for action in actions:
 					if action.__class__ is ActionMove:
-						print("\n\n\nWTF IT WORKS!!!\n\n\n")
 						move_action_pool.append(action)
 				break
 		return move_action_pool

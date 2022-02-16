@@ -65,7 +65,9 @@ def a_star_search(kd_map, start_node_id: str, goal_node_id: str, cache_dict: Dic
             break
 
         # Checking for cache
-        t = tuple(sorted(current, goal_node_id))
+        first = min(current, goal_node_id)
+        second = max(current, goal_node_id)
+        t = (first, second)
         if t in cache_dict:
             print("found in cache")
             for previous, step in zip(cache_dict[t][:], cache_dict[t][1:]):
@@ -77,7 +79,9 @@ def a_star_search(kd_map, start_node_id: str, goal_node_id: str, cache_dict: Dic
             conn_node = kd_map.d_nodes[conn]
             conn_lat_lon = conn_node.coordinate.get_lat_lon()
 
-            t = tuple(sorted(current_node.id, conn_node.id))
+            first = min(current_node.id, conn_node.id)
+            second = max(current_node.id, conn_node.id)
+            t = (first, second)
             dist = kd_map.d_roads[t].length
 
             new_cost = cost_so_far[current] + dist
@@ -93,7 +97,9 @@ def a_star_search(kd_map, start_node_id: str, goal_node_id: str, cache_dict: Dic
 
     path = reconstruct_path(came_from, start_node_id, goal_node_id)
     
-    t = tuple(sorted(start_node_id, goal_node_id))
+    first = min(start_node_id, goal_node_id)
+    second = max(start_node_id, goal_node_id)
+    t = (first, second)
     cache_dict[t] = path
     
     return path
