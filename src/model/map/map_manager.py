@@ -20,7 +20,7 @@ import csv
 
 #def clean_up_road
 
-def build_map(osm_file_path):
+def build_map(osm_file_path, config):
 	print("starting building Map")
 	st = time.time()
 	
@@ -54,65 +54,24 @@ def build_map(osm_file_path):
 	print(f"Finished creating roads ({time.time() - st}s) ")
 	st = time.time()
 
-	places = create_places_osm(ways, kd_map, main_road_graph, 10)
+	places = create_places_osm(ways, kd_map, main_road_graph, config["road connection grid size"])
 	kd_map.d_places = places
 
 	print(f"Finished creating places ({time.time() - st}s) ")
 	st = time.time()
 
-	bussinesses, residences = create_types_from_csv(kd_map, 10, "config/map/tsukuba-tu-building-data.csv")
+	bussinesses, residences = create_types_from_csv(kd_map, 10, config["building tagging data"])
 	print(f"Finished creating businesses and residences ({time.time() - st}s) ")
 	st = time.time()
 
-	generate_businesses_hours(bussinesses, "config/map/business.csv")
+	generate_businesses_hours(bussinesses, config["business data"])
 	print(f"Finished setting work hours ({time.time() - st}s) ")
 
 	kd_map.d_businesses = bussinesses
 	kd_map.d_residences = residences
 	# repair_places(places, businesses, households)
 
-	generate_evacuation_centers(kd_map, "config/map/evacuation_center.json")
-
 	return kd_map
-
-def generate_evacuation_centers(kd_map: Map, file_path):
-	evacuation_dict = {}
-	with open(file_path) as file:
-		evacuation_dict = json.load(file)["evacuation_centers"]
-	
-	for location in evacuation_dict:
-		try:
-			rules = location["rules"]
-			attr = location["attributes"]
-			selection = location["selection"]
-			places = []
-			if  selection == "by_id":
-				p = kd_map.d_places[rules["place_id"]]
-				places.append(p)
-			else:
-				qtd = rules["qtd"] 
-				allowed_places = [p for p in kd_map.d_places.values()]
-				if "place_types" in rules:
-					allowed_places = [p for p in kd_map.d_places.values() if p.type in rules["place_types"]]
-				
-				if selection == "by_type" and len(allowed_places) >= qtd:
-					places = np.random.choice(allowed_places, qtd, replace=False)
-				elif selection == "by_grid":
-					grid = create_places_grid(kd_map, allowed_places, rules["grid_size"])
-					x, y = rules["cell"]
-					if len(grid[x][y]) >= qtd:
-						places = np.random.choice(grid[x][y], qtd, replace=False)
-
-		except KeyError as e:
-			print("Warning: Key error when processing evacuation center file ", file_path)
-			print("Error on entry: ", location)
-			print("Tried to access key ", e, " but it does not exist")
-
-		if len(places) > 0:
-			for place in places:
-				place.evacuation_center = True
-				place.evacuation_attr = attr
-
 
 def create_places_osm(ways, kd_map, main_road_graph, grid_size):
 	places = {}
