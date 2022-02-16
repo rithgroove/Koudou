@@ -34,8 +34,12 @@ class Business:
     def is_open(self, t: TimeStamp):
         day = t.get_day_of_week_str()
         t_hour = t.get_hour()
-        t_min = t.get_min()
+        t_min = t.get_minute()
         for start, finish in self.working_hours[day]:
+            if start==finish:
+                #Means it is open 24 hours
+                return True 
+                
             start_hour, start_minute = [int(i) for i in start.split(":")]
             finish_hour, finish_minute = [int(i) for i in finish.split(":")]
             
