@@ -36,7 +36,7 @@ class Activity:
 			if (temp[0].lower() == "wait"):
 				actions.append(ActionWait(agent,temp[1],rng))
 			elif (temp[0].lower()=="move"):
-				actions.append(ActionMove(agent,kd_map,temp[1]))
+				actions.append(ActionMove(agent,kd_map,temp[1],rng))
 			elif (temp[0].lower()=="modify_attribute"):
 				actions.append(ActionModifyAttribute(agent,temp[1]))
 		print(f"length = {len(actions)}")

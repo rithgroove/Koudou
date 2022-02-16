@@ -5,10 +5,11 @@ from src.util.time_stamp import TimeStamp
 class Business:
     idCounter = itertools.count().__next__
 
-    def __init__(self, node_id: str, road_connection_id: str, business_type: str):
+    def __init__(self, node_id: str, place_id:str, road_connection_id: str, business_type: str):
         self.id = self.idCounter()
         self.road_connection_id: str = road_connection_id
         self.node_id: str = node_id
+        self.place_id: str = place_id
         self.type: str = business_type
 
         self.workers_ids: List[str] = []
@@ -33,8 +34,12 @@ class Business:
     def is_open(self, t: TimeStamp):
         day = t.get_day_of_week_str()
         t_hour = t.get_hour()
-        t_min = t.get_min()
+        t_min = t.get_minute()
         for start, finish in self.working_hours[day]:
+            if start==finish:
+                #Means it is open 24 hours
+                return True 
+                
             start_hour, start_minute = [int(i) for i in start.split(":")]
             finish_hour, finish_minute = [int(i) for i in finish.split(":")]
             
@@ -50,4 +55,3 @@ class Business:
     def __str__(self):
         tempstring = "[Business]\n"
         return tempstring
-        

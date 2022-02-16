@@ -8,7 +8,7 @@ class ActionMove(Action):
     Properties:
         - name      : (string-inherited)
     """
-    def __init__(self,agent,kd_map,destination_string):
+    def __init__(self,agent,kd_map,destination_string,rng):
         """
         [Constructor]
         Initialize a wait action
@@ -39,7 +39,7 @@ class ActionMove(Action):
             temp = agent.get_attribute(temp.replace("$",""))
 
         if typing == "destination_type":
-            self.destination = kd_map.get_random_business(temp).node_id
+            self.destination = kd_map.get_random_business(temp, 1, self.rng)[0].node_id
         elif typing == "destination_id":
             self.destination = temp
         self.sequence = []

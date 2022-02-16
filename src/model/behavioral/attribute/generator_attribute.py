@@ -149,7 +149,8 @@ class GeneratorAttribute:
 		agent.add_attribute(Attribute("schedule", ",".join(workdays)))
 		agent.add_attribute(Attribute("off_map", temp["off_map"]))
 		profession = AttributeGroupedSchedule("is_working_hour")
-		business = kd_map.get_random_business(self.rng)
+
+		business = kd_map.get_random_business(temp["place"], 1, self.rng)[0]
 		agent.add_attribute(Attribute("workplace_id",business.id))
 		agent.add_attribute(Attribute("workplace_node_id",business.node_id))
 		#business_node = kd_map.get_node(business.node_id)

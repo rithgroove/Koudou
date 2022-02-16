@@ -1,8 +1,10 @@
 import argparse
+import json
 
 from controller import Controller
 from os.path import join
 
+default_config = "config.json"
 
 def main():
     parser = argparse.ArgumentParser()
@@ -10,7 +12,10 @@ def main():
     args = parser.parse_args()
 
 
-    crtl = Controller()
+    with open(default_config) as file:
+        config = json.load(file)
+
+    crtl = Controller(config)
     if args.use_view:
         crtl.use_view()
         crtl.main_loop()
