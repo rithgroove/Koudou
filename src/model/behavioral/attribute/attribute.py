@@ -4,10 +4,10 @@ class Attribute:
 
     def __init__(self,name,value,typing = "string"):
         self.name = name
-        self.value = self._cast(value)
         self.typing = typing.lower()
         if (self.typing == "integer"):
             self.typing = "int"
+        self.value = cast(value,self.typing)
         self._cast_value()
 
     @property
@@ -15,11 +15,18 @@ class Attribute:
         return self.value
 
     def set_value(self,value):
-        temp_value = self._cast(value)
-        self.value = temp_value
+        try:
+            temp_value = cast(value,self.typing)
+            self.value = temp_value
+        except ValueError as e:
+            if ("[Casting] " in str(e)):
+                self._unknown_type(self.typing)
+            else:
+                self._casting_error(value, self.typing)
+        
 
     def update_value(self,value):
-        if self.typing == "int" || self.typing == "integer" || self.typing == "float":
+        if self.typing == "int" or self.typing == "integer" or self.typing == "float":
             self.value += value
         else:
             tempstring = "[Attribute] this attribute cannot be updated:\n"
@@ -51,31 +58,38 @@ class Attribute:
 
     def _cast_value(self):
         try:
-            self._value =  self._cast(self.value,self.typing)
+            self._value =  cast(self.value,self.typing)
         except ValueError as e:
-            if ("[Attribute] " in str(e)):
-                raise ValueError(e)
+            if ("[Casting] " in str(e)):
+                self._unknown_type(self.typing)
             else:
-                tempstring = f"\nUnable to cast value to {self.typing} :\n"
-                tempstring += self._get_object_details()
-                raise(ValueError(tempstring))
+                self._casting_error(self.value, self.typing)
 
-    def _cast(self,value,typing):
-        if typing == "string":
-            return f"{value}"
-        elif self.typing == "bool":
-            return bool(value)
-        elif self.typing == "int" || typing == "integer":
-            return int(value)
-        elif self.typing == "float":
-            return int(value)
-        else:
-            tempstring = "\n[Attribute] Unknown typing for:\n"
-            tempstring += self._get_object_details()
-            raise(ValueError(tempstring))
+    def _casting_error(self, value, typing):               
+        tempstring = f"\nUnable to cast value {value} to {typing} :\n"
+        tempstring += self._get_object_details()
+        raise(ValueError(tempstring))
+
+
+    def _unknown_type(self,typing):
+        tempstring = f"\nUnknown typing: {typing} :\n"
+        tempstring += self._get_object_details()
+        raise(ValueError(tempstring))
 
     def __str__(self):
         tempstring = "[Attribute]\n"
         tempstring += _get_object_details()
         return tempstring
 
+def cast(value,typing):
+    if typing == "string":
+        return f"{value}"
+    elif typing == "bool":
+        return bool(value)
+    elif typing == "int" or typing == "integer":
+        return int(value)
+    elif typing == "float":
+        return float(value)
+    else:
+        tempstring = f"\n[Casting] Unknown typing: {typing}\n"
+        raise(ValueError(tempstring))

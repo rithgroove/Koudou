@@ -39,7 +39,7 @@ class ActionMove(Action):
             temp = agent.get_attribute(temp.replace("$",""))
 
         if typing == "destination_type":
-            self.destination = kd_map.get_random_business(temp, 1, self.rng)[0].node_id
+            self.destination = kd_map.get_random_business(temp, 1, rng)[0].node_id
         elif typing == "destination_id":
             self.destination = temp
         self.sequence = []

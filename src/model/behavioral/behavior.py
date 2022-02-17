@@ -24,5 +24,4 @@ class Behavior:
 	def __str__(self):
 		tempstring = "[Behavior]\n"
 		tempstring += f"   Name = {self.name}"
-
 		return tempstring

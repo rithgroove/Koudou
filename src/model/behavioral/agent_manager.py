@@ -14,9 +14,9 @@ def load_conditions(condition_file):
 	conditions = {}
 	for x in data:
 		if x["value"] == "$random":
-			conditions[x["name"]] = Condition(x["name"],x["attribute"],x["value"],x["operator"])
+			conditions[x["name"]] = Condition(x["name"],x["attribute"],x["value"],x["operator"],x["type"])
 		else:
-			conditions[x["name"]] = Condition(x["name"],x["attribute"],x["value"],x["operator"])
+			conditions[x["name"]] = Condition(x["name"],x["attribute"],x["value"],x["operator"],x["type"])
 	return conditions
 	
 def generate_agents(kd_map,attribute_generator,count):

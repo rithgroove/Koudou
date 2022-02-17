@@ -1,12 +1,13 @@
-from .attribute import Attribute
+from .attribute import Attribute,cast
 
-class AttributeUpdateable(Attribute,typing):
+class AttributeUpdateable(Attribute):
     
-    def __init__(self,name, value, min_val, max_val, step_change,typing):
+    def __init__(self,name, value, min_val, max_val, step_change, typing):
         super(AttributeUpdateable,self).__init__(name,value,typing)
-        self.min_val = self._cast_value(min_val,self.typing)
-        self.max_val = self._cast_value(max_val,self.typing)
-        self.step_change = self._cast_value(step_change,self.typing)
+        self.min_val = cast(min_val,self.typing)
+        self.max_val = cast(max_val,self.typing)
+        self.step_change = cast(step_change,self.typing)
+
 
     def step(self,kd_sim,kd_map,ts,step_length,rng,agent):
         self.value += self.step_change*step_length

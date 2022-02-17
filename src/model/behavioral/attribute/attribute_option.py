@@ -1,17 +1,30 @@
-from .attribute import Attribute
+from .attribute import Attribute, cast
 
 class AttributeOption(Attribute):
     def __init__(self,name, value,options, typing = "string"):
         super(AttributeOption,self).__init__(name,value,typing)
         self.options = options
         for option in self.options:
-            option["value"] = self._cast_value(option["value"],self.typing) #cast the options just to ensure
+            try:
+                option["value"] = cast(option["value"],self.typing) #cast the options just to ensure
+            except ValueError as e:
+                if ("[Casting] " in str(e)):
+                    self._unknown_type(self.typing)
+                else:
+                    self._casting_error(option["value"],self.typing)
 
     def get_options(self):
         return options
 
     def set_value(self,value):
-        temp_value = self._cast_value(value,self.typing)
+        try:
+            temp_value = cast(value,self.typing)
+        except ValueError as e:
+            if ("[Casting] " in str(e)):
+                self._unknown_type(self.typing)
+            else:
+                self._casting_error(value,self.typing)
+
         success = False
         for x in self.options:
             if (x["value"] == temp_value):
@@ -22,8 +35,8 @@ class AttributeOption(Attribute):
             tempstring += self._get_object_details()
             tempstring += f" {temp_value} is not available in options.\n"
             tempstring += " Available options:\n"
-            for option in options:
-                tempstring += f" - {option["value"]}\n"
+            for option in self.options:
+                tempstring += f" - {option['value']}\n"
             raise(ValueError(tempstring))
 
     def step(self,kd_sim,kd_map,ts,step_length,rng,agent):
@@ -33,5 +46,5 @@ class AttributeOption(Attribute):
         tempstring = "[AttributeOption]\n"
         tempstring += self._get_object_details()
         tempstring += " Options:\n"
-        for option in options:
-            tempstring += f" - {option["value"]}\n"
+        for option in self.options:
+            tempstring += f" - {option['value']}\n"

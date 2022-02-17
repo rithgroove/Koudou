@@ -1,4 +1,4 @@
-"name","attribute","operator","value"," max","min","typing"
+"name","attribute","operator","value"," max","min","type"
 "is_working","is_working_hour","equal","True","N/A","N/A","bool"
 "not_at_home","current_node_id","not_equal","$home_node_id","N/A","N/A","string"
 "hungry","hunger","less_than_equal",0.66,"N/A","N/A","float"

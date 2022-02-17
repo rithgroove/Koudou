@@ -3,7 +3,7 @@ from .action import Action
 class ActionModifyAttribute(Action):    
     def __init__(self,agent,command):
         super(ActionModifyAttribute,self).__init__()
-        temp = command.split(":")        
+        temp = command.split("-")        
         self.attribute_name = temp[0]
         if (temp[1].lower() == "max"):
             self.value = "max"
@@ -27,7 +27,7 @@ class ActionModifyAttribute(Action):
         return:
         - (int) the remainder of the step_length that was not consumed by this action
         """
-        agent.update_attribute(self.attribute_name,self.value)
+        self.agent.update_attribute(self.attribute_name,self.value)
         self.finished = True
         return step_length #return the left over time 
 
