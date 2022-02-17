@@ -12,7 +12,13 @@ class Condition:
         if ("$" in value):
             value = agent.get_attribute(value.replace("$",""))
         print(f"{agent.get_attribute(self.attribute_name)} {_fetch_symbols(self.operator_string)} {value}")
-        return self.operator(agent.get_attribute(self.attribute_name), value)
+        try:
+            return self.operator(agent.get_attribute(self.attribute_name), value)
+        except:
+            tempstring = "\nProblem with {self.attribute_name}\n"
+            tempstring += f"value             = {value}\n"
+            tempstring += f"agent's attribute = {agent.get_attribute(self.attribute_name)}\n"
+            raise ValueError(tempstring)
 
     @property
     def short_string(self):

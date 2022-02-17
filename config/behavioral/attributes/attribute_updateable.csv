@@ -1,3 +1,3 @@
 "name","default_min","default_max","max","min","step_update","notes"
-"Hunger",0.5,0.9,1,0,-1.15E-05,"The number are selected to simulate a 3 time meals per day"
-"Energy",1000,1440,1440,0,-0.017,"1440 is the number of minutes in one day, 0.017 is 1 minutes divided by 60 seconds"
+"hunger",0.5,0.9,1,0,-1.15E-05,"The number are selected to simulate a 3 time meals per day","float"
+"energy",1000,1440,1440,0,-0.017,"1440 is the number of minutes in one day, 0.017 is 1 minutes divided by 60 seconds","float"

@@ -33,7 +33,10 @@ class GeneratorAttribute:
 	def load_basic_attribute(self,file):
 		basic_attributes  = csv_reader.read_csv_as_dict(file)
 		for attr in basic_attributes:
-			self.basic[attr["name"]] = attr["value"]
+			temp = {}
+			temp["value"] = attr["value"]
+			temp["type"] = attr["type"]
+			self.basic[attr["name"]] = temp
 
 	def load_option_based_attribute(self,file):
 		option_based_attributes  = csv_reader.read_csv_as_dict(file)
@@ -45,6 +48,7 @@ class GeneratorAttribute:
 				self.option[attr["name"]]["options"] = []
 			self.option[attr["name"]]["weights"].append(float(attr["weight"]))
 			self.option[attr["name"]]["value"].append(attr["value"])
+			self.option[attr["name"]]["type"].append(attr["type"])
 			option = {}
 			option["value"]= attr["value"]
 			option["weight"]= float(attr["weight"])
@@ -55,11 +59,19 @@ class GeneratorAttribute:
 		for attr in updateable_attributes:
 			temp  = {}
 			temp["name"] = attr["name"]
-			temp["max"] = float(attr["max"])
-			temp["min"] = float(attr["min"])
-			temp["default_max"] = float(attr["default_max"])
-			temp["default_min"] = float(attr["default_min"])
-			temp["step_update"] = float(attr["step_update"])
+			temp["type"] = attr["type"]
+			if (temp["type"].lower() == "float"):
+				temp["max"] = float(attr["max"])
+				temp["min"] = float(attr["min"])
+				temp["default_max"] = float(attr["default_max"])
+				temp["default_min"] = float(attr["default_min"])
+				temp["step_update"] = float(attr["step_update"])
+			else (temp["type"].lower() == "int" || temp["type"].lower() == "integer" ):
+				temp["max"] = int(attr["max"])
+				temp["min"] = int(attr["min"])
+				temp["default_max"] = int(attr["default_max"])
+				temp["default_min"] = int(attr["default_min"])
+				temp["step_update"] = int(attr["step_update"]) 
 			self.updateable[attr["name"]] = temp
 
 	def load_profession(self,file):
@@ -99,7 +111,7 @@ class GeneratorAttribute:
 		agent.coordinate =  home_node.coordinate.clone()
 
 		for attr in self.basic:
-			agent.add_attribute(Attribute(attr,self.basic[attr]))
+			agent.add_attribute(Attribute(attr,self.basic[attr]["value"],self.basic[attr]["type"]))
 
 		for key in self.updateable:
 			attr = self.updateable[key]
