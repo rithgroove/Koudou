@@ -1,2 +1,2 @@
-name,value,type
-walking_speed,1.46,float
+target,name,value,type
+agent,walking_speed,1.46,float

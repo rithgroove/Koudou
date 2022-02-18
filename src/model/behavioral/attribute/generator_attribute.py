@@ -12,8 +12,13 @@ class GeneratorAttribute:
 		self.attributes = []		
 		self.rng = rng
 		self.basic = {}
+		self.basic_sim = {}
 		self.option = {}	
+		self.option_sim = {}
 		self.updateable = {}
+		self.updateable_sim = {}
+		self.schedules = {}
+		self.schedules_sim = {}
 		self.professions = []
 		self.counter = 0
 		self.max_weight = 0
@@ -30,13 +35,23 @@ class GeneratorAttribute:
 		for filepath in attribute_files["profession"]:
 			self.load_profession(filepath)
 
+		for filepath in attribute_files["schedule"]:
+			self.load_schedule_based_attribute(filepath)
+
 	def load_basic_attribute(self,file):
 		basic_attributes  = csv_reader.read_csv_as_dict(file)
 		for attr in basic_attributes:
 			temp = {}
 			temp["value"] = attr["value"]
 			temp["type"] = attr["type"]
-			self.basic[attr["name"]] = temp
+			if (attr["target"] == "agent"):
+				self.basic[attr["name"]] = temp
+			elif(attr["target"] == "simulation"):
+				self.basic_sim[attr["name"]] = temp
+			else:
+				tempstring = f"Unknown target : {attr['target']} for attribute {attr['name']}\n"
+				tempstring += f"available target: agent or simulation"
+				raise ValueError(tempstring)
 
 	def load_option_based_attribute(self,file):
 		option_based_attributes  = csv_reader.read_csv_as_dict(file)
@@ -53,7 +68,37 @@ class GeneratorAttribute:
 			option = {}
 			option["value"]= attr["value"]
 			option["weight"]= float(attr["weight"])
-			self.option[attr["name"]]["options"].append(option)
+			if (attr["target"] == "agent"):
+				self.option[attr["name"]]["options"].append(option)
+			elif(attr["target"] == "simulation"):
+				self.option_sim[attr["name"]]["options"].append(option)
+			else:
+				tempstring = f"Unknown target : {attr['target']} for attribute {attr['name']}\n"
+				tempstring += f"available target: agent or simulation"
+				raise ValueError(tempstring)
+
+	def load_schedule_based_attribute(self,file):
+		option_based_attributes  = csv_reader.read_csv_as_dict(file)
+		for attr in option_based_attributes:
+			temp = {}
+			temp["name"] = attr["name"]
+			temp["start_time"] = int(attr["evacuation_start_day"]) #days
+			temp["start_time"] += (temp["start_time"]*24) + int(attr["evacuation_start_hour"]) #convert to hours
+			temp["start_time"] += (temp["start_time"]*60) + int(attr["evacuation_start_minute"]) #convert to minutes
+			temp["start_time"] += (temp["start_time"]*60) + int(attr["evacuation_start_second"]) #convert to seconds
+
+			temp["end_time"] = int(attr["evacuation_end_day"]) #days
+			temp["end_time"] += (temp["end_time"]*24) + int(attr["evacuation_end_hour"]) #convert to hours
+			temp["end_time"] += (temp["end_time"]*60) + int(attr["evacuation_end_minute"]) #convert to minutes
+			temp["end_time"] += (temp["end_time"]*60) + int(attr["evacuation_end_second"]) #convert to seconds
+			if (attr["target"] == "agent"):
+				self.schedules[attr["name"]] = temp
+			elif(attr["target"] == "simulation"):
+				self.schedules_sim[attr["name"]] = temp
+			else:
+				tempstring = f"Unknown target : {attr['target']} for attribute {attr['name']}\n"
+				tempstring += f"available target: agent or simulation"
+				raise ValueError(tempstring)
 
 	def load_updatable_attribute(self,file):
 		updateable_attributes  = csv_reader.read_csv_as_dict(file)
@@ -66,7 +111,14 @@ class GeneratorAttribute:
 			temp["default_max"] = cast(attr["default_max"],attr["type"])
 			temp["default_min"] = cast(attr["default_min"],attr["type"])
 			temp["step_update"] = cast(attr["step_update"],attr["type"])
-			self.updateable[attr["name"]] = temp
+			if (attr["target"] == "agent"):
+				self.updateable[attr["name"]] = temp
+			elif(attr["target"] == "simulation"):
+				self.updateable_sim[attr["name"]] = temp
+			else:
+				tempstring = f"Unknown target : {attr['target']} for attribute {attr['name']}\n"
+				tempstring += f"available target: agent or simulation"
+				raise ValueError(tempstring)
 
 	def load_profession(self,file):
 		professions  = csv_reader.read_csv_as_dict(file)
@@ -173,7 +225,6 @@ class GeneratorAttribute:
 		agent.add_attribute(profession)
 
 		return agent
-
 
 	def __str__(self):
 		tempstring = "[Attribute Generator]\n\n"

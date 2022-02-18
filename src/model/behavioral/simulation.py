@@ -16,11 +16,22 @@ class Simulation:
 		self.kd_map = kd_map
 		self.cache_file_name = cache_file_name
 		self.report = report
+		self.attributes ={}
+
+	def add_attribute(self,attr):
+		self.attributes[attr.name] = attr
+
+	def get_attribute(self,name):
+		return self.attributes[name].get_value
 
 	def __str__(self):
 		tempstring = "[Simulation]\n"
 		tempstring += f"Total agents = {len(self.agents)}\n"
 		tempstring += f"Condition = {len(self.conditions)}\n"
+		tempstring += f"Attributes:\n"
+		for x in self.attributes:
+			tempstring +=  f"  - {x} = {self.attributes[x].get_value}\n"
+
 		return tempstring
 
 	def test(self):

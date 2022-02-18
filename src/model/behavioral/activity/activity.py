@@ -18,10 +18,10 @@ class Activity:
 	def add_action(self,action):
 		self.actions.append(action)
 
-	def check_conditions(self,agent):
+	def check_conditions(self,agent,kd_sim):
 		result = True
 		for x in self.condition:
-			result = result and x.check_value(agent)
+			result = result and x.check_value(agent,kd_sim)
 		return result
 
 	def generate_actions(self,agent,kd_map,rng):
@@ -38,6 +38,8 @@ class Activity:
 			elif (temp[0].lower()=="move"):
 				actions.append(ActionMove(agent,kd_map,temp[1],rng))
 			elif (temp[0].lower()=="modify_attribute"):
+				actions.append(ActionModifyAttribute(agent,temp[1]))
+			elif (temp[0].lower()=="change_behavior"):
 				actions.append(ActionModifyAttribute(agent,temp[1]))
 		print(f"length = {len(actions)}")
 		return actions

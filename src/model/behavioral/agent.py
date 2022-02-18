@@ -5,6 +5,7 @@ class Agent:
 		self.agent_id = agent_id
 		self.attributes = {}
 		self.default_behavior = None
+		self.behaviors = {}
 		self.actions = []
 		self.active_action = None
 		self.coordinate = Coordinate(0.0,0.0)
@@ -25,6 +26,12 @@ class Agent:
 
 	def set_attribute(self,attribute_name,value):
 		self.attributes[attribute_name].set_value(value)
+
+	def add_behavior(self,behavior):
+		self.behaviors[behavior.name] = behavior
+
+	def switch_behavior(self,behavior_name):
+		self.default_behavior = self.behaviors[behavior_name]
 
 	def __str__(self):
 		tempstring = "[Agent]\n"

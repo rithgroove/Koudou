@@ -1,21 +1,22 @@
 import operator
 from src.model.behavioral.attribute.attribute import cast
 class Condition:
-    def __init__(self,name, attribute_name,value, operator_string,typing = "string"):
+    def __init__(self,name, attribute_name,value, operator_string,typing = "string",target ="agent"):
         self.name = name
         self.attribute_name = attribute_name
         self.value = value
         self.operator_string = operator_string
         self.operator = _fetch_operator(operator_string)
         self.typing = typing
+        self.target = target
 
-    def check_value(self,agent):
+    def check_value(self,agent,kd_sim):
         value = self.value
-        if ("$" in value):
+        if ("$" in value and self.target == "agent"):
             value = agent.get_attribute(value.replace("$",""))
-
+        elif ("$" in value and self.target == "simulator"):
+            value = kd_sim.get_attribute(value.replace("$",""))
         value = cast(value,self.typing)
-        print(f"{agent.get_attribute(self.attribute_name)} {_fetch_symbols(self.operator_string)} {value}")
         try:
             return self.operator(agent.get_attribute(self.attribute_name), value)
         except:
