@@ -1,8 +1,9 @@
 from .action import Action
 
 class ActionChangeBehavior(Action):    
+
     def __init__(self,agent,behavior_name):
-        super(ActionModifyAttribute,self).__init__()
+        super(ActionChangeBehavior,self).__init__()
         self.behavior_name = behavior_name
         self.agent = agent
 
@@ -17,9 +18,21 @@ class ActionChangeBehavior(Action):
         return:
         - (int) the remainder of the step_length that was not consumed by this action
         """
-        self.agent.change_behavior(behavior_name)
+        self.agent.change_behavior(self.behavior_name)
         self.finished = True
         return step_length #return the left over time 
+
+    @property
+    def is_finished(self):
+        """
+        [Property]
+        Check if this action is finished or not
+
+        return:
+        - (bool) true if finished, false otherwise
+        """
+        return self.finished
+
 
     @property
     def short_string(self):

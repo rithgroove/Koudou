@@ -1,6 +1,7 @@
 from src.model.behavioral.activity.action_move import ActionMove
 from src.model.behavioral.activity.action_wait import ActionWait
 from src.model.behavioral.activity.action_modify_attribute import ActionModifyAttribute
+from src.model.behavioral.activity.action_change_behavior import ActionChangeBehavior
 
 class Activity:
 	def __init__(self,name):
@@ -36,7 +37,7 @@ class Activity:
 			elif (temp[0].lower()=="modify_attribute"):
 				actions.append(ActionModifyAttribute(agent,temp[1]))
 			elif (temp[0].lower()=="change_behavior"):
-				actions.append(ActionModifyAttribute(agent,temp[1]))
+				actions.append(ActionChangeBehavior(agent,temp[1]))
 		print(f"length = {len(actions)}")
 		return actions
 

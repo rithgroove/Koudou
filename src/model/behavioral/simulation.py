@@ -4,21 +4,24 @@ import src.model.map.a_star as a_star
 class Simulation:
 	def __init__(self,config,kd_map,rng,agents_count,threads = 1, cache_file_name = None, report = None):
 		self.agents = []
-		attribute_generator = agent_manager.load_attributes_generator(config["attribute_generator"],rng)
-		print(attribute_generator)
+		attribute_generator = agent_manager.load_attributes_generator(config["attributes"],rng)
+		#print(attribute_generator)
 		self.agents = agent_manager.generate_agents(kd_map,attribute_generator,agents_count)		
 		self.conditions = agent_manager.load_conditions(config["condition"])
-		self.behavior = agent_manager.load_behavior("normal", config["behavior"], self.conditions, rng)
+		self.behaviors = {}
+		for key in config["behaviors"]:
+			self.behaviors[key] = agent_manager.load_behavior(key, config["behaviors"][key], self.conditions, rng)
 		for x in self.agents:
-			x.default_behavior = self.behavior
+			x.behaviors = self.behaviors
+			x.default_behavior = self.behaviors[config["default_behavior"]]
+		self.attributes = {}
+		attribute_generator.generate_attribute_for_simulation(self,kd_map)
 		self.rng = rng
-		self.ts = TimeStamp(9*3600)
+		self.ts = TimeStamp(0)
 		self.threads = threads
 		self.kd_map = kd_map
 		self.cache_file_name = cache_file_name
 		self.report = report
-		self.attributes = {}
-		attribute_generator.generate_attribute_for_simulation(self,kd_map)
 
 	def add_attribute(self,attr):
 		self.attributes[attr.name] = attr
@@ -43,10 +46,11 @@ class Simulation:
 	def attribute_step(self,kd_sim,kd_map,ts,step_length,rng):
 		#update attribute
 		for attr in self.attributes:
-			self.attributes[attr].step(kd_sim,kd_map,ts,step_length,rng,self)
+			self.attributes[attr].step(kd_sim,kd_map,ts,step_length,rng,None)
 
 	def step(self,step_length):
 		self.ts.step(step_length)
+		self.attribute_step(self,self.kd_map,self.ts,step_length,self.rng)
 		##############################################################################
 		# update all agents attribute
 		##############################################################################

@@ -30,14 +30,15 @@ class Agent:
 	def add_behavior(self,behavior):
 		self.behaviors[behavior.name] = behavior
 
-	def switch_behavior(self,behavior_name):
+	def change_behavior(self,behavior_name):
 		self.default_behavior = self.behaviors[behavior_name]
 
 	def __str__(self):
 		tempstring = "[Agent]\n"
-		tempstring += f" Agent ID = {self.agent_id}\n"
+		tempstring += f" Agent ID         = {self.agent_id}\n"
+		tempstring += f" Current behavior = {self.default_behavior.name}\n"
 		tempstring += f" Current location = (lat = {self.coordinate.lat}, lon {self.coordinate.lon})\n"
-		tempstring += f" Current Actions = {len(self.actions)}\n"
+		tempstring += f" Current Actions  = {len(self.actions)}\n"
 		tempstring += f" Attributes:\n"
 		for x in self.attributes:
 			tempstring +=  f"  - {x} = {self.attributes[x].get_value}\n"

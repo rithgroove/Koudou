@@ -13,16 +13,11 @@ def load_conditions(condition_file):
 	data = read_csv_as_dict(condition_file)
 	conditions = {}
 	for x in data:
-		target = "agent"
 		attribute = x["attribute"]
-		if "(simulation)" in attribute.lower():
-			target = "simulation"
-			attribute = attribute.replace("(simulation)","")
+		if x["value"] == "$random":
+			conditions[x["name"]] = Condition(x["name"],x["attribute"],x["value"],x["operator"],x["type"],x["target"])
 		else:
-			if x["value"] == "$random":
-				conditions[x["name"]] = Condition(x["name"],x["attribute"],x["value"],x["operator"],x["type"],target)
-			else:
-				conditions[x["name"]] = Condition(x["name"],x["attribute"],x["value"],x["operator"],x["type"],target)
+			conditions[x["name"]] = Condition(x["name"],x["attribute"],x["value"],x["operator"],x["type"],x["target"])
 	return conditions
 	
 def generate_agents(kd_map,attribute_generator,count):

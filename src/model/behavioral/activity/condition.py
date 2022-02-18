@@ -27,7 +27,10 @@ class Condition:
         except:
             tempstring = f"\nProblem with {self.attribute_name}\n"
             tempstring += f"value             = {value}\n"
-            tempstring += f"agent's attribute = {agent.get_attribute(self.attribute_name)}\n"
+            if self.target == "agent":
+                tempstring += f"agent's attribute = {agent.get_attribute(self.attribute_name)}\n"
+            elif self.target == "simulation":
+                tempstring += f"agent's attribute = {kd_sim.get_attribute(self.attribute_name)}\n"
             raise ValueError(tempstring)
 
     @property
