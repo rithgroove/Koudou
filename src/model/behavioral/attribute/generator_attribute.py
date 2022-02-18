@@ -100,6 +100,7 @@ class GeneratorAttribute:
 				tempstring += f"available target: agent or simulation"
 				raise ValueError(tempstring)
 
+
 	def load_updatable_attribute(self,file):
 		updateable_attributes  = csv_reader.read_csv_as_dict(file)
 		for attr in updateable_attributes:
@@ -174,6 +175,9 @@ class GeneratorAttribute:
 			value = self.rng.choice(self.option[key]["value"],1,p=self.option[key]["weights"])[0]
 			agent.add_attribute(AttributeOption(key,value,self.option[key]["options"],self.option[key]["type"]))
 
+		for key in self.schedules:
+			agent.add_attribute(AttributeSchedule(key, self.schedules[key]["start_time"],self.schedules[key]["end_time"]))
+
 		# get profession for this agent (not random but iteratively)
 		counter = self.counter % self.max_weight
 		temp = None
@@ -226,15 +230,37 @@ class GeneratorAttribute:
 
 		return agent
 
+
+	def generate_attribute_for_simulation(self,kd_sim,kd_map):
+		# add basic attribute
+		for attr in self.basic_sim:
+			kd_sim.add_attribute(Attribute(attr,self.basic_sim[attr]["value"],self.basic_sim[attr]["type"]))
+
+		# add updateable attribute
+		for key in self.updateable_sim:
+			attr = self.updateable_sim[key]
+			kd_sim.add_attribute(AttributeUpdateable(key, self.rng.uniform(attr["default_min"],attr["default_max"],1)[0], attr["min"], attr["max"], attr["step_update"], attr["type"]))
+
+		# add option based attribute
+		for key in self.option_sim:
+			value = self.rng.choice(self.option_sim[key]["value"],1,p=self.option_sim[key]["weights"])[0]
+			kd_sim.add_attribute(AttributeOption(key,value,self.option_sim[key]["options"],self.option_sim[key]["type"]))
+
+		for key in self.schedules_sim:
+			kd_sim.add_attribute(AttributeSchedule(key, self.schedules_sim[key]["start_time"],self.schedules_sim[key]["end_time"]))
+
 	def __str__(self):
 		tempstring = "[Attribute Generator]\n\n"
+		tempstring += "-----------------------------------------------\n"
+		tempstring += "| Agent's attributes                          |\n"
+		tempstring += "-----------------------------------------------\n"
 		tempstring += f" Basic attributes = {len(self.basic)}\n"
 		for x in self.basic:
-			tempstring+= f"   + {x} : {self.basic[x]}\n"
+			tempstring+= f"   + {x} : {self.basic[x]['value']}({self.basic[x]['type']})\n"
 		tempstring += f"\n"
 		tempstring += f" Option based attributes = {len(self.option)}\n"
 		for x in self.option:
-			tempstring+= f"   + {x} :\n"
+			tempstring+= f"   + {x} ({self.option[x]['type']}):\n"
 			if self.option[x].get("default") is not None:
 				tempstring+= f"     - Default Value = {self.option[x]['default']}\n"
 			for option in self.option[x]["options"]:
@@ -242,13 +268,20 @@ class GeneratorAttribute:
 		tempstring += f"\n"
 		tempstring += f" Updateable attributes = {len(self.updateable)}\n"
 		for key in self.updateable:
-			tempstring+= f"   + {key} : \n"
 			x = self.updateable[key]
+			tempstring+= f"   + {key} ({x['type']}): \n"
 			tempstring+= f"     - range            : {x['min']} - {x['max']} \n"
 			tempstring+= f"     - initialization   : {x['default_min']} - {x['default_max']}\n"
 			tempstring+= f"     - update (seconds) : {x['step_update']}\n"
 			if (x.get("notes") is not None):
 				tempstring+= f"     - notes            : {x['notes']}\n"
+		tempstring += f"\n"
+		tempstring += f" Scheduled attributes = {len(self.schedules)}\n"
+		for key in self.schedules:
+			x = self.schedules[key]
+			tempstring+= f"   + {key}: \n"
+			tempstring+= f"     - start          : {x['start_time']}\n"
+			tempstring+= f"     - end            : {x['end_time']}\n"
 		tempstring += f"\n"
 		tempstring += f" Professions = {len(self.professions)}\n"
 		for profession in self.professions:
@@ -263,4 +296,35 @@ class GeneratorAttribute:
 			else:
 				tempstring += f"     - off_map        : False\n"
 			tempstring += f"     - schedule      : {','.join(profession['schedule'])}\n"
+		tempstring += "-----------------------------------------------\n"
+		tempstring += "| simulator's attributes                      |\n"
+		tempstring += "-----------------------------------------------\n"
+		tempstring += f" Basic attributes = {len(self.basic_sim)}\n"
+		for x in self.basic_sim:
+			tempstring+= f"   + {x} : {self.basic_sim[x]['value']}({self.basic_sim[x]['type']})\n"
+		tempstring += f"\n"
+		tempstring += f" Option based attributes = {len(self.option_sim)}\n"
+		for x in self.option_sim:
+			tempstring+= f"   + {x} ({self.option_sim[x]['type']}):\n"
+			if self.option_sim[x].get("default") is not None:
+				tempstring+= f"     - Default Value = {self.option_sim[x]['default']}\n"
+			for option in self.option_sim[x]["options"]:
+				tempstring+= f"     - {option_sim['value']} : {option['weight']}\n"
+		tempstring += f"\n"
+		tempstring += f" Updateable attributes = {len(self.updateable_sim)}\n"
+		for key in self.updateable_sim:
+			x = self.updateable_sim[key]
+			tempstring+= f"   + {key} ({x['type']}): \n"
+			tempstring+= f"     - range            : {x['min']} - {x['max']} \n"
+			tempstring+= f"     - initialization   : {x['default_min']} - {x['default_max']}\n"
+			tempstring+= f"     - update (seconds) : {x['step_update']}\n"
+			if (x.get("notes") is not None):
+				tempstring+= f"     - notes            : {x['notes']}\n"
+		tempstring += f" Scheduled attributes = {len(self.schedules_sim)}\n"
+		for key in self.schedules_sim:
+			x = self.schedules_sim[key]
+			tempstring+= f"   + {key}: \n"
+			tempstring+= f"     - start          : {x['start_time']}\n"
+			tempstring+= f"     - end            : {x['end_time']}\n"
+		tempstring += f"\n"
 		return tempstring

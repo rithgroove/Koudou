@@ -26,10 +26,6 @@ class Activity:
 
 	def generate_actions(self,agent,kd_map,rng):
 		actions = []
-		print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-		print(self.actions)
-		print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-
 		for x in self.actions:
 			temp = x.split(":")
 			temp[0] = temp[0].replace(" ","")

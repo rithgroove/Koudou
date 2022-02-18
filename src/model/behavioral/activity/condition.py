@@ -8,17 +8,22 @@ class Condition:
         self.operator_string = operator_string
         self.operator = _fetch_operator(operator_string)
         self.typing = typing
-        self.target = target
+        self.target = target.lower()
 
     def check_value(self,agent,kd_sim):
         value = self.value
-        if ("$" in value and self.target == "agent"):
+        if ("$" in value):
             value = agent.get_attribute(value.replace("$",""))
-        elif ("$" in value and self.target == "simulator"):
-            value = kd_sim.get_attribute(value.replace("$",""))
         value = cast(value,self.typing)
         try:
-            return self.operator(agent.get_attribute(self.attribute_name), value)
+            if self.target == "agent":
+                return self.operator(agent.get_attribute(self.attribute_name), value)
+            elif self.target == "simulation":
+                return self.operator(kd_sim.get_attribute(self.attribute_name), value)
+            else:
+                tempstring = f"Unknown target for condition {self.name}: {self.target}\n"
+                tempstring += "Available target: agent, simulation"
+                raise ValueError(tempstring)
         except:
             tempstring = f"\nProblem with {self.attribute_name}\n"
             tempstring += f"value             = {value}\n"

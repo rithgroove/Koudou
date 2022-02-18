@@ -5,6 +5,7 @@ class Simulation:
 	def __init__(self,config,kd_map,rng,agents_count,threads = 1, cache_file_name = None, report = None):
 		self.agents = []
 		attribute_generator = agent_manager.load_attributes_generator(config["attribute_generator"],rng)
+		print(attribute_generator)
 		self.agents = agent_manager.generate_agents(kd_map,attribute_generator,agents_count)		
 		self.conditions = agent_manager.load_conditions(config["condition"])
 		self.behavior = agent_manager.load_behavior("normal", config["behavior"], self.conditions, rng)
@@ -16,7 +17,8 @@ class Simulation:
 		self.kd_map = kd_map
 		self.cache_file_name = cache_file_name
 		self.report = report
-		self.attributes ={}
+		self.attributes = {}
+		attribute_generator.generate_attribute_for_simulation(self,kd_map)
 
 	def add_attribute(self,attr):
 		self.attributes[attr.name] = attr
@@ -37,6 +39,11 @@ class Simulation:
 	def test(self):
 		for x in self.agents:
 			print(x)
+
+	def attribute_step(self,kd_sim,kd_map,ts,step_length,rng):
+		#update attribute
+		for attr in self.attributes:
+			self.attributes[attr].step(kd_sim,kd_map,ts,step_length,rng,self)
 
 	def step(self,step_length):
 		self.ts.step(step_length)
