@@ -12,23 +12,25 @@ class AttributeGroupedSchedule(Attribute):
         - schedules : (list-AttributeSchedule) list of work schedule
     """
     def __init__(self, name):
-        super(AttributeGroupedSchedule,self).__init__(name, "False") 
+        super(AttributeGroupedSchedule,self).__init__(name, False, "bool") 
         self.schedules = []
         self.active_schedule = None
 
     def add_schedule(self, schedule):
         self.schedules.append(schedule)
 
-    @property
-    def get_value(self):
-        #maybe have a global timestamp variable? 
-        self.check_active_schedule()
-        if (self.active_schedule is not None):
-            return self.active_schedule.get_value
-        return "False"
-
-    def check_active_schedule(self):
+    def step(self,kd_sim,kd_map,ts,step_length,rng,agent):
+        self.value = False
         for x in self.schedules:
-            if (x.get_value == "True"):
-                self.active_schedule = x
+            x.step(kd_sim,kd_map,ts,step_length,rng,agent)
+            if x.get_value:
+                self.value = True
                 break
+
+    def __str__(self):
+        tempstring = "[AttributeGroupedSchedule]\n"
+        tempstring += self._get_object_details()
+        tempstring += f"   schedules :\n"
+        for x in self.schedules:
+            tempstring += f"   - {x.short_string}\n"
+        return tempstring

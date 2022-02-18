@@ -1,2 +1,2 @@
-name,value
-walking_speed,1.46
+name,value,type
+walking_speed,1.46,float

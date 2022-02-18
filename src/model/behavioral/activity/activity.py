@@ -1,3 +1,7 @@
+from src.model.behavioral.activity.action_move import ActionMove
+from src.model.behavioral.activity.action_wait import ActionWait
+from src.model.behavioral.activity.action_modify_attribute import ActionModifyAttribute
+
 class Activity:
 	def __init__(self,name):
 		self.name = name
@@ -13,6 +17,30 @@ class Activity:
 
 	def add_action(self,action):
 		self.actions.append(action)
+
+	def check_conditions(self,agent):
+		result = True
+		for x in self.condition:
+			result = result and x.check_value(agent)
+		return result
+
+	def generate_actions(self,agent,kd_map,rng):
+		actions = []
+		print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+		print(self.actions)
+		print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+
+		for x in self.actions:
+			temp = x.split(":")
+			temp[0] = temp[0].replace(" ","")
+			if (temp[0].lower() == "wait"):
+				actions.append(ActionWait(agent,temp[1],rng))
+			elif (temp[0].lower()=="move"):
+				actions.append(ActionMove(agent,kd_map,temp[1],rng))
+			elif (temp[0].lower()=="modify_attribute"):
+				actions.append(ActionModifyAttribute(agent,temp[1]))
+		print(f"length = {len(actions)}")
+		return actions
 
 	def __str__(self):
 		tempstring = "[Activity]\n"

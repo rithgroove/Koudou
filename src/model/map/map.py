@@ -1,4 +1,6 @@
 from typing import Any, Dict, List, Tuple
+from .residence import Residence
+from .business import Business
 from .road import Road
 from .place import Place
 from .node import Node
@@ -21,9 +23,14 @@ class Map():
 
         self.d_places: Dict[str, Place] = {}
         self.d_roads: Dict[Tuple[str, str], Road] = {} # the tuple of id is ordered, NOT start, goal
+        self.d_businesses: Dict[str, Business] = {} 
+        self.d_residences: Dict[str, Residence] = {}
 
     def add_node(self, node):
         self.d_nodes[node.id] = node
+
+    def get_node(self,node_id):
+        return self.d_nodes[node_id]
 
     def add_way(self, way):
         self.d_ways[way.id] = way
@@ -47,3 +54,19 @@ class Map():
 
     def set_main_road(self, main_road):
         self.main_road = main_road
+
+    def get_random_residence(self,rng):
+        key = rng.choice(list(self.d_residences.keys()),1)[0]
+        return self.d_residences[key]
+
+    def get_random_business(self, business_type, qtd, rng, time_stamp=None, only_open=False, only_closed=False):
+        arr = [b for b in self.d_businesses.values()]
+        if only_open:
+            arr = [b for b in arr if b.is_open(time_stamp)]
+        elif only_closed:
+            arr = [b for b in arr if not b.is_open(time_stamp)]
+
+        arr = [b for b in arr if b.type == business_type]
+        
+        results = rng.choice(arr, qtd, replace=False)
+        return results

@@ -1,0 +1,79 @@
+{
+    "quadrants": [
+        [
+            {
+                "id": [0,0],
+                "ditribution": "absolute",
+                "buildings": [
+                ]
+
+            },
+            {
+                "id": [0,1],
+                "ditribution": "absolute",
+                "buildings": [
+                    {"type": "nursery", "qtd":1},
+                    {"type": "school", "qtd": 1}
+                ]
+
+            },
+            {
+                "id": [0,2],
+                "ditribution": "absolute",
+                "buildings": [
+                    {"type": "", "qtd":1}
+                ]
+            }
+        ],
+        [
+            {
+                "id": [1,0],
+                "ditribution": "absolute",
+                "buildings": [
+                    {"type": "", "qtd":1}
+                ]
+
+            },
+            {
+                "id": [1,1],
+                "ditribution": "absolute",
+                "buildings": [
+                    {"type": "", "qtd":1}
+                ]
+
+            },
+            {
+                "id": [1,2],
+                "ditribution": "absolute",
+                "buildings": [
+                    {"type": "", "qtd":1}
+                ]
+            }
+        ],
+        [
+            {
+                "id": [2,0],
+                "ditribution": "absolute",
+                "buildings": [
+                    {"type": "", "qtd":1}
+                ]
+
+            },
+            {
+                "id": [2,1],
+                "ditribution": "absolute",
+                "buildings": [
+                    {"type": "", "qtd":1}
+                ]
+
+            },
+            {
+                "id": [2,2],
+                "ditribution": "absolute",
+                "buildings": [
+                    {"type": "", "qtd":1}
+                ]
+            }
+        ]
+    ]
+}

@@ -1,6 +1,6 @@
 import src.util.csv_reader as csv_reader
 import numpy as np
-from .attribute import Attribute
+from .attribute import Attribute,cast
 from .attribute_updateable import AttributeUpdateable
 from .attribute_option import AttributeOption
 from .attribute_grouped_schedule import AttributeGroupedSchedule
@@ -33,7 +33,10 @@ class GeneratorAttribute:
 	def load_basic_attribute(self,file):
 		basic_attributes  = csv_reader.read_csv_as_dict(file)
 		for attr in basic_attributes:
-			self.basic[attr["name"]] = attr["value"]
+			temp = {}
+			temp["value"] = attr["value"]
+			temp["type"] = attr["type"]
+			self.basic[attr["name"]] = temp
 
 	def load_option_based_attribute(self,file):
 		option_based_attributes  = csv_reader.read_csv_as_dict(file)
@@ -43,8 +46,10 @@ class GeneratorAttribute:
 				self.option[attr["name"]]["weights"] = []
 				self.option[attr["name"]]["value"] = []
 				self.option[attr["name"]]["options"] = []
+				self.option[attr["name"]]["type"] = []
 			self.option[attr["name"]]["weights"].append(float(attr["weight"]))
 			self.option[attr["name"]]["value"].append(attr["value"])
+			self.option[attr["name"]]["type"] = attr["type"]
 			option = {}
 			option["value"]= attr["value"]
 			option["weight"]= float(attr["weight"])
@@ -55,11 +60,12 @@ class GeneratorAttribute:
 		for attr in updateable_attributes:
 			temp  = {}
 			temp["name"] = attr["name"]
-			temp["max"] = float(attr["max"])
-			temp["min"] = float(attr["min"])
-			temp["default_max"] = float(attr["default_max"])
-			temp["default_min"] = float(attr["default_min"])
-			temp["step_update"] = float(attr["step_update"])
+			temp["type"] = attr["type"]
+			temp["max"] = cast(attr["max"],attr["type"])
+			temp["min"] = cast(attr["min"],attr["type"])
+			temp["default_max"] = cast(attr["default_max"],attr["type"])
+			temp["default_min"] = cast(attr["default_min"],attr["type"])
+			temp["step_update"] = cast(attr["step_update"],attr["type"])
 			self.updateable[attr["name"]] = temp
 
 	def load_profession(self,file):
@@ -89,22 +95,35 @@ class GeneratorAttribute:
 			profession["schedule"]= np.array(profession["schedule"])
 			self.professions.append(profession)
 
-	def generate_attribute(self,agent):
-		#add attribute to the agent
-		for attr in self.basic:
-			agent.add_attribute(Attribute(attr,self.basic[attr]))
+	def generate_attribute(self,agent,kd_map):
+		# get random residence (need to develop household)
+		residence = kd_map.get_random_residence(self.rng)
 
+		# setup initial coordinate
+		home_node = kd_map.get_node(residence.node_id)
+		agent.coordinate =  home_node.coordinate.clone()
+
+		# add home node id
+		agent.add_attribute(Attribute("home_id",residence.id,"string"))
+		agent.add_attribute(Attribute("home_node_id",residence.node_id,"string"))
+		agent.add_attribute(Attribute("current_node_id",residence.node_id,"string"))
+
+		# add basic attribute
+		for attr in self.basic:
+			agent.add_attribute(Attribute(attr,self.basic[attr]["value"],self.basic[attr]["type"]))
+
+		# add updateable attribute
 		for key in self.updateable:
 			attr = self.updateable[key]
-			agent.add_attribute(AttributeUpdateable(key, self.rng.uniform(attr["default_min"],attr["default_max"],1)[0], attr["min"], attr["max"], attr["step_update"]))
+			agent.add_attribute(AttributeUpdateable(key, self.rng.uniform(attr["default_min"],attr["default_max"],1)[0], attr["min"], attr["max"], attr["step_update"], attr["type"]))
 
+		# add option based attribute
 		for key in self.option:
 			value = self.rng.choice(self.option[key]["value"],1,p=self.option[key]["weights"])[0]
-			agent.add_attribute(AttributeOption(key,value,self.option[key]["options"]))
-		#agent profession
+			agent.add_attribute(AttributeOption(key,value,self.option[key]["options"],self.option[key]["type"]))
 
+		# get profession for this agent (not random but iteratively)
 		counter = self.counter % self.max_weight
-
 		temp = None
 		for prof in self.professions:
 			if prof["weight"] > counter:
@@ -113,40 +132,45 @@ class GeneratorAttribute:
 			else:
 				counter -= prof["weight"]
 		self.counter+=1
+
+		#calculate start time, end time, etc
 		start_time = self.rng.integers(temp["min_start_hour"],temp["max_start_hour"]+1,1)[0]
 		workhour = self.rng.integers(temp["min_workhour"],temp["max_workhour"]+1,1)[0]
 		end_time = (start_time + workhour)%24
 		workday = self.rng.integers(temp["min_workday"],temp["max_workday"]+1,1)[0]
 
-		### randomize day
-
+		# randomize day
 		workdays = temp["schedule"]
 		self.rng.shuffle(workdays,axis = 0)
 		workdays = workdays[:workday]
-		
-		###---just for sorting from mon to sun--
+		#------just for sorting from mon to sun (cosmetic for printing)------
 		temp2 = []
 		for x in ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]:
 			if x in workdays:
 				temp2.append(x)
-		workdays =temp2
+		workdays =temp2		
+		#---------------------------sorting done-----------------------------
+
+		#get random workplace
+		business = kd_map.get_random_business(temp["place"], 1, self.rng)[0]
 		
-		###---sorting done---
+		# generate profession related attribute 
+		agent.add_attribute(Attribute("profession",temp["name"],"string"))
+		agent.add_attribute(Attribute("workplace_type",temp["place"],"string"))
+		agent.add_attribute(Attribute("start_time",start_time,"int"))
+		agent.add_attribute(Attribute("end_time",end_time,"int"))
+		agent.add_attribute(Attribute("workhour",workhour,"int"))
+		agent.add_attribute(Attribute("workday",workday,"int"))
+		agent.add_attribute(Attribute("schedule", ",".join(workdays),"string"))
+		agent.add_attribute(Attribute("off_map", temp["off_map"],"bool"))
+		agent.add_attribute(Attribute("workplace_id",business.id,"string"))
+		agent.add_attribute(Attribute("workplace_node_id",business.node_id,"string"))
 
-		agent.add_attribute(Attribute("profession",temp["name"]))
-		agent.add_attribute(Attribute("workplace_type",temp["place"]))
-		agent.add_attribute(Attribute("start_time",start_time))
-		agent.add_attribute(Attribute("end_time",end_time))
-		agent.add_attribute(Attribute("workhour",workhour))
-		agent.add_attribute(Attribute("workday",workday))
-		agent.add_attribute(Attribute("schedule", ",".join(workdays)))
-		agent.add_attribute(Attribute("off_map", temp["off_map"]))
+		# generate and add schedule attribute
 		profession = AttributeGroupedSchedule("is_working_hour")
-
 		for x in workdays:
 			profession.add_schedule(AttributeSchedule(f"work-{x}", start_time*3600,end_time*3600, day_str = x,repeat = True))
 		agent.add_attribute(profession)
-
 
 		return agent
 

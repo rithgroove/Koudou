@@ -1,5 +1,5 @@
 from .action import Action
-
+from .movement_vector import MovementVector
 class ActionMove(Action):
     """
     [Class] ActionMove
@@ -8,7 +8,7 @@ class ActionMove(Action):
     Properties:
         - name      : (string-inherited)
     """
-    def __init__(self,destination_string):
+    def __init__(self,agent,kd_map,destination_string,rng):
         """
         [Constructor]
         Initialize a wait action
@@ -18,21 +18,47 @@ class ActionMove(Action):
         - duration : (int) the duration of the action in seconds
         """
         super(ActionMove,self).__init__()
+        self.destination = ""
+        temp = destination_string
+        temp =temp.replace(")", "")
         self.destination_string = destination_string
+        typing = "destination_type"
+        self.origin = agent.get_attribute("current_node_id")
+        if ("(" in temp):
+            temp2 = temp.split("(")
+            temp = temp2[0]
+            if (temp2[1].lower() == "destination_id") or (temp2[1].lower() == "id"):
+                typing = "destination_id"
+            elif (temp2[1].lower() == "destination_type") or (temp2[1].lower() == "type"):
+                typing = "destination_type"
+            else:
+                raise ValueError(f"Unknown destination type : {temp2[1].lower()}")
+        self.vectors = []
+
+        if ("$" in temp):
+            temp = agent.get_attribute(temp.replace("$",""))
+
+        if typing == "destination_type":
+            self.destination = kd_map.get_random_business(temp, 1, rng)[0].node_id
+        elif typing == "destination_id":
+            self.destination = temp
         self.sequence = []
+        self.agent = agent
+        self.finished = False
 
-    def update(self,step_length):
-        """
-        [Method]
-        Update method
-
-        parameter:
-        - step_length : (int) how many seconds elapsed
-
-        return:
-        - (int) the remainder of the step_length that was not consumed by this action
-        """
-        return step_length #return the left over time 
+    def step(self,kd_sim,kd_map,ts,step_length,rng):
+        # if have action do it
+        leftover = step_length
+        while len(self.sequence) > 0:
+            mov_vec = self.sequence[0]
+            leftover = mov_vec.step(self.agent,leftover) 
+            if not mov_vec.is_finished:
+                break
+            else:
+                self.sequence.pop(0)
+        if len(self.sequence) == 0:
+            self.finished = True
+        return leftover
 
     @property
     def is_finished(self):
@@ -43,11 +69,25 @@ class ActionMove(Action):
         return:
         - (bool) true if finished, false otherwise
         """
-        return True
+        return self.finished
 
     @property
     def short_string(self):
         return f"Move to {self.destination_string}"
 
     def __str__(self):
-        return f"[ActionMove]\n   Destination = {self.destination_string}"
+        tempString = f"[ActionMove]\n"
+        tempString += f"   Origin = {self.origin}\n"
+        tempString += f"   Destination = {self.destination}\n"
+        tempString += f"   Destination String = {self.destination_string}"
+        return tempString
+
+    def generate_vector(self,kd_map,path):
+        working = None
+        for x in path:
+            temp = kd_map.get_node(x)
+            if working is not None:
+                self.sequence.append(MovementVector(working,temp))
+            working = temp
+
+

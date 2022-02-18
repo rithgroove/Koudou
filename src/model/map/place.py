@@ -17,3 +17,6 @@ class Place:
         self.centroid = centroid_id
         self.road_connection = road_connection_id
 
+        self.type = None
+        self.evacuation_attr = None
+        self.evacuation_center = False

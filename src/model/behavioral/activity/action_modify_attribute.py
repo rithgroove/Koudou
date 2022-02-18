@@ -1,21 +1,22 @@
 from .action import Action
 
-class ActionModifyAttribute(Action):	
-	def __init__(self,command):
+class ActionModifyAttribute(Action):    
+    def __init__(self,agent,command):
         super(ActionModifyAttribute,self).__init__()
-		temp = command.split(":")		
-		self.attribute_name = temp[0]
-		if (temp[1].lower() == "max"):
-			self.value = "max"
-		elif(temp[1].lower() == "min"):
-			self.value = "min"
-		elif("set" in temp[1].lower):
-			self.value = temp[1]
-		else:
-			self.value = float(temp[1])
-		self.is_finished = False
+        temp = command.split("-")        
+        self.attribute_name = temp[0]
+        if (temp[1].lower() == "max"):
+            self.value = "max"
+        elif(temp[1].lower() == "min"):
+            self.value = "min"
+        elif("set" in temp[1].lower):
+            self.value = temp[1]
+        else:
+            self.value = float(temp[1])
+        self.finished = False
+        self.agent = agent
 
-    def update(self,step_length):
+    def step(self,kd_sim,kd_map,ts,step_length,rng):
         """
         [Method]
         Update method
@@ -26,18 +27,18 @@ class ActionModifyAttribute(Action):
         return:
         - (int) the remainder of the step_length that was not consumed by this action
         """
-		agent.update_attribute(self.attribute_name,self.value)\
-		self.is_finished = True
+        self.agent.update_attribute(self.attribute_name,self.value)
+        self.finished = True
         return step_length #return the left over time 
 
-	@property
-	def short_string(self):
-		return f"{self.attribute_name} = {self.value}\n"
+    @property
+    def short_string(self):
+        return f"{self.attribute_name} = {self.value}\n"
 
-	def __str__(self):
-		tempstring = "[Action_Modify_attribute]\n"
-		tempstring += f"{self.attribute_name} = {self.value}"
-		return tempstring
+    def __str__(self):
+        tempstring = "[Action_Modify_attribute]\n"
+        tempstring += f"{self.attribute_name} = {self.value}"
+        return tempstring
 
 
     @property
@@ -49,4 +50,4 @@ class ActionModifyAttribute(Action):
         return:
         - (bool) true if finished, false otherwise
         """
-        return self.is_finished = False
+        return self.finished

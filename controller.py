@@ -11,10 +11,12 @@ import pickle
 from platform import system
 
 class Controller():
-    def __init__(self):
+    def __init__(self, config):
         # view
         self.view = None
         self.map = None
+
+        self.config = config
 
         # bindings
         self.bind_no_view()
@@ -80,7 +82,7 @@ class Controller():
     def load_map(self): pass
     def __load_map_noview(self, osm_file):
         self.print_msg(f"Loading map: {Path(osm_file).stem}")
-        self.map = build_map(osm_file)
+        self.map = build_map(osm_file, self.config)
     def __load_map_view(self):
         # shortcuts
         filepath = self.view.ask_load_file()
@@ -89,13 +91,12 @@ class Controller():
 
         if fileext==".osm":
             self.print_msg(f"Loading map: {filename}{fileext}")
-            self.map = build_map(filepath)
-
+            self.map = build_map(filepath, self.config)
             ## temp pickling it here since loading takes time
             if not path.exists("cache"):
                 mkdir("cache")
 
-            file = open(path.join("cache",f"{filename}.pkl"), "wb")
+            file = open(self.config["map consntruction cache"], "wb")
             pickle.dump(self.map, file)
             file.close()
         elif fileext==".pkl":
