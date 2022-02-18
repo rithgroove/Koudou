@@ -1,0 +1,13 @@
+"name","attribute","operator","value"," max","min"
+"hungry","hunger","less_than_equal",0.66,"N/A","N/A"
+"symptomatic","symptoms","equal","Symptomatic","N/A","N/A"
+"not_at_hospital","location","not_equal","Hospital","N/A","N/A"
+"severe","symptoms","equal","Severe","N/A","N/A"
+"not_at_home","location","not_equal","$residential","N/A","N/A"
+"sleepy","energy","less_than",0.2,"N/A","N/A"
+"eat_out","eat_out_preference","less_than","$random",0,1
+"at_hospital","location","equal","Hospital","N/A","N/A"
+"not_at_evac_point","location","not_equal","evac_point","N/A","N/A"
+"at_evac_point","location","equal","evac_point","N/A","N/A"
+"asymptomatic","symptoms","equal","Asymptomatic","N/A","N/A"
+"work","is_working_hour","equal","working","N/A","N/A"
