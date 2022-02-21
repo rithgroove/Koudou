@@ -44,6 +44,8 @@ class GeneratorAttribute:
 			temp = {}
 			temp["value"] = attr["value"]
 			temp["type"] = attr["type"]
+			temp["max"] = cast(attr["max"],attr["type"])
+			temp["min"] = cast(attr["min"],attr["type"])
 			if (attr["target"] == "agent"):
 				self.basic[attr["name"]] = temp
 			elif(attr["target"] == "simulation"):
@@ -171,7 +173,11 @@ class GeneratorAttribute:
 
 		# add basic attribute
 		for attr in self.basic:
-			agent.add_attribute(Attribute(attr,self.basic[attr]["value"],self.basic[attr]["type"]))
+			if (value == "!random"):
+				agent.add_attribute(Attribute(attr,self.rng.uniform(self.basic[attr]["min"],self.basic[attr]["max"]),self.basic[attr]["type"]))
+
+			else:
+				agent.add_attribute(Attribute(attr,self.basic[attr]["value"],self.basic[attr]["type"]))
 
 		# add updateable attribute
 		for key in self.updateable:
@@ -264,7 +270,10 @@ class GeneratorAttribute:
 		tempstring += "-----------------------------------------------\n"
 		tempstring += f" Basic attributes = {len(self.basic)}\n"
 		for x in self.basic:
-			tempstring+= f"   + {x} : {self.basic[x]['value']}({self.basic[x]['type']})\n"
+			if (self.basic[x]['value']!= "!random"):
+				tempstring+= f"   + {x} : {self.basic[x]['value']}({self.basic[x]['type']})\n"
+			else:
+				tempstring+= f"   + {x} : random({self.basic[x]['min']}-{self.basic[x]['max']})({self.basic[x]['type']})\n"
 		tempstring += f"\n"
 		tempstring += f" Option based attributes = {len(self.option)}\n"
 		for x in self.option:

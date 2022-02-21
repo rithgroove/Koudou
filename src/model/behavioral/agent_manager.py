@@ -2,6 +2,7 @@ import csv
 from .attribute.generator_attribute import GeneratorAttribute
 from src.util.csv_reader import read_csv_as_dict
 from src.model.behavioral.activity.condition import Condition
+from src.model.behavioral.activity.condition_random import ConditionRandom
 from src.model.behavioral.activity.activity import Activity
 from .agent import Agent
 from .behavior import Behavior
@@ -15,7 +16,7 @@ def load_conditions(condition_file):
 	for x in data:
 		attribute = x["attribute"]
 		if x["value"] == "$random":
-			conditions[x["name"]] = Condition(x["name"],x["attribute"],x["value"],x["operator"],x["type"],x["target"])
+			conditions[x["name"]] = ConditionRandom(x["name"],x["value"],x["min"],x["max"],x["operator"],x["type"],x["target"])
 		else:
 			conditions[x["name"]] = Condition(x["name"],x["attribute"],x["value"],x["operator"],x["type"],x["target"])
 	return conditions
