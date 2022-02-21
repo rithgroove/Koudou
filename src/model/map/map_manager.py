@@ -54,7 +54,6 @@ def build_map(osm_file_path, config):
 	print(f"Finished creating roads ({time.time() - st}s) ")
 	st = time.time()
 
-	print(config)
 	places = create_places_osm(ways, kd_map, main_road_graph, config["road connection grid size"])
 	kd_map.d_places = places
 
