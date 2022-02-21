@@ -3,10 +3,11 @@ from .condition import Condition,_fetch_operator,_fetch_symbols
 from src.model.behavioral.attribute.attribute import cast
 
 class ConditionRandom(Condition):
-    def __init__(self,name,value,min_value, max_value, operator_string,typing = "string",target ="agent"):
+    def __init__(self,name,value,min_value, max_value, rng, operator_string,typing = "string",target ="agent"):
         self.name = name
         self.min_value = cast(min_value,typing)
         self.max_value = cast(max_value,typing)
+        self.value = value
         self.operator_string = operator_string
         self.operator = _fetch_operator(operator_string)
         self.typing = typing
@@ -14,19 +15,17 @@ class ConditionRandom(Condition):
         self.rng = rng
 
     def check_value(self,agent,kd_sim):
-        value2 = self.rng.uniform(self.min, self.max)
+        value2 = self.rng.uniform(self.min_value, self.max_value)
+        value = self.value
         if ("$" in value):
             value = agent.get_attribute(value.replace("$",""))
         value = cast(value,self.typing)
         try:    
             return self.operator(value2, value)
         except:
-            tempstring = f"\nProblem with {self.attribute_name}\n"
+            tempstring = f"\nProblem with random condition {self.name}\n"
             tempstring += f"value             = {value}\n"
-            if self.target == "agent":
-                tempstring += f"agent's attribute = {agent.get_attribute(self.attribute_name)}\n"
-            elif self.target == "simulation":
-                tempstring += f"agent's attribute = {kd_sim.get_attribute(self.attribute_name)}\n"
+            tempstring += f"randomizer result = {value2}\n"
             raise ValueError(tempstring)
 
     @property

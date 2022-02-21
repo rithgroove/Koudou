@@ -44,8 +44,9 @@ class GeneratorAttribute:
 			temp = {}
 			temp["value"] = attr["value"]
 			temp["type"] = attr["type"]
-			temp["max"] = cast(attr["max"],attr["type"])
-			temp["min"] = cast(attr["min"],attr["type"])
+			if (temp["value"] == "!random"):
+				temp["max"] = cast(attr["max"],attr["type"])
+				temp["min"] = cast(attr["min"],attr["type"])
 			if (attr["target"] == "agent"):
 				self.basic[attr["name"]] = temp
 			elif(attr["target"] == "simulation"):
@@ -173,7 +174,7 @@ class GeneratorAttribute:
 
 		# add basic attribute
 		for attr in self.basic:
-			if (value == "!random"):
+			if (self.basic[attr]["value"] == "!random"):
 				agent.add_attribute(Attribute(attr,self.rng.uniform(self.basic[attr]["min"],self.basic[attr]["max"]),self.basic[attr]["type"]))
 
 			else:

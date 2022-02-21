@@ -4,11 +4,12 @@ from src.model.behavioral.activity.action_modify_attribute import ActionModifyAt
 from src.model.behavioral.activity.action_change_behavior import ActionChangeBehavior
 
 class Activity:
-	def __init__(self,name):
+	def __init__(self,name, command = "and"):
 		self.name = name
 		self.condition = []
 		self.rewards = []
 		self.actions = []
+		self.command = command.lower()
 
 	def add_condition(self,condition):
 		self.condition.append(condition)
@@ -22,7 +23,14 @@ class Activity:
 	def check_conditions(self,agent,kd_sim):
 		result = True
 		for x in self.condition:
-			result = result and x.check_value(agent,kd_sim)
+			if (self.command.lower() == "and" or self.command.lower() == "none" ):
+				result = result and x.check_value(agent,kd_sim)
+				if not result:
+					break
+			elif (self.command.lower() == "or"):
+				result = result or x.check_value(agent,kd_sim)
+				if result:
+					break
 		return result
 
 	def generate_actions(self,agent,kd_map,rng):

@@ -7,7 +7,7 @@ class Simulation:
 		attribute_generator = agent_manager.load_attributes_generator(config["attributes"],rng)
 		#print(attribute_generator)
 		self.agents = agent_manager.generate_agents(kd_map,attribute_generator,agents_count)		
-		self.conditions = agent_manager.load_conditions(config["condition"])
+		self.conditions = agent_manager.load_conditions(config["condition"],rng)
 		self.behaviors = {}
 		for key in config["behaviors"]:
 			self.behaviors[key] = agent_manager.load_behavior(key, config["behaviors"][key], self.conditions, rng)
