@@ -17,10 +17,13 @@ class Agent:
 		return self.attributes[name].get_value
 	
 	def update_attribute(self,attribute_name,value):
-		if (value == "max"):
+		print(f"value = {value}")
+		if (value.lower() == "max"):
 			self.attributes[attribute_name].set_max()
-		elif(value == "min"):
+		elif(value.lower() == "min"):
 			self.attributes[attribute_name].set_min()
+		elif(self.attributes[attribute_name].typing == "string"):
+			self.attributes[attribute_name].set_value(value)
 		else:
 			self.attributes[attribute_name].update_value(value)
 

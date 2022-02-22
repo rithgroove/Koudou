@@ -9,10 +9,8 @@ class ActionModifyAttribute(Action):
             self.value = "max"
         elif(temp[1].lower() == "min"):
             self.value = "min"
-        elif("set" in temp[1].lower):
-            self.value = temp[1]
         else:
-            self.value = float(temp[1])
+            self.value = temp[1]
         self.finished = False
         self.agent = agent
 
