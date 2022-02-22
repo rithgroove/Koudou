@@ -136,6 +136,7 @@ osmData/
 osm_data/
 osm_files/
 .DS_Store
+results/
 
 cache/
 

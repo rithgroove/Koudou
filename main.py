@@ -1,30 +1,21 @@
 import argparse
 import json
 
+from src.utils.parser import load_parameters
 from controller import Controller
 from os.path import join
-
-default_config = "config.json"
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", dest='use_view', action='store_true', help="Use UI")
+    parser.add_argument("-p", dest='param', help="Parameter File")
     args = parser.parse_args()
 
+    parameters = load_parameters(args.param)
+    parameters["USE_VIEW"] = args.use_view or parameters["USE_VIEW"]
 
-    with open(default_config) as file:
-        config = json.load(file)
-
-    crtl = Controller(config)
-    if args.use_view:
-        crtl.use_view()
-        crtl.main_loop()
-    else:
-        osm_file = join("osm_files","TX-To-TU.osm")
-        crtl.load_map(osm_file)
-        crtl.print_map()
-        # print(crtl.map)
-        # print(crtl.map.d_places)
+    crtl = Controller(parameters=parameters)
+    crtl.main_loop()
 
 if __name__ == "__main__":
     main()
