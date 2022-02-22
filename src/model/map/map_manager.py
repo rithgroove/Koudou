@@ -54,7 +54,6 @@ def build_map(osm_file_path, config):
 	print(f"Finished creating roads ({time.time() - st}s) ")
 	st = time.time()
 
-	print(config)
 	places = create_places_osm(ways, kd_map, main_road_graph, config["road connection grid size"])
 	kd_map.d_places = places
 
@@ -71,6 +70,8 @@ def build_map(osm_file_path, config):
 	kd_map.d_businesses = bussinesses
 	kd_map.d_residences = residences
 	# repair_places(places, businesses, households)
+
+	generate_evacuation_centers(kd_map, config["evacuation centers"])
 
 	return kd_map
 
@@ -421,3 +422,42 @@ def generate_businesses_hours(businesses_dict, csv_file_name):
 
 		for day in workdays:
 			business.add_working_hour(day, f"{start_hour}:00", f"{finish_hour}:00")
+
+
+def generate_evacuation_centers(kd_map, file_path):
+	evacuation_dict = {}
+	with open(file_path) as file:
+		evacuation_dict = json.load(file)["evacuation_centers"]
+
+	for location in evacuation_dict:
+		try:
+			rules = location["rules"]
+			attr = location["attributes"]
+			selection = location["selection"]
+			places = []
+			if selection == "by_id":
+				p = kd_map.d_places[rules["place_id"]]
+				places.append(p)
+			else:
+				qtd = rules["qtd"]
+				allowed_places = [p for p in kd_map.d_places.values()]
+				if "place_types" in rules:
+					allowed_places = [p for p in kd_map.d_places.values() if p.type in rules["place_types"]]
+
+				if selection == "by_type" and len(allowed_places) >= qtd:
+					places = np.random.choice(allowed_places, qtd, replace=False)
+				elif selection == "by_grid":
+					grid = create_places_grid(kd_map, allowed_places, rules["grid_size"])
+					x, y = rules["cell"]
+					places = np.random.choice(grid[x][y], min(qtd, len(grid[x][y])), replace=False)
+
+			if len(places) > 0:
+				for place in places:
+					place.evacuation_center = True
+					place.evacuation_attr = attr
+		
+		except KeyError as e:
+			print("Warning: Key error when processing evacuation center file ", file_path)
+			print("Error on entry: ", location)
+			print("Tried to access key ", e, " but it does not exist")
+

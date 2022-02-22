@@ -1,0 +1,50 @@
+{
+    "evacuation_centers": [
+        {
+            "selection": "by_id",
+            "rules": {
+                "place_id": "133876543"
+            },
+            "attributes": {
+                "capacity": 100,
+                "contains_food": true,
+                "contains_medicine": false
+            }
+        },
+        {
+            "selection": "by_type",
+            "rules": {
+                "qtd": 3,
+                "place_types": [
+                    "school",
+                    "skill school"
+                ]
+            },
+            "attributes": {
+                "capacity": 100,
+                "contains_food": true,
+                "contains_medicine": true
+            }
+        },
+        {
+            "selection": "by_grid",
+            "rules": {
+                "qtd": 2,
+                "place_types": [
+                    "school",
+                    "skill school"
+                ],
+                "grid_size": 10,
+                "cell": [
+                    2,
+                    5
+                ]
+            },
+            "attributes": {
+                "capacity": 100,
+                "contains_food": true,
+                "contains_medicine": true
+            }
+        }
+    ]
+}
