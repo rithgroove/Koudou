@@ -20,7 +20,7 @@ import csv
 
 #def clean_up_road
 
-def build_map(osm_file_path, bldg_tags, business_data, grid_size=10):
+def build_map(osm_file_path, bldg_tags, business_data, grid_size=10,evacuation_center=None):
 	print("starting building Map")
 	st = time.time()
 
@@ -54,7 +54,7 @@ def build_map(osm_file_path, bldg_tags, business_data, grid_size=10):
 	print(f"Finished creating roads ({time.time() - st}s) ")
 	st = time.time()
 
-	places = create_places_osm(ways, kd_map, main_road_graph, config["road connection grid size"])
+	places = create_places_osm(ways, kd_map, main_road_graph, grid_size)
 
 	kd_map.d_places = places
 
@@ -72,7 +72,8 @@ def build_map(osm_file_path, bldg_tags, business_data, grid_size=10):
 	kd_map.d_residences = residences
 	# repair_places(places, businesses, households)
 
-	generate_evacuation_centers(kd_map, config["evacuation centers"])
+	if evacuation_center is not None:
+		generate_evacuation_centers(kd_map,evacuation_center)
 
 	return kd_map
 

@@ -6,7 +6,7 @@ from .place import Place
 from .node import Node
 from .way import Way
 from .coordinate import Coordinate
-
+import sys
 class Map():
     def __init__(self, bounding_box: Any, nodes: List[Node], ways: List[Way]):
         self.d_nodes: Dict[str, Node] = {}
@@ -70,3 +70,28 @@ class Map():
         
         results = rng.choice(arr, qtd, replace=False)
         return results
+
+    def get_closest_evacuation_center(self,coordinate, explored_places):
+        arr = []
+        for x in self.d_places:
+            if (self.d_places[x].evacuation_center):
+                arr.append(self.d_places[x])
+        explored_evac_center = explored_places.split(",")
+        distance = sys.float_info.max
+        place = None
+        for x in arr :
+            temp_distance = self.d_nodes[x.centroid].coordinate.calculate_distance(lat = coordinate.lat,lon = coordinate.lon)
+            if (temp_distance < distance and temp_distance > 0 and x not in explored_evac_center):
+                place = x
+                distance = temp_distance
+        return place
+
+    def get_random_connected_nodes(self,node_id, last_visited,rng):
+        node = self.d_nodes[node_id]
+        connection = node.connections.copy()
+        if (last_visited in connection):
+            connection.remove(last_visited)
+        if len(connection) == 0:
+            return last_visited
+        else:
+            return rng.choice(connection,1)[0]

@@ -112,7 +112,8 @@ class Controller():
             self.map = build_map(osm_file,
                                  bldg_tags    = self.d_param["BUILDING_TAGS"],
                                  business_data= self.d_param["BUSINESS"],
-                                 grid_size    = self.d_param["GRID_SIZE"])
+                                 grid_size    = self.d_param["GRID_SIZE"],
+                                 evacuation_center = self.d_param["EVAC_CENTER"])
 
             ## temp pickling it here since loading takes time
             if not path.exists("cache"):
