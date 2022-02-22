@@ -1,13 +1,15 @@
 from src.model.behavioral.activity.action_move import ActionMove
 from src.model.behavioral.activity.action_wait import ActionWait
 from src.model.behavioral.activity.action_modify_attribute import ActionModifyAttribute
+from src.model.behavioral.activity.action_change_behavior import ActionChangeBehavior
 
 class Activity:
-	def __init__(self,name):
+	def __init__(self,name, command = "and"):
 		self.name = name
 		self.condition = []
 		self.rewards = []
 		self.actions = []
+		self.command = command.lower()
 
 	def add_condition(self,condition):
 		self.condition.append(condition)
@@ -18,18 +20,21 @@ class Activity:
 	def add_action(self,action):
 		self.actions.append(action)
 
-	def check_conditions(self,agent):
+	def check_conditions(self,agent,kd_sim):
 		result = True
 		for x in self.condition:
-			result = result and x.check_value(agent)
+			if (self.command.lower() == "and" or self.command.lower() == "none" ):
+				result = result and x.check_value(agent,kd_sim)
+				if not result:
+					break
+			elif (self.command.lower() == "or"):
+				result = result or x.check_value(agent,kd_sim)
+				if result:
+					break
 		return result
 
 	def generate_actions(self,agent,kd_map,rng):
 		actions = []
-		print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-		print(self.actions)
-		print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-
 		for x in self.actions:
 			temp = x.split(":")
 			temp[0] = temp[0].replace(" ","")
@@ -39,6 +44,8 @@ class Activity:
 				actions.append(ActionMove(agent,kd_map,temp[1],rng))
 			elif (temp[0].lower()=="modify_attribute"):
 				actions.append(ActionModifyAttribute(agent,temp[1]))
+			elif (temp[0].lower()=="change_behavior"):
+				actions.append(ActionChangeBehavior(agent,temp[1]))
 		print(f"length = {len(actions)}")
 		return actions
 
