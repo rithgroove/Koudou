@@ -14,7 +14,14 @@ def initialize_infection(disease_files, population: List[Agent], rng):
     for file_name in disease_files:
         with open(file_name) as file:
             d_config = json.load(file)
-        d = Disease(d_config["name"], d_config["attributes"], d_config["transition_states"])
+        
+        d = Disease(
+            d_config["name"],
+            d_config["attributes"],
+            d_config["transition_states"],
+            d_config["infection_file"],
+            d_config["infectious_states"]
+        )
         diseases.append(d)
 
         initializate_disease_on_population(d, d_config["initialization"], population, rng)
@@ -38,28 +45,42 @@ def initializate_disease_on_population(disease: Disease, initialization: Dict, p
     for ag in infected_ags:
         ag.set_attribute(disease.name, initialization["state"])
 
-def step_infection(step_size: int, kd_map: Map, population: List[Agent], infection_module: Infection, rng):
-    for ag in population:
-        for disease in infection_module.diseases.values():
-            current_state = ag.get_attribute(disease.name)
-            next_state = current_state
+def infection_step(step_size: int, kd_map: Map, population: List[Agent], infection_module: Infection, rng):
+    # next state of the infected agents
+    for disease in infection_module.diseases.values():
+        infected_agents = [ag for ag in population if ag.get_attribute(disease.name) != "susceptible"]
+        for ag in infected_agents:
+            infected_next_stage(step_size, ag, disease, rng)
 
-            if current_state != "susceptible":
-                rand_value = rng.random()
-                previous_chances = 0
-                for compartiment, attr in disease.transitions[current_state].items():
-                    chance = apply_time_scale(step_size, attr["scale"], attr["probability"])
-                    if rand_value < previous_chances + chance:
-                        next_state = compartiment
-                        break
-                    previous_chances += chance
-            else:
-                call_complex_function()
-            
-            ag.set_attribute(disease.name, next_state)
+    # infection to healthy agents
+    for disease in infection_module.diseases.values():
+        disease_transmission(step_size, kd_map, population, disease, rng)
+
+    
+
+def infected_next_stage(step_size, ag: Agent, disease: Disease, rng):
+    current_state = ag.get_attribute(disease.name)
+    next_state = current_state
+
+    if current_state in disease.transitions:
+        rand_value = rng.random()
+        previous_chances = 0
+        for compartiment, attr in disease.transitions[current_state].items():
+            chance = apply_time_scale(step_size, attr["scale"], attr["probability"])
+            if rand_value < previous_chances + chance:
+                next_state = compartiment
+                break
+            previous_chances += chance
+    else:
+        print(f"Could not find transition for state {current_state} of disease {disease.name}")
+
+    ag.set_attribute(disease.name, next_state)
 
 
-def call_complex_function():
+def disease_transmission(step_size: int, kd_map: Map, population: List[Agent], disease: Disease, rng):
+    infected_agents = [ag for ag in population if ag.get_attribute(disease.name) in disease.infectious_states]
+    for ag in infected_agents:
+        pass
     pass
 
 def apply_time_scale(step_size, time_scale, chance):
@@ -71,7 +92,3 @@ def apply_time_scale(step_size, time_scale, chance):
         return chance*step_size/(60*60)
     elif time_scale == "per_day":
         return chance*step_size/(60*60*24)
-
-
-
-

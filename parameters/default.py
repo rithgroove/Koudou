@@ -12,7 +12,7 @@ parameters = {
     "GRID_SIZE":      20,
 
     "DISEASES": [
-        "config/infection/disease.json"
+        "config/infection/covid.json"
     ],
 
     "SIM_CONFIG": {

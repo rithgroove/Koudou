@@ -8,6 +8,12 @@
     "attributes": {
         "symptoms": ["cough", "loss of taste"]
     },
+    "infection_file": "config/infection/covid_infection.json",
+    "infectious_states": [
+        "asymptomatic",
+        "symptomatic",
+        "severe"
+    ],
     "transition_states": {
         "exposed": {
             "asymptomatic": {
