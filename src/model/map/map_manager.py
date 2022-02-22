@@ -20,10 +20,10 @@ import csv
 
 #def clean_up_road
 
-def build_map(osm_file_path, config):
+def build_map(osm_file_path, bldg_tags, business_data, grid_size=10):
 	print("starting building Map")
 	st = time.time()
-	
+
 	osm_map = OSMHandler()
 	osm_map.apply_file(osm_file_path)
 	osm_map.set_bounding_box(osm_file_path)
@@ -41,7 +41,7 @@ def build_map(osm_file_path, config):
 		ways.append(Way(w["id"], tags, n))
 
 	kd_map = Map(osm_map.bounding_box, nodes, ways)
-	
+
 	print(f"Finished getting nodes and ways ({time.time() - st}s) ")
 	st = time.time()
 
@@ -55,16 +55,17 @@ def build_map(osm_file_path, config):
 	st = time.time()
 
 	places = create_places_osm(ways, kd_map, main_road_graph, config["road connection grid size"])
+
 	kd_map.d_places = places
 
 	print(f"Finished creating places ({time.time() - st}s) ")
 	st = time.time()
 
-	bussinesses, residences = create_types_from_csv(kd_map, 10, config["building tagging data"])
+	bussinesses, residences = create_types_from_csv(kd_map, 10, bldg_tags)
 	print(f"Finished creating businesses and residences ({time.time() - st}s) ")
 	st = time.time()
 
-	generate_businesses_hours(bussinesses, config["business data"])
+	generate_businesses_hours(bussinesses, business_data)
 	print(f"Finished setting work hours ({time.time() - st}s) ")
 
 	kd_map.d_businesses = bussinesses
@@ -193,7 +194,7 @@ def create_types_from_csv (kd_map: Map, grid_size, csv_file_name):
 			else:
 				n = int(number)
 				to_create = [grid[x][y].pop() for _ in range(n) if len(grid[x][y]) > 0]
-			
+
 			for place_id in to_create:
 				place = kd_map.d_places[place_id]
 				place.type = p_type
@@ -224,7 +225,7 @@ def build_node_connections(kd_map):
 		# working_node = None
 		for current_node_id, next_node_id in zip(way.nodes, way.nodes[1:]):
 			current_node = kd_map.d_nodes[current_node_id]
-			
+
 			connectingNode = kd_map.d_nodes[next_node_id]
 			current_node.add_connection(next_node_id) #add the connection from current_node to the connecting_node
 			connectingNode.add_connection(current_node.id) #add the connection from the connecting_node to the current_node
@@ -315,7 +316,7 @@ def connect_centroid_to_road(centroid, road_start, road_destination, closest_coo
 
 	if road_destination.id in road_start.connections:
 		road_start.connections.remove(road_destination.id)
-	
+
 	if road_start.id in road_destination.connections:
 		road_destination.connections.remove(road_start.id)
 
@@ -338,7 +339,7 @@ def connect_centroid_to_road(centroid, road_start, road_destination, closest_coo
 
 	kd_map.add_node(new_node)
 	kd_map.main_road.append(new_node)
-	
+
 # Gets the distance from a road to a node and the closest point on the road
 def get_dist_and_closest_coord(road_start, road_destination, target_node):
 	start_dist = road_start.coordinate.calculate_distance(*target_node.coordinate.get_lat_lon())
@@ -414,7 +415,7 @@ def generate_businesses_hours(businesses_dict, csv_file_name):
 			workdays = ["Mon", "Tue", "Wed", "Thu", "Fri"]
 		elif b_info["day"] == "weekend":
 			workdays = ["Sat", "Sun"]
-			
+
 		activity = np.random.randint(min_activity_per_week, max_activity_per_week+1)
 
 		activity = np.min([activity, len(workdays)])
