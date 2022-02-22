@@ -80,6 +80,9 @@ def infected_next_stage(step_size, ag: Agent, disease: Disease, rng):
 def disease_transmission(step_size: int, kd_map: Map, population: List[Agent], disease: Disease, rng):
     infected_agents = [ag for ag in population if ag.get_attribute(disease.name) in disease.infectious_states]
     for ag in infected_agents:
+        n_id = ag.get_attribute("current_node_id")
+        node = kd_map.d_nodes[n_id]
+        print(node)
         pass
     pass
 
