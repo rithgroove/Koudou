@@ -46,7 +46,6 @@ class Activity:
 				actions.append(ActionModifyAttribute(agent,temp[1]))
 			elif (temp[0].lower()=="change_behavior"):
 				actions.append(ActionChangeBehavior(agent,temp[1]))
-		print(f"length = {len(actions)}")
 		return actions
 
 	def __str__(self):

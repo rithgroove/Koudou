@@ -46,6 +46,3 @@ def load_behavior(name,file_name,condition_dict, rng):
 	activities = load_activities(file_name,condition_dict, rng)
 	behavior.activities = activities
 	return behavior
-
-def test():
-	print("test")

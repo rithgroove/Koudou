@@ -1,3 +1,4 @@
+from typing import Dict
 import warnings
 
 class Attribute:
@@ -78,7 +79,7 @@ class Attribute:
 
     def __str__(self):
         tempstring = "[Attribute]\n"
-        tempstring += _get_object_details()
+        tempstring += self._get_object_details()
         return tempstring
 
 def cast(value,typing):

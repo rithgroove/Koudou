@@ -5,7 +5,6 @@ class Simulation:
 	def __init__(self,config,kd_map,rng,agents_count,threads = 1, cache_file_name = None, report = None):
 		self.agents = []
 		attribute_generator = agent_manager.load_attributes_generator(config["attributes"],rng)
-		#print(attribute_generator)
 		self.agents = agent_manager.generate_agents(kd_map,attribute_generator,agents_count)		
 		self.conditions = agent_manager.load_conditions(config["condition"],rng)
 		self.behaviors = {}
@@ -39,10 +38,6 @@ class Simulation:
 
 		return tempstring
 
-	def test(self):
-		for x in self.agents:
-			print(x)
-
 	def attribute_step(self,kd_sim,kd_map,ts,step_length,rng):
 		#update attribute
 		for attr in self.attributes:
@@ -64,9 +59,6 @@ class Simulation:
 		for agent in self.agents:
 			move_actions = agent.behavior_step(self,self.kd_map,self.ts,step_length,self.rng)
 			move_action_pool.extend(move_actions)
-
-		for x in move_action_pool:
-			print(x)
 
 		##############################################################################
 		# pathfind

@@ -84,24 +84,15 @@ class GeneratorAttribute:
 		option_based_attributes  = csv_reader.read_csv_as_dict(file)
 		for attr in option_based_attributes:
 			temp = {}
-			print(attr)
 			temp["name"] = attr["name"]
 			temp["start_time"] = int(attr["evacuation_start_day"]) #days
-			print(temp["start_time"])
 			temp["start_time"] = (temp["start_time"]*24) + int(attr["evacuation_start_hour"]) #convert to hours
-			print(temp["start_time"])
 			temp["start_time"] = (temp["start_time"]*60) + int(attr["evacuation_start_minute"]) #convert to minutes
-			print(temp["start_time"])
 			temp["start_time"] = (temp["start_time"]*60) + int(attr["evacuation_start_second"]) #convert to seconds
-			print(temp["start_time"])
 			temp["end_time"] = int(attr["evacuation_end_day"]) #days
-			print(temp["end_time"])
 			temp["end_time"] = (temp["end_time"]*24) + int(attr["evacuation_end_hour"]) #convert to hours
-			print(temp["end_time"])
 			temp["end_time"] = (temp["end_time"]*60) + int(attr["evacuation_end_minute"]) #convert to minutes
-			print(temp["end_time"])
 			temp["end_time"] = (temp["end_time"]*60) + int(attr["evacuation_end_second"]) #convert to seconds
-			print(temp["end_time"])
 			if (attr["target"] == "agent"):
 				self.schedules[attr["name"]] = temp
 			elif(attr["target"] == "simulation"):
@@ -327,7 +318,7 @@ class GeneratorAttribute:
 			if self.option_sim[x].get("default") is not None:
 				tempstring+= f"     - Default Value = {self.option_sim[x]['default']}\n"
 			for option in self.option_sim[x]["options"]:
-				tempstring+= f"     - {option_sim['value']} : {option['weight']}\n"
+				tempstring+= f"     - {self.option_sim['value']} : {option['weight']}\n"
 		tempstring += f"\n"
 		tempstring += f" Updateable attributes = {len(self.updateable_sim)}\n"
 		for key in self.updateable_sim:

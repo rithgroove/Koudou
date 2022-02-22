@@ -3,7 +3,6 @@
     "initialization": {
         "type": "absolute",
         "value": 10,
-        "distribution": "random",
         "state": "asymptomatic"
     },
     "attributes": {
