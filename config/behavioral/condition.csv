@@ -1,6 +1,7 @@
 "target","name","attribute","operator","value","max","min","type"
 "agent","is_working","is_working_hour","equal","True","N/A","N/A","bool"
 "agent","not_at_home","current_node_id","not_equal","$home_node_id","N/A","N/A","string"
+"agent","at_home","current_node_id","equal","$home_node_id","N/A","N/A","string"
 "agent","hungry","hunger","less_than_equal",0.66,"N/A","N/A","float"
 "agent","symptomatic","symptoms","equal","Symptomatic","N/A","N/A","string"
 "agent","not_at_hospital","location","not_equal","Hospital","N/A","N/A","string"

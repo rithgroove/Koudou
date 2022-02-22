@@ -12,6 +12,7 @@ from src.model.behavioral.simulation import Simulation
 import pickle
 from platform import system
 import numpy as np
+from src.utils.parser import load_parameters
 class Controller():
     def __init__(self, parameters):
         self.d_param = parameters

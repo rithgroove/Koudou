@@ -1,0 +1,5 @@
+"target","name","attribute","operator","value","max","min","type"
+"agent","not_evacuated","evacuated","equal",FALSE,"N/A","N/A","bool"
+"agent","evacuated","evacuated","equal",TRUE,"N/A","N/A","bool"
+"agent","know_evac","target_evac","not_equal","none","N/A","N/A","string"
+"agent","no_necessity","taken_necessity","equal",FALSE,"N/A","N/A","string"

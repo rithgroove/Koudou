@@ -1,0 +1,6 @@
+"priority","name","conditions","conditions_type","actions"
+1,"switch_to_normal","is_not_evac","None","change_behavior:normal"
+2,"go_home","no_necessity,not_at_home","None","move:$home_node_id(id),modify_attribute:location-home"
+3,"take_necessity","no_necessity,at_home","None","modify_attribute:taken _necessity-True,wait:$5(min)-6(hour)"
+4,"move_to_evac","not_evacuated,know_evac","None","move:!evac"
+5,"move_to_randomly","not_evacuated","None","move:!random"

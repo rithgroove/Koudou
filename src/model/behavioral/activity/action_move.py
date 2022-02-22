@@ -22,29 +22,37 @@ class ActionMove(Action):
         temp = destination_string
         temp =temp.replace(")", "")
         self.destination_string = destination_string
-        typing = "destination_type"
-        self.origin = agent.get_attribute("current_node_id")
-        if ("(" in temp):
-            temp2 = temp.split("(")
-            temp = temp2[0]
-            if (temp2[1].lower() == "destination_id") or (temp2[1].lower() == "id"):
-                typing = "destination_id"
-            elif (temp2[1].lower() == "destination_type") or (temp2[1].lower() == "type"):
-                typing = "destination_type"
-            else:
-                raise ValueError(f"Unknown destination type : {temp2[1].lower()}")
-        self.vectors = []
-
-        if ("$" in temp):
-            temp = agent.get_attribute(temp.replace("$",""))
-
-        if typing == "destination_type":
-            self.destination = kd_map.get_random_business(temp, 1, rng)[0].node_id
-        elif typing == "destination_id":
-            self.destination = temp
         self.sequence = []
         self.agent = agent
         self.finished = False
+        self.origin = agent.get_attribute("current_node_id")
+        self.vectors = []
+        self.target = None
+        if destination_string != "!evac":
+            node = kd_map.d_nodes[self.origin]
+            self.target = kd_map.get_closest_evacuation_center(node.coordinate,"")
+            self.destination = target.node_id
+        elif destination_string != "!random":
+            self.destination = kd_map.get_random_connected_nodes(self.origin,"",rng)
+        else:
+            typing = "destination_type"
+            if ("(" in temp):
+                temp2 = temp.split("(")
+                temp = temp2[0]
+                if (temp2[1].lower() == "destination_id") or (temp2[1].lower() == "id"):
+                    typing = "destination_id"
+                elif (temp2[1].lower() == "destination_type") or (temp2[1].lower() == "type"):
+                    typing = "destination_type"
+                else:
+                    raise ValueError(f"Unknown destination type : {temp2[1].lower()}")
+    
+            if ("$" in temp):
+                temp = agent.get_attribute(temp.replace("$",""))
+
+            if typing == "destination_type":
+                self.destination = kd_map.get_random_business(temp, 1, rng)[0].node_id
+            elif typing == "destination_id":
+                self.destination = temp
 
     def step(self,kd_sim,kd_map,ts,step_length,rng):
         # if have action do it

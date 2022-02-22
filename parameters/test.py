@@ -13,10 +13,10 @@ parameters = {
     "EVAC_CENTER" : "config/map/evacuation_center.json",
     "step_length" : 300,
     "sim_config":{
-        "condition" : "config/behavioral/condition.csv",
+        "condition" : ["config/behavioral/condition.csv","config/evacuation/condition_evac.csv"],
         "default_behavior" : "normal",
         "attributes" : {
-            "basic" : ["config/behavioral/attributes/attribute_basic.csv"],
+            "basic" : ["config/behavioral/attributes/attribute_basic.csv","config/evacuation/attributes/attribute_basic_evac.csv"],
             "option" : ["config/behavioral/attributes/attribute_option.csv"],
             "updateable" : ["config/behavioral/attributes/attribute_updateable.csv"],
             "schedule" : ["config/behavioral/attributes/attribute_schedule.csv"],
@@ -24,7 +24,7 @@ parameters = {
         },
         "behaviors" :{
             "normal" : "config/behavioral/behavior/behavior_normal.csv",
-            "evacuate" : "config/behavioral/behavior/behavior_evacuate.csv"
+            "evacuate" : "config/evacuation/behavior/behavior_evacuate.csv"
         }
-    }
+    },
 }
