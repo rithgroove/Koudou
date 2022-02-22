@@ -54,6 +54,8 @@ class View():
         self.tab1.frame_canvas = tk.Frame(self.tab1)
         self.canvas = tk.Canvas(self.tab1.frame_canvas)
 
+        ### tab 2
+
         # tab 1: canvas pack and size
         self.canvas.pack(expand=True)
         self.canvas.config(width=self.window_size[0], height=self.window_size[1])
@@ -91,20 +93,21 @@ class View():
             path_flat = [e for c in path_trans for e in c]
             clat, clon = viewport.apply(*place.center.get_lon_lat())
 
+            w=viewport.s*0.000015
             if "building" in place.tags.keys():
                 if len(path_flat)>=6:
                     #print(f"drawing {id} {path_flat[:4]}")
-                    self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=2)
-                    r=2
+                    self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=w)
+                    r=viewport.s*0.000015
                     self.canvas.create_oval(clat-r, clon-r, clat+r, clon+r, fill="black")
                 else:
                     1#print("not renderable")
             elif "natural" in place.tags.keys():
-                self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=2)
+                self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=w)
             elif "leisure" in place.tags.keys():
-                self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=2)
+                self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=w)
             elif "amenity" in place.tags.keys():
-                self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=2)
+                self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=w)
             # elif 'highway' in place.tags.keys():
             #     for (lon_a, lat_a), (lon_b, lat_b) in zip(path[:-1], path[1:]):
             #         self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="grey", width=3)
