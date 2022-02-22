@@ -3,5 +3,6 @@
     "map consntruction cache": "cache/TX-To-TU.pkl",
     "building tagging data": "config/map/tsukuba-tu-building-data.csv",
     "business data": "config/map/business.csv",
-    "road connection grid size": 20
+    "road connection grid size": 20,
+    "evacuation centers": "config/map/evacuation_center.json"
 }
