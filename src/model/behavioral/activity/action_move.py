@@ -31,7 +31,7 @@ class ActionMove(Action):
         if destination_string != "!evac":
             node = kd_map.d_nodes[self.origin]
             self.target = kd_map.get_closest_evacuation_center(node.coordinate,"")
-            self.destination = target.node_id
+            self.destination = self.target.centroid
         elif destination_string != "!random":
             self.destination = kd_map.get_random_connected_nodes(self.origin,"",rng)
         else:

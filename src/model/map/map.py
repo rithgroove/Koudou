@@ -79,7 +79,7 @@ class Map():
         explored_evac_center = explored_places.split(",")
         distance = sys.float_info.max
         place = None
-        for x in arr :
+        for x in arr :                
             temp_distance = self.d_nodes[x.centroid].coordinate.calculate_distance(lat = coordinate.lat,lon = coordinate.lon)
             if (temp_distance < distance and temp_distance > 0 and x not in explored_evac_center):
                 place = x

@@ -86,14 +86,14 @@ class GeneratorAttribute:
 			temp = {}
 
 			temp["name"] = attr["name"]
-			temp["start_time"] = int(attr["evacuation_start_day"]) #days
-			temp["start_time"] = (temp["start_time"]*24) + int(attr["evacuation_start_hour"]) #convert to hours
-			temp["start_time"] = (temp["start_time"]*60) + int(attr["evacuation_start_minute"]) #convert to minutes
-			temp["start_time"] = (temp["start_time"]*60) + int(attr["evacuation_start_second"]) #convert to seconds
-			temp["end_time"] = int(attr["evacuation_end_day"]) #days
-			temp["end_time"] = (temp["end_time"]*24) + int(attr["evacuation_end_hour"]) #convert to hours
-			temp["end_time"] = (temp["end_time"]*60) + int(attr["evacuation_end_minute"]) #convert to minutes
-			temp["end_time"] = (temp["end_time"]*60) + int(attr["evacuation_end_second"]) #convert to seconds
+			temp["start_time"] = int(attr["start_day"]) #days
+			temp["start_time"] = (temp["start_time"]*24) + int(attr["start_hour"]) #convert to hours
+			temp["start_time"] = (temp["start_time"]*60) + int(attr["start_minute"]) #convert to minutes
+			temp["start_time"] = (temp["start_time"]*60) + int(attr["start_second"]) #convert to seconds
+			temp["end_time"] = int(attr["end_day"]) #days
+			temp["end_time"] = (temp["end_time"]*24) + int(attr["end_hour"]) #convert to hours
+			temp["end_time"] = (temp["end_time"]*60) + int(attr["end_minute"]) #convert to minutes
+			temp["end_time"] = (temp["end_time"]*60) + int(attr["end_second"]) #convert to seconds
 			if (attr["target"] == "agent"):
 				self.schedules[attr["name"]] = temp
 			elif(attr["target"] == "simulation"):

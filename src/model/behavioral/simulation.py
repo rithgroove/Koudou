@@ -22,6 +22,8 @@ class Simulation:
 		self.kd_map = kd_map
 		self.cache_file_name = cache_file_name
 		self.report = report
+		self.d_agents_by_location = {}
+		self.modules = []
 
 	def add_attribute(self,attr):
 		self.attributes[attr.name] = attr
@@ -81,12 +83,24 @@ class Simulation:
 			agent.action_step(self,self.kd_map,self.ts,step_length,self.rng)
 
 		##############################################################################
+		# construct location dictionary for ease of use
+		##############################################################################
+		self.group_agents_by_location()
+		##############################################################################
 		# evacuation
 		##############################################################################
-
+		for module in self.modules:
+			module.step(self,self.kd_map,self.ts,step_length,self.rng)
 		##############################################################################
 		# epidemicon
 		##############################################################################
+
+	def group_agents_by_location(self):
+		self.d_agents_by_location = {}
+		for agent in self.agents:
+			if (agent.get_attribute("current_node_id") not in self.d_agents_by_location.keys()):
+				self.d_agents_by_location[agent.get_attribute('current_node_id')] = []
+			self.d_agents_by_location[agent.get_attribute('current_node_id')].append(agent)
 
 	def pathfind(self,move_actions):
 		pool = []
