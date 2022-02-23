@@ -25,6 +25,7 @@ class Map():
         self.d_roads: Dict[Tuple[str, str], Road] = {} # the tuple of id is ordered, NOT start, goal
         self.d_businesses: Dict[str, Business] = {} 
         self.d_residences: Dict[str, Residence] = {}
+        self.d_evacuation_centers: Dict[str, Place] = {}
 
     def add_node(self, node):
         self.d_nodes[node.id] = node
@@ -72,17 +73,15 @@ class Map():
         return results
 
     def get_closest_evacuation_center(self,coordinate, explored_places):
-        arr = []
-        for x in self.d_places:
-            if (self.d_places[x].evacuation_center):
-                arr.append(self.d_places[x])
         explored_evac_center = explored_places.split(",")
         distance = sys.float_info.max
         place = None
-        for x in arr :                
-            temp_distance = self.d_nodes[x.centroid].coordinate.calculate_distance(lat = coordinate.lat,lon = coordinate.lon)
-            if (temp_distance < distance and temp_distance > 0 and x not in explored_evac_center):
-                place = x
+        for evac_place_id in self.d_evacuation_centers:
+            temp_place = self.d_evacuation_centers[evac_place_id]
+            node = self.d_nodes[temp_place.centroid]
+            temp_distance = node.coordinate.calculate_distance(lat = coordinate.lat,lon = coordinate.lon)
+            if temp_place.id not in explored_places and temp_distance < distance:
+                place = self.d_evacuation_centers[evac_place_id]
                 distance = temp_distance
         return place
 

@@ -1,4 +1,5 @@
 "target","name","value","min","max","type"
-"agent","taken_necessity","FALSE","-","-","bool"
+"agent","taken_necessity",FALSE,"-","-","bool"
 "agent","target_evac","none","-","-","string"
 "agent","explored_evac","none","-","-","string"
+"agent","evacuated",FALSE,"-","-","bool"

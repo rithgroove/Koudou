@@ -1,5 +1,5 @@
 from src.model.map.coordinate import Coordinate
-
+from src.model.behavioral.activity.action_move import ActionMove
 class Agent:
 	def __init__(self,agent_id):
 		self.agent_id = agent_id
@@ -32,6 +32,14 @@ class Agent:
 
 	def add_behavior(self,behavior):
 		self.behaviors[behavior.name] = behavior
+
+	def force_reset(self):
+		if (isinstance(self.actions[0],ActionMove)):
+			temp = self.actions[0]
+			temp.force_reset()
+			self.actions = [temp]
+		else:
+			self.actions = []
 
 	def change_behavior(self,behavior_name):
 		self.default_behavior = self.behaviors[behavior_name]

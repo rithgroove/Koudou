@@ -430,7 +430,7 @@ def generate_evacuation_centers(kd_map, file_path):
 	evacuation_dict = {}
 	with open(file_path) as file:
 		evacuation_dict = json.load(file)["evacuation_centers"]
-
+	evacuation_center_dict = {}
 	for location in evacuation_dict:
 		try:
 			rules = location["rules"]
@@ -457,9 +457,9 @@ def generate_evacuation_centers(kd_map, file_path):
 				for place in places:
 					place.evacuation_center = True
 					place.evacuation_attr = attr
-		
+					evacuation_center_dict[place.centroid] = place		
 		except KeyError as e:
 			print("Warning: Key error when processing evacuation center file ", file_path)
 			print("Error on entry: ", location)
 			print("Tried to access key ", e, " but it does not exist")
-
+	kd_map.d_evacuation_centers = evacuation_center_dict

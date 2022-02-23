@@ -71,6 +71,7 @@ class MovementVector:
             self.finished = True
             self.current_position =  self.destination_node.coordinate
             leftOver = (distance - current_traveled_distance)
+            agent.set_attribute("last_node_id",agent.get_attribute("current_node_id"))
             agent.set_attribute("current_node_id",self.destination_node.id)
         else:
             self.progress = self.passed_through_distance/self.distance

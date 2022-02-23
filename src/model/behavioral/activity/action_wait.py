@@ -45,6 +45,7 @@ class ActionWait(Action):
         self.duration = rng.integers(min_duration,max_duration,1)[0]
         self.current = 0
 
+
     def step(self,kd_sim,kd_map,ts,step_length,rng):
         """
         [Method]

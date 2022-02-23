@@ -163,6 +163,7 @@ class GeneratorAttribute:
 		agent.add_attribute(Attribute("location","home","string"))
 		agent.add_attribute(Attribute("home_id",residence.id,"string"))
 		agent.add_attribute(Attribute("home_node_id",residence.node_id,"string"))
+		agent.add_attribute(Attribute("last_node_id",residence.node_id,"string"))
 		agent.add_attribute(Attribute("current_node_id",residence.node_id,"string"))
 
 		# add basic attribute
