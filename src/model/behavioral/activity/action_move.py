@@ -62,7 +62,7 @@ class ActionMove(Action):
         leftover = step_length
         while len(self.sequence) > 0:
             mov_vec = self.sequence[0]
-            leftover = mov_vec.step(self.agent,leftover) 
+            leftover = mov_vec.step(self.agent,leftover,kd_map) 
             if not mov_vec.is_finished:
                 break
             else:

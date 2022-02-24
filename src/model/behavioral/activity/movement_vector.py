@@ -48,7 +48,7 @@ class MovementVector:
         """
         return (self.current_position[0] - current_position.lat, self.current_position[1] - current_position.lon)
         
-    def step(self,agent,step_length):
+    def step(self,agent,step_length,kd_map):
         """
         [Method] step    
         Travel a certain number of distances in this vector, if the distance is higher than our remaining distance in this vector, the leftover will be returned.
@@ -61,7 +61,14 @@ class MovementVector:
             - [float] the leftover of the distance            
         """
         # calculate is there any left over translation
-        distance = float(agent.get_attribute("walking_speed"))*step_length
+        first = min(self.starting_node.id, self.destination_node.id)
+        second = max(self.starting_node.id, self.destination_node.id)
+        t = (first, second)
+        road = kd_map.d_roads[t]
+        speed = float(agent.get_attribute("walking_speed")) 
+        if road is not None:
+            speed *= road.modifier
+        distance =  speed*step_length 
         untraveled_distance = self.distance - self.passed_through_distance
         current_traveled_distance = min(distance,untraveled_distance)
         self.passed_through_distance += current_traveled_distance
@@ -79,7 +86,7 @@ class MovementVector:
             lon = self.starting_node.coordinate.lon +(self.progress * self.total_translation[1])
             self.current_position = Coordinate(lat=lat, lon=lon)
         agent.coordinate = self.current_position
-        return leftOver/float(agent.get_attribute("walking_speed"))
+        return leftOver/speed
     
     def extract(self):
         """

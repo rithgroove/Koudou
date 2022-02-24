@@ -1,10 +1,17 @@
 {
-    "pathfind cache": "cache/TX-pathfind.pkl",
-    "map consntruction cache": "cache/TX-To-TU.pkl",
-    "building tagging data": "config/map/tsukuba-tu-building-data.csv",
-    "business data": "config/map/business.csv",
-    "road connection grid size": 20,
-    "sim_config":{
+    "EXP_NAME":       "test_config_file",
+    "MAP":            "osm_files/TX-To-TU.osm",
+    "PATHFIND_CACHE": "cache/TX-pathfind.pkl",
+
+    "BUILDING_TAGS":  "config/map/tsukuba-tu-building-data.csv",
+    "BUSINESS":       "config/map/business.csv",
+    "GRID_SIZE":      20,
+    "EVAC_CENTER" : "config/map/evacuation_center.json",
+    "step_length" : 300,
+    "DISEASES": [
+        "config/infection/covid.json"
+    ],
+    "SIM_CONFIG":{
         "condition" : ["config/behavioral/condition.csv","config/evacuation/condition_evac.csv"],
         "default_behavior" : "normal",
         "attributes" : {
@@ -18,6 +25,5 @@
             "normal" : "config/behavioral/behavior/behavior_normal.csv",
             "evacuate" : "config/evacuation/behavior/behavior_evacuate.csv"
         }
-    },
-    "evacuation centers": "config/map/evacuation_center.json"
+    }
 }

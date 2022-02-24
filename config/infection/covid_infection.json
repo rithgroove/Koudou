@@ -1,0 +1,19 @@
+{
+    "roads":{
+        "scale": "per_day",
+        "close_contact_probability": 0.63,
+        "gradient_by_distance": -0.46
+    },
+    "businesses":{
+        "scale": "per_day",
+        "probability": 0.1
+    },
+    "residences":{
+        "scale": "per_day",
+        "probability": 0.1
+    },
+    "other":{
+        "scale": "per_day",
+        "probability": 0.1
+    }
+}

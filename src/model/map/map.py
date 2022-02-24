@@ -68,7 +68,6 @@ class Map():
             arr = [b for b in arr if not b.is_open(time_stamp)]
 
         arr = [b for b in arr if b.type == business_type]
-        print(business_type)
         results = rng.choice(arr, qtd, replace=False)
         return results
 
@@ -94,3 +93,15 @@ class Map():
             return last_visited
         else:
             return rng.choice(connection,1)[0]
+
+    def is_roads_node(self, node_id):
+        aux = [x.start_id for x in self.d_roads.values()]
+        return node_id in aux
+
+    def is_businesses_node(self, node_id):
+        aux = [x.node_id for x in self.d_businesses.values()]
+        return node_id in aux
+
+    def is_residences_node(self, node_id):
+        aux = [x.node_id for x in self.d_residences.values()]
+        return node_id in aux

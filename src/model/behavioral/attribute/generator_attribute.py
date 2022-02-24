@@ -13,12 +13,16 @@ class GeneratorAttribute:
 		self.rng = rng
 		self.basic = {}
 		self.basic_sim = {}
+		self.basic_household = {}
 		self.option = {}	
 		self.option_sim = {}
+		self.option_household = {}
 		self.updateable = {}
 		self.updateable_sim = {}
+		self.updateable_household = {}
 		self.schedules = {}
 		self.schedules_sim = {}
+		self.schedules_household = {}
 		self.professions = []
 		self.counter = 0
 		self.max_weight = 0
@@ -51,6 +55,8 @@ class GeneratorAttribute:
 				self.basic[attr["name"]] = temp
 			elif(attr["target"] == "simulation"):
 				self.basic_sim[attr["name"]] = temp
+			elif(attr["target"] == "household"):
+				self.basic_household[attr["name"]] = temp
 			else:
 				tempstring = f"Unknown target : {attr['target']} for attribute {attr['name']}\n"
 				tempstring += f"available target: agent or simulation"
@@ -75,6 +81,8 @@ class GeneratorAttribute:
 				self.option[attr["name"]]["options"].append(option)
 			elif(attr["target"] == "simulation"):
 				self.option_sim[attr["name"]]["options"].append(option)
+			elif(attr["target"] == "household"):
+				self.option_household[attr["name"]]["options"].append(option)
 			else:
 				tempstring = f"Unknown target : {attr['target']} for attribute {attr['name']}\n"
 				tempstring += f"available target: agent or simulation"
@@ -84,7 +92,6 @@ class GeneratorAttribute:
 		option_based_attributes  = csv_reader.read_csv_as_dict(file)
 		for attr in option_based_attributes:
 			temp = {}
-
 			temp["name"] = attr["name"]
 			temp["start_time"] = int(attr["start_day"]) #days
 			temp["start_time"] = (temp["start_time"]*24) + int(attr["start_hour"]) #convert to hours
@@ -98,6 +105,8 @@ class GeneratorAttribute:
 				self.schedules[attr["name"]] = temp
 			elif(attr["target"] == "simulation"):
 				self.schedules_sim[attr["name"]] = temp
+			elif(attr["target"] == "household"):
+				self.schedules_household[attr["name"]] = temp
 			else:
 				tempstring = f"Unknown target : {attr['target']} for attribute {attr['name']}\n"
 				tempstring += f"available target: agent or simulation"
@@ -119,6 +128,8 @@ class GeneratorAttribute:
 				self.updateable[attr["name"]] = temp
 			elif(attr["target"] == "simulation"):
 				self.updateable_sim[attr["name"]] = temp
+			elif(attr["target"] == "household"):
+				self.updateable_household[attr["name"]] = temp
 			else:
 				tempstring = f"Unknown target : {attr['target']} for attribute {attr['name']}\n"
 				tempstring += f"available target: agent or simulation"
@@ -151,21 +162,69 @@ class GeneratorAttribute:
 			profession["schedule"]= np.array(profession["schedule"])
 			self.professions.append(profession)
 
+	def generate_household_attribute(self,agents,kd_map):
+		temp_agents = agents.copy()
+		self.rng.shuffle(temp_agents,axis = 0)
+		agent_by_household = []
+		household_id = 0
+		while len(temp_agents) > 0:
+
+			family_size = self.rng.integers(1,4,1)[0]
+			# get random residence (need to develop household)
+			residence = kd_map.get_random_residence(self.rng)
+
+			# setup initial coordinate
+			home_node = kd_map.get_node(residence.node_id)
+			temp = []
+			for i in range(0,family_size):
+				if len(temp_agents) <= 0:
+					break
+				agent = temp_agents.pop(0)
+				agent.coordinate =  home_node.coordinate.clone()
+
+				# add home node id
+				agent.add_attribute(Attribute("location","home","string"))
+				agent.add_attribute(Attribute("home_id",residence.id,"string"))
+				agent.add_attribute(Attribute("home_node_id",residence.node_id,"string"))
+				agent.add_attribute(Attribute("last_node_id",residence.node_id,"string"))
+				agent.add_attribute(Attribute("current_node_id",residence.node_id,"string"))
+				agent.add_attribute(Attribute("household_id",household_id,"int"))
+				temp.append(agent)
+
+			household_id += 1
+			agent_by_household.append(temp)
+		for household in agent_by_household:
+
+			# add basic attribute
+			for attr in self.basic_household:
+				shared_attr = None
+				if (self.basic_household[attr]["value"] == "!random"):
+					shared_attr = Attribute(attr,self.rng.uniform(self.basic_household[attr]["min"],self.basic_household[attr]["max"]),self.basic_household[attr]["type"])
+				else:
+					shared_attr = Attribute(attr,self.basic_household[attr]["value"],self.basic_household[attr]["type"])
+				for agent in household:
+					agent.add_attribute(shared_attr)
+
+			# add updateable attribute
+			for key in self.updateable_household:
+				attr = self.updateable_household[key]
+				shared_attr = AttributeUpdateable(key, self.rng.uniform(attr["default_min"],attr["default_max"],1)[0], attr["min"], attr["max"], attr["step_update"], attr["type"])
+				for agent in household:
+					agent.add_attribute(shared_attr)
+
+			# add option based attribute
+			for key in self.option_household:
+				value = self.rng.choice(self.option_household[key]["value"],1,p=self.option_household[key]["weights"])[0]
+				shared_attr = AttributeOption(key,value,self.option_household[key]["options"],self.option_household[key]["type"])
+				for agent in household:
+					agent.add_attribute(shared_attr)
+
+			for key in self.schedules_household:
+				shared_attr = AttributeSchedule(key, self.schedules_household[key]["start_time"],self.schedules_household[key]["end_time"])
+				for agent in household:
+					agent.add_attribute(shared_attr)
+
 	def generate_attribute(self,agent,kd_map):
-		# get random residence (need to develop household)
-		residence = kd_map.get_random_residence(self.rng)
-
-		# setup initial coordinate
-		home_node = kd_map.get_node(residence.node_id)
-		agent.coordinate =  home_node.coordinate.clone()
-
-		# add home node id
-		agent.add_attribute(Attribute("location","home","string"))
-		agent.add_attribute(Attribute("home_id",residence.id,"string"))
-		agent.add_attribute(Attribute("home_node_id",residence.node_id,"string"))
-		agent.add_attribute(Attribute("last_node_id",residence.node_id,"string"))
-		agent.add_attribute(Attribute("current_node_id",residence.node_id,"string"))
-
 		# add basic attribute
 		for attr in self.basic:
 			if (self.basic[attr]["value"] == "!random"):

@@ -12,7 +12,10 @@ parameters = {
     "GRID_SIZE":      20,
     "EVAC_CENTER" : "config/map/evacuation_center.json",
     "step_length" : 300,
-    "sim_config":{
+    "DISEASES": [
+        "config/infection/covid.json"
+    ],
+    "SIM_CONFIG":{
         "condition" : ["config/behavioral/condition.csv","config/evacuation/condition_evac.csv"],
         "default_behavior" : "normal",
         "attributes" : {
