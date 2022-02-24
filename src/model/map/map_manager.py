@@ -60,7 +60,12 @@ def build_map(osm_file_path, bldg_tags, business_data, grid_size=10):
 	print(f"Finished creating places ({time.time() - st}s) ")
 	st = time.time()
 
-	bussinesses, residences = create_types_from_csv(kd_map, 10, bldg_tags)
+	bussinesses, residences = create_types_from_osm_tags(kd_map)
+	bussinesses_csv, residences_csv = create_types_from_csv(kd_map, 10, bldg_tags)
+
+	bussinesses.update(bussinesses_csv)
+	residences.update(residences_csv)
+
 	print(f"Finished creating businesses and residences ({time.time() - st}s) ")
 	st = time.time()
 
@@ -72,6 +77,31 @@ def build_map(osm_file_path, bldg_tags, business_data, grid_size=10):
 	# repair_places(places, businesses, households)
 
 	return kd_map
+
+def create_types_from_osm_tags(kd_map: Map):
+	businesses = {}
+	residences = {}
+
+	for p in kd_map.d_places.values():
+		centroid = kd_map.d_nodes[p.centroid]
+		p_type = None
+		if "building" in centroid.tags:
+			if centroid.tags["building"] != "yes" and centroid.tags["building"] != "+":
+				p_type = centroid.tags["building"]
+			elif "amenity" in centroid.tags:
+				p_type = centroid.tags["amenity"]
+
+		if p_type is not None:
+			p.type = p_type
+			kd_map.d_nodes[p.centroid].tags["type"] = p_type
+			if p_type == "apartments" or p_type == "house" or p_type == "residential":
+				r = Residence(p.centroid, p.id, p.road_connection, 1)
+				residences[r.id] = r
+			else:
+				b = Business(p.centroid, p.id, p.road_connection, p_type)
+				businesses[b.id] = b
+
+	return businesses, residences
 
 def create_places_osm(ways, kd_map, main_road_graph, grid_size):
 	places = {}
@@ -95,15 +125,18 @@ def create_places_osm(ways, kd_map, main_road_graph, grid_size):
 def create_centroid(way, n_dict):
 	lat, lon = 0, 0
 	size = len(way.nodes)-1
+	tags = {"centroid": True,  "type": "place"}
 
 	for i in range(size):
 		n_id = way.nodes[i]
 		lat += n_dict[n_id].coordinate.lat
 		lon += n_dict[n_id].coordinate.lon
+		for k, v in n_dict[n_id].tags.items():
+			tags[k] = v
 
 	coord = Coordinate(lat/size, lon/size)
 	new_id = n_dict[way.nodes[0]].id + "_centroid"
-	n = Node(new_id, {"centroid": True, "type": "place"}, coord)
+	n = Node(new_id, tags, coord)
 	return n
 
 
@@ -177,7 +210,7 @@ def create_types_from_csv (kd_map: Map, grid_size, csv_file_name):
 	businesses = {}
 	residences = {}
 
-	places = [p for p in kd_map.d_places.values()]
+	places = [p for p in kd_map.d_places.values() if p.type is None]
 	grid = create_places_grid(kd_map, places, grid_size)
 
 	with open(csv_file_name) as csv_file:
@@ -393,8 +426,13 @@ def generate_businesses_hours(businesses_dict, csv_file_name):
 		for row in csv_reader:
 			csv_info[row["building_type"]] = row
 
+	days_of_the_week = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
 	for business in businesses_dict.values():
 		if business.type not in csv_info:
+			# Default is opening everyday every hour
+			for day in days_of_the_week:
+				business.add_working_hour(day, "00:00", "00:00")
 			continue
 		b_info = csv_info[business.type]
 		min_workhour = int(b_info["min_workhour"])
@@ -413,7 +451,7 @@ def generate_businesses_hours(businesses_dict, csv_file_name):
 			start_hour = 0
 			finish_hour = 0
 
-		workdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+		workdays =  days_of_the_week
 		if b_info["day"] == "weekday":
 			workdays = ["Mon", "Tue", "Wed", "Thu", "Fri"]
 		elif b_info["day"] == "weekend":
