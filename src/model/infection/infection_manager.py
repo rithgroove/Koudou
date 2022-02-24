@@ -101,7 +101,7 @@ def disease_transmission(step_size: int, kd_map: Map, population: List[Agent], d
         if kd_map.is_businesses_node(loc):
             business_infection(step_size, ags_by_location[loc], disease, rng)
         elif kd_map.is_residences_node(loc):
-            residence_infection(step_size, ags_by_location[loc], disease, rng)
+            residence_infection(step_size, ag, ags_by_location[loc], disease, rng)
         elif kd_map.is_roads_node(loc):
             road_infection(step_size, kd_map, ag, ags_by_location, disease, rng)
         else:
@@ -120,13 +120,15 @@ def business_infection(step_size, ag_same_location: List[Agent], disease, rng):
             ag.set_attribute(disease.name, disease.starting_state)
 
 
-def residence_infection(step_size, ag_same_location: List[Agent], disease, rng):
+def residence_infection(step_size,infector:Agent, ag_same_location: List[Agent], disease, rng):
     infection_attr = disease.infection_method["residences"]
     scale = infection_attr["scale"]
     prob = infection_attr["probability"]
 
     for ag in ag_same_location:
         if ag.get_attribute(disease.name) != "susceptible":  # Already infected
+            continue
+        if ag.get_attribute("household_id") != infector.get_attribute("household_id"): #needs to be in the same household
             continue
         chance = apply_time_scale(step_size, scale, prob)
         if rng.uniform(0.0,1.0,1)[0] < chance:  # infect agent
