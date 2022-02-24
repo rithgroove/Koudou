@@ -70,3 +70,15 @@ class Map():
         
         results = rng.choice(arr, qtd, replace=False)
         return results
+
+    def is_roads_node(self, node_id):
+        aux = [x.start_id for x in self.d_roads.values()]
+        return node_id in aux
+
+    def is_businesses_node(self, node_id):
+        aux = [x.node_id for x in self.d_businesses.values()]
+        return node_id in aux
+
+    def is_residences_node(self, node_id):
+        aux = [x.node_id for x in self.d_residences.values()]
+        return node_id in aux
