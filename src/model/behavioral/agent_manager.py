@@ -28,6 +28,7 @@ def generate_agents(kd_map,attribute_generator,count):
 		agent = Agent(x)
 		attribute_generator.generate_attribute(agent,kd_map)
 		agents.append(agent)
+	attribute_generator.generate_household_attribute(agents,kd_map)
 	return agents
 
 def load_activities(activity_file,conditions_dict, rng):

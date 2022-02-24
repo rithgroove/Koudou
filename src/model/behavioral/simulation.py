@@ -100,6 +100,7 @@ class Simulation:
 			temp = (x.origin ,x.destination)
 			if (temp not in pool):
 				pool.append(temp)
+		#print (pool)
 		results = a_star.parallel_a_star(self.kd_map, pool, n_threads=self.threads, cache_file_name = self.cache_file_name, report = self.report)
 		for x in move_actions:
 			temp = (x.origin ,x.destination)

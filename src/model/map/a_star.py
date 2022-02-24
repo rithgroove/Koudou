@@ -26,12 +26,6 @@ def reconstruct_path(came_from: Dict[str, str], start: str, goal: str):
     current: str = goal
     path: List[str] = []
     while current != start:  # note: this will fail if no path is found
-        if (current in path):
-            print (f"\n\n\n cyclic in {start} to {goal}")
-            print (f"\n\n\n current = {current}")
-            print (f"\n\n\n came from = {came_from[current]}")
-            print(came_from)
-            break
         path.append(current)
         current = came_from[current]
     path.append(start)  
@@ -71,9 +65,9 @@ def a_star_search(kd_map, start_node_id: str, goal_node_id: str, cache_dict: Dic
             break
 
         # Checking for cache
-        first = min(current, goal_node_id)
-        second = max(current, goal_node_id)
-        t = (first, second)
+        # first = min(current, goal_node_id)
+        # second = max(current, goal_node_id)
+        t = (current, goal_node_id)
         if t in cache_dict:
             print("found in cache")
             for previous, step in zip(cache_dict[t][:], cache_dict[t][1:]):

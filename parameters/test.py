@@ -15,7 +15,7 @@ parameters = {
     "DISEASES": [
         "config/infection/covid.json"
     ],
-    "sim_config":{
+    "SIM_CONFIG":{
         "condition" : ["config/behavioral/condition.csv","config/evacuation/condition_evac.csv"],
         "default_behavior" : "normal",
         "attributes" : {

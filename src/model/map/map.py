@@ -69,7 +69,6 @@ class Map():
 
         arr = [b for b in arr if b.type == business_type]
         
-        print(business_type)
         results = rng.choice(arr, qtd, replace=False)
         return results
 

@@ -4,7 +4,7 @@ from src.model.infection.infection_manager import initialize_infection, infectio
 import pickle
 import numpy as np
 
-parameters = load_parameters("parameters/default.py")
+parameters = load_parameters("parameters/test.py")
 with open("cache/TX-To-TU.pkl", "rb") as file:
     kd_map = pickle.load(file)
 
