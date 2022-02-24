@@ -67,8 +67,7 @@ class Simulation:
 			move_actions = agent.behavior_step(self,self.kd_map,self.ts,step_length,self.rng)
 			move_action_pool.extend(move_actions)
 
-		for x in move_action_pool:
-			print(x)
+		print(f"\n\n\nwe're calculating {len(move_action_pool)} number of pathfind request\n\n\n")
 
 		##############################################################################
 		# pathfind
@@ -108,6 +107,7 @@ class Simulation:
 			temp = (x.origin ,x.destination)
 			if (temp not in pool):
 				pool.append(temp)
+		print(f"\n\n\n pool = {len(pool)}\n\n\n")
 		results = a_star.parallel_a_star(self.kd_map, pool, n_threads=self.threads, cache_file_name = self.cache_file_name, report = self.report)
 		for x in move_actions:
 			temp = (x.origin ,x.destination)

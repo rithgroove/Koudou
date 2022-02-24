@@ -25,7 +25,18 @@ class PriorityQueue:
 def reconstruct_path(came_from: Dict[str, str], start: str, goal: str):
     current: str = goal
     path: List[str] = []
-    while current != start:  # note: this will fail if no path is found
+
+    while current != start:  # note: this will fail if no path is found <-this cause cyclic loop =_=
+        if current in path:
+            path.append(current)
+            print(f"start from {start}")
+            print(f"goal from {goal}")
+            print(f"\ncyclic loop: {start} to {goal}\n")
+            print(f"\ncurrent = {current}")
+            print(f"\npath = {path}")
+            print(f"\ndict = {came_from}")
+
+            break
         path.append(current)
         current = came_from[current]
     path.append(start)  
@@ -66,7 +77,7 @@ def a_star_search(kd_map, start_node_id: str, goal_node_id: str, cache_dict: Dic
 
         # Checking for cache
         first = min(current, goal_node_id)
-        second = max(current, goal_node_id)
+        second = max(current, goal_node_id) #why inside loop?
         t = (first, second)
         if t in cache_dict:
             print("found in cache")
@@ -85,7 +96,7 @@ def a_star_search(kd_map, start_node_id: str, goal_node_id: str, cache_dict: Dic
             dist = kd_map.d_roads[t].length
 
             new_cost = cost_so_far[current] + dist
-            if conn not in cost_so_far or new_cost < cost_so_far[conn]:
+            if (conn not in cost_so_far or new_cost < cost_so_far[conn]):
                 cost_so_far[conn] = new_cost
                 dist_to_goal = goal_node.coordinate.calculate_distance(*conn_lat_lon)
                 priority = new_cost + dist_to_goal
