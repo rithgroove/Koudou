@@ -55,7 +55,7 @@ def build_map(osm_file_path, bldg_tags, business_data, grid_size=10,evacuation_c
 	st = time.time()
 
 	places = create_places_osm(ways, kd_map, main_road_graph, grid_size)
-
+	
 	kd_map.d_places = places
 
 	print(f"Finished creating places ({time.time() - st}s) ")
@@ -109,8 +109,9 @@ def create_types_from_osm_tags(kd_map: Map):
 def create_places_osm(ways, kd_map, main_road_graph, grid_size):
 	places = {}
 	road_grid = create_node_grid(kd_map, main_road_graph, grid_size)
+	problem = 0
 	for w in ways:
-		if 'road' in w.tags or 'highway' in w.tags:
+		if 'building' not in w.tags:
 			continue
 
 		centroid = create_centroid(w, kd_map.d_nodes)
@@ -119,9 +120,14 @@ def create_places_osm(ways, kd_map, main_road_graph, grid_size):
 		centroid_grid_coord = get_grid_coordinate(centroid.coordinate.lat, centroid.coordinate.lon, kd_map, grid_size)
 		road_connection = create_road_connection(centroid, centroid_grid_coord, road_grid, kd_map)
 
-		render_info = Render_info([kd_map.d_nodes[n_id].coordinate for n_id in w.nodes], centroid.coordinate, w.tags)
-		p = Place(w.id, True, render_info, centroid.id, road_connection)
-		places[p.id] = p
+		if (road_connection == False):
+
+			problem += 1
+		else:
+			render_info = Render_info([kd_map.d_nodes[n_id].coordinate for n_id in w.nodes], centroid.coordinate, w.tags)
+			p = Place(w.id, True, render_info, centroid.id, road_connection)
+			places[p.id] = p
+	print(f"Warning: There are {problem} problematic places and {len(places)} good places")
 
 	return places
 
@@ -193,21 +199,22 @@ def create_road_connection(centroid: Node, centroid_grid_coord, road_grid, kd_ma
 	road_start, road_destination, closest_coord = get_closest_road(centroid, centroid_grid_coord, road_grid, kd_map)
 
 	if road_start is None or road_destination is None:
-		return None
+		return False
 
 	# Checking if the closest coordinate is one of the nodes of the roades
 	if closest_coord.get_lat_lon() == road_start.coordinate.get_lat_lon():
 		centroid.add_connection(road_start.id)
 		road_start.add_connection(road_start.id)
 		create_road_sorted(kd_map, centroid, road_start)
-		return
+		return True
 	if closest_coord.get_lat_lon() == road_destination.coordinate.get_lat_lon():
 		centroid.add_connection(road_destination.id)
 		road_destination.add_connection(road_destination.id)
 		create_road_sorted(kd_map, centroid, road_destination)
-		return
+		return True	
 
 	connect_centroid_to_road(centroid, road_start, road_destination, closest_coord, kd_map)
+	return True
 
 def create_types_from_csv (kd_map: Map, grid_size, csv_file_name):
 	businesses = {}
@@ -312,7 +319,6 @@ def clean_road(road_nodes, kd_map):
 			main_road = result
 		else:
 			disconnected_nodes.extend(result)
-
 	return main_road, disconnected_nodes
 
 

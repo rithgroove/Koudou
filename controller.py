@@ -38,7 +38,7 @@ class Controller():
         else:
             self.load_map(self.d_param["MAP_CACHE"])
 
-        self.__load_sim(self.d_param["sim_config"])
+        self.__load_sim(self.d_param["SIM_CONFIG"])
 
         self.init_logger()
 

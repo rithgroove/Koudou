@@ -61,8 +61,8 @@ class MovementVector:
             - [float] the leftover of the distance            
         """
         # calculate is there any left over translation
-        first = min(starting_node, destination_node)
-        second = max(starting_node, destination_node)
+        first = min(self.starting_node.id, self.destination_node.id)
+        second = max(self.starting_node.id, self.destination_node.id)
         t = (first, second)
         road = kd_map.d_roads[t]
         speed = float(agent.get_attribute("walking_speed")) 

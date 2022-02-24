@@ -17,8 +17,8 @@ infection = initialize_infection(parameters["DISEASES"], sim.agents, rng)
 print(sim)
 print("#####################################################################")
 
-day = 1 * 24
-step_size = 3600
+day = 1 * 24 *12
+step_size = 300
 
 for x in range(0, day):
     infection_step(step_size, kd_map, sim.agents, infection, rng)
