@@ -26,6 +26,12 @@ def reconstruct_path(came_from: Dict[str, str], start: str, goal: str):
     current: str = goal
     path: List[str] = []
     while current != start:  # note: this will fail if no path is found
+        if (current in path):
+            print (f"\n\n\n cyclic in {start} to {goal}")
+            print (f"\n\n\n current = {current}")
+            print (f"\n\n\n came from = {came_from[current]}")
+            print(came_from)
+            break
         path.append(current)
         current = came_from[current]
     path.append(start)  
