@@ -154,7 +154,6 @@ def parallel_a_star(kd_map, start_goals_arr, n_threads=1, cache_file_name = None
             with open(cache_file_name, "rb") as f:
                 cache_dict = pickle.load(f)
         cache_dict = manager.dict(cache_dict)
-        print(len(cache_dict))
         path_dict = manager.dict()
         tasks = []
         for i in range(n_threads):

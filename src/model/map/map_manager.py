@@ -107,7 +107,7 @@ def create_centroid(way, n_dict):
 
 	coord = Coordinate(lat/size, lon/size)
 	new_id = n_dict[way.nodes[0]].id + "_centroid"
-	n = Node(new_id, {"centroid": True}, coord)
+	n = Node(new_id, {"centroid": True, "type": "place"}, coord)
 	return n
 
 
@@ -202,9 +202,13 @@ def create_types_from_csv (kd_map: Map, grid_size, csv_file_name):
 				if p_type == "residential" or p_type == "apartments":
 					r = Residence(place.centroid, place.id, place.road_connection, 1)
 					residences[r.id] = r
+					kd_map.d_nodes[place.centroid].tags["place_type"] = "residence"
+					kd_map.d_nodes[place.centroid].tags["place_subtype"] = p_type
 				else:
 					b = Business(place.centroid, place.id, place.road_connection, p_type)
 					businesses[b.id] = b
+					kd_map.d_nodes[place.centroid].tags["place_type"] = "business"
+					kd_map.d_nodes[place.centroid].tags["place_subtype"] = p_type
 
 	return businesses, residences
 
@@ -236,6 +240,8 @@ def build_node_connections(kd_map):
 			for k, v in way.tags.items():
 				connectingNode.tags[k] = v
 				current_node.tags[k] = v
+			current_node.tags["type"] = "road"
+			connectingNode.tags["type"] = "road"
 
 def separate_nodes(kd_map):
 	road_nodes = []

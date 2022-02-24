@@ -84,7 +84,6 @@ class GeneratorAttribute:
 		option_based_attributes  = csv_reader.read_csv_as_dict(file)
 		for attr in option_based_attributes:
 			temp = {}
-
 			temp["name"] = attr["name"]
 			temp["start_time"] = int(attr["start_day"]) #days
 			temp["start_time"] = (temp["start_time"]*24) + int(attr["start_hour"]) #convert to hours

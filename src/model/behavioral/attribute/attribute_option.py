@@ -14,7 +14,7 @@ class AttributeOption(Attribute):
                     self._casting_error(option["value"],self.typing)
 
     def get_options(self):
-        return options
+        return self.options
 
     def set_value(self,value):
         try:
