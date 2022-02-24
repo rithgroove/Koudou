@@ -106,3 +106,11 @@ class Simulation:
 			temp = (x.origin ,x.destination)
 			x.generate_vector(self.kd_map, results[temp])
 
+	def summarized_attribute(self,attribute_name):
+		temp = {}
+		for agent in self.agents:
+			key = agent.get_attribute(attribute_name)
+			if key not in temp.keys():
+				temp[key] = 0
+			temp[key] += 1
+		return temp

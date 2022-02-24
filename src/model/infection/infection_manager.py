@@ -20,7 +20,8 @@ def initialize_infection(disease_files, population: List[Agent], rng):
             d_config["attributes"],
             d_config["transition_states"],
             d_config["infection_file"],
-            d_config["infectious_states"]
+            d_config["infectious_states"],
+            d_config["infected_starting_state"]
         )
         diseases.append(d)
 
@@ -76,16 +77,6 @@ def infected_next_stage(step_size, ag: Agent, disease: Disease, rng):
 
     ag.set_attribute(disease.name, next_state)
 
-
-def disease_transmission(step_size: int, kd_map: Map, population: List[Agent], disease: Disease, rng):
-    infected_agents = [ag for ag in population if ag.get_attribute(disease.name) in disease.infectious_states]
-    for ag in infected_agents:
-        n_id = ag.get_attribute("current_node_id")
-        node = kd_map.d_nodes[n_id]
-        print(node)
-        pass
-    pass
-
 def apply_time_scale(step_size, time_scale, chance):
     if time_scale == "per_second":
         return chance*step_size
@@ -95,3 +86,79 @@ def apply_time_scale(step_size, time_scale, chance):
         return chance*step_size/(60*60)
     elif time_scale == "per_day":
         return chance*step_size/(60*60*24)
+
+
+def disease_transmission(step_size: int, kd_map: Map, population: List[Agent], disease: Disease, rng):
+
+    infected_ags = [ag for ag in population if ag.get_attribute(disease.name) in disease.infectious_states]
+    ags_by_location = {ag.get_attribute("current_node_id"): [] for ag in population}
+
+    for ag in infected_ags:
+        loc = ag.get_attribute("current_node_id")
+        if kd_map.is_businesses_node(loc):
+            business_infection(step_size, ags_by_location[loc], disease, rng)
+        elif kd_map.is_residences_node(loc):
+            residence_infection(step_size, ags_by_location[loc], disease, rng)
+        elif kd_map.is_roads_node(loc):
+            road_infection(step_size, kd_map, ag, ags_by_location, disease, rng)
+        else:
+            other_infection(step_size, ags_by_location[loc], disease, rng)
+
+def business_infection(step_size, ag_same_location: List[Agent], disease, rng):
+    infection_attr = disease.infection_method["businesses"]
+    scale = infection_attr["scale"]
+    prob = infection_attr["probability"]
+
+    for ag in ag_same_location:
+        if ag.get_attribute(disease.name) != "susceptible": #Already infected
+            continue
+        chance = apply_time_scale(step_size, scale, prob)
+        if rng.random() < chance: # infect agent
+            ag.set_attribute(disease.name, disease.starting_state)
+
+
+def residence_infection(step_size, ag_same_location: List[Agent], disease, rng):
+    infection_attr = disease.infection_method["residences"]
+    scale = infection_attr["scale"]
+    prob = infection_attr["probability"]
+
+    for ag in ag_same_location:
+        if ag.get_attribute(disease.name) != "susceptible":  # Already infected
+            continue
+        chance = apply_time_scale(step_size, scale, prob)
+        if rng.random() < chance:  # infect agent
+            ag.set_attribute(disease.name, disease.starting_state)
+
+
+def other_infection(step_size, ag_same_location: List[Agent], disease, rng):
+    infection_attr = disease.infection_method["other"]
+    scale = infection_attr["scale"]
+    prob = infection_attr["probability"]
+
+    for ag in ag_same_location:
+        if ag.get_attribute(disease.name) != "susceptible":  # Already infected
+            continue
+        chance = apply_time_scale(step_size, scale, prob)
+        if rng.random() < chance:  # infect agent
+            ag.set_attribute(disease.name, disease.starting_state)
+
+
+def road_infection(step_size, kd_map: Map, infected_ag, ags_by_location, disease, rng):
+    infection_attr = disease.infection_method["roads"]
+    scale = infection_attr["scale"]
+    gradient = infection_attr["gradient_by_distance"]
+    cc_prob = infection_attr["close_contact_probability"] 
+
+    loc = infected_ag.get_attribute("current_node_id")
+    susceptible_ags = ags_by_location[loc]
+    for conn in kd_map.d_nodes[loc].connections:
+        susceptible_ags += ags_by_location[conn]
+
+    for ag in susceptible_ags:
+        if ag.get_attribute(disease.name) != "susceptible":  # Already infected
+            continue
+        dist = 10
+        prob = cc_prob - gradient*dist
+        chance = apply_time_scale(step_size, scale, prob)
+        if rng.random() < chance:  # infect agent
+            ag.set_attribute(disease.name, disease.starting_state)

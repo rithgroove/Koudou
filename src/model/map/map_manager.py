@@ -97,11 +97,16 @@ def create_types_from_osm_tags(kd_map: Map):
 
 		if p_type is not None:
 			p.type = p_type
+			kd_map.d_nodes[p.centroid].tags["type"] = "place"
+			kd_map.d_nodes[p.centroid].tags["place_subtype"] = p_type
+
 			if p_type == "apartments" or p_type == "house" or p_type == "residential":
 				r = Residence(p.centroid, p.id, p.road_connection, 1)
 				residences[r.id] = r
+				kd_map.d_nodes[p.centroid].tags["place_type"] = "residence"
 			else:
 				b = Business(p.centroid, p.id, p.road_connection, p_type)
+				kd_map.d_nodes[p.centroid].tags["place_type"] = "business"
 				businesses[b.id] = b
 
 	return businesses, residences
@@ -134,7 +139,7 @@ def create_places_osm(ways, kd_map, main_road_graph, grid_size):
 def create_centroid(way, n_dict):
 	lat, lon = 0, 0
 	size = len(way.nodes)-1
-	tags = {"centroid": True}
+	tags = {"centroid": True,  "type": "place"}
 
 	for i in range(size):
 		n_id = way.nodes[i]
@@ -238,16 +243,16 @@ def create_types_from_csv (kd_map: Map, grid_size, csv_file_name):
 			for place_id in to_create:
 				place = kd_map.d_places[place_id]
 				place.type = p_type
+				kd_map.d_nodes[place.centroid].tags["type"] = "place"
+				kd_map.d_nodes[place.centroid].tags["place_subtype"] = p_type
 				if p_type == "residential" or p_type == "apartments":
 					r = Residence(place.centroid, place.id, place.road_connection, 1)
 					residences[r.id] = r
 					kd_map.d_nodes[place.centroid].tags["place_type"] = "residence"
-					kd_map.d_nodes[place.centroid].tags["place_subtype"] = p_type
 				else:
 					b = Business(place.centroid, place.id, place.road_connection, p_type)
 					businesses[b.id] = b
 					kd_map.d_nodes[place.centroid].tags["place_type"] = "business"
-					kd_map.d_nodes[place.centroid].tags["place_subtype"] = p_type
 
 	return businesses, residences
 
@@ -279,8 +284,6 @@ def build_node_connections(kd_map):
 			for k, v in way.tags.items():
 				connectingNode.tags[k] = v
 				current_node.tags[k] = v
-			current_node.tags["type"] = "road"
-			connectingNode.tags["type"] = "road"
 
 def separate_nodes(kd_map):
 	road_nodes = []
@@ -289,6 +292,7 @@ def separate_nodes(kd_map):
 		node = kd_map.d_nodes[key]
 		if (node.is_road):
 			road_nodes.append(node)
+			node.tags["type"] = "road"
 		else:
 			other_nodes.append(node)
 	return road_nodes, other_nodes

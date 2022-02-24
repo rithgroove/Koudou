@@ -14,6 +14,7 @@
         "symptomatic",
         "severe"
     ],
+    "infected_starting_state": "exposed",
     "transition_states": {
         "exposed": {
             "asymptomatic": {

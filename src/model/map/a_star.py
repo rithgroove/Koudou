@@ -74,7 +74,7 @@ def a_star_search(kd_map, start_node_id: str, goal_node_id: str, cache_dict: Dic
         # Checking for cache
         t = get_ordered_tuple(current, goal_node_id)
         if t in cache_dict:
-            print("found in cache")
+            #print("found in cache")
             cached_path = cache_dict[t]
             if cached_path[0] == goal_node_id:
                 cached_path.reverse()

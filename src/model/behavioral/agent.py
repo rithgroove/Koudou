@@ -17,7 +17,6 @@ class Agent:
 		return self.attributes[name].get_value
 	
 	def update_attribute(self,attribute_name,value):
-		print(f"value = {value}")
 		if (value.lower() == "max"):
 			self.attributes[attribute_name].set_max()
 		elif(value.lower() == "min"):

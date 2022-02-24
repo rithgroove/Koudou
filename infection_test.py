@@ -1,6 +1,7 @@
 from src.utils.parser import load_parameters
 from src.model.behavioral.simulation import Simulation
 from src.model.infection.infection_manager import initialize_infection, infection_step
+from src.model.map.a_star import a_star_search
 import pickle
 import numpy as np
 
@@ -22,4 +23,6 @@ step_size = 300
 
 for x in range(0, day):
     infection_step(step_size, kd_map, sim.agents, infection, rng)
-    sim.step(step_size)
+
+infected_ags = [ag for ag in sim.agents if ag.get_attribute("covid") != "susceptible"]
+print(len(infected_ags))
