@@ -72,8 +72,7 @@ class EvacuationModule(Module):
 						agent.set_attribute("explored_evac", temp) 
 						if (count < can_accept):
 							agent.set_attribute("evacuated",True)
-						else:
-							agent.set_attribute("know_evac",True)
+						agent.set_attribute("know_evac",True)
 						count += 1
 
 

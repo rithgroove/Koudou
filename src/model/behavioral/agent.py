@@ -9,6 +9,7 @@ class Agent:
 		self.actions = []
 		self.active_action = None
 		self.coordinate = Coordinate(0.0,0.0)
+		self.previous_activity = ""
 
 	def add_attribute(self,attr):
 		self.attributes[attr.name] = attr
