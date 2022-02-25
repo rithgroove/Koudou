@@ -24,7 +24,7 @@ class Agent:
 		elif("(minus)" in value):
 			temp = f"-{value.replace('(minus)','')}"
 			self.attributes[attribute_name].update_value(temp)
-		elif(self.attributes[attribute_name].typing == "string"):
+		elif(self.attributes[attribute_name].typing == "string" or self.attributes[attribute_name].typing == "bool"):
 			self.attributes[attribute_name].set_value(value)
 		else:
 			self.attributes[attribute_name].update_value(value)

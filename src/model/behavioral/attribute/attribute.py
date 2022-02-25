@@ -33,8 +33,8 @@ class Attribute:
         else:
             tempstring = "[Attribute] this attribute cannot be updated:\n"
             tempstring += self._get_object_details()
-            tempstring = "Only integer or float type are updatable.\n"
-            tempstring = "Use set_value(value) for other type.\n"
+            tempstring += "Only integer or float type are updatable.\n"
+            tempstring += "Use set_value(value) for other type.\n"
             raise(ValueError(tempstring))
 
     def set_max(self):
@@ -87,7 +87,10 @@ def cast(value,typing):
     if typing == "string":
         return f"{value}"
     elif typing == "bool":
-        return bool(value)
+        temp = value
+        if isinstance(temp, str):
+            temp = temp.lower()== "true"
+        return bool(temp)
     elif typing == "int" or typing == "integer":
         return int(value)
     elif typing == "float":

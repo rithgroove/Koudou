@@ -6,7 +6,7 @@
                 "place_id": "133876543"
             },
             "attributes": {
-                "capacity": 100,
+                "capacity": 1000,
                 "contains_food": true,
                 "contains_medicine": false
             }
@@ -21,7 +21,7 @@
                 ]
             },
             "attributes": {
-                "capacity": 100,
+                "capacity": 1000,
                 "contains_food": true,
                 "contains_medicine": true
             }
@@ -41,7 +41,7 @@
                 ]
             },
             "attributes": {
-                "capacity": 100,
+                "capacity": 1000,
                 "contains_food": true,
                 "contains_medicine": true
             }

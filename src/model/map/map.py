@@ -50,7 +50,8 @@ class Map():
         tempstring = "[Map]\n"
         tempstring += f"Simulated area = ({self.min_coord.lon},{self.min_coord.lat}) to ({self.max_coord.lon},{self.max_coord.lat})\n"
         tempstring += f"Number of nodes = {len(self.d_nodes)}\n"
-        tempstring += f"Number of ways = {len(self.d_ways)}"
+        tempstring += f"Number of ways = {len(self.d_ways)}\n"
+        tempstring += f"Number of residence = {len(self.d_residences)}"
         return tempstring
 
     def set_main_road(self, main_road):

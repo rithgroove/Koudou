@@ -11,6 +11,8 @@ class Condition:
         self.target = target.lower()
 
     def check_value(self,agent,kd_sim):
+
+
         value = self.value
         if ("$" in value):
             value = agent.get_attribute(value.replace("$",""))

@@ -35,7 +35,7 @@ class Activity:
 			for x in self.actions:
 				temp = x.split(":")
 				temp[0] = temp[0].replace(" ","")
-				if temp[0].lower()=="move" and "id)" not in temp[1]:
+				if temp[0].lower()=="move" and "id)" not in temp[1] and "!" not in temp[1]:
 					temp[1] = temp[1].replace("(building_type)","")
 					temp[1] = temp[1].replace("(type)","")
 					temp[1] = temp[1].replace(" ","")

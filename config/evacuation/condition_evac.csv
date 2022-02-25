@@ -2,5 +2,5 @@
 "agent","not_evacuated","evacuated","equal",FALSE,"N/A","N/A","bool"
 "agent","evacuated","evacuated","equal",TRUE,"N/A","N/A","bool"
 "agent","have_target","target_evac","not_equal","none","N/A","N/A","string"
-"agent","know_evac","know_evac","not_equal","none","N/A","N/A","string"
-"agent","no_necessity","taken_necessity","equal",FALSE,"N/A","N/A","string"
+"agent","know_evac","know_evac","equal",TRUE,"N/A","N/A","bool"
+"agent","no_necessity","taken_necessity","equal",FALSE,"N/A","N/A","bool"
