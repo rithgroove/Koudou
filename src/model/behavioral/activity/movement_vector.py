@@ -1,4 +1,4 @@
-import geopy.distance as gdistance
+import haversine as hs
 from src.model.map.coordinate import Coordinate
 class MovementVector:
     """
@@ -27,7 +27,7 @@ class MovementVector:
         """
         self.starting_node = starting_node
         self.destination_node = destination_node
-        self.distance = gdistance.distance(self.starting_node.coordinate.get_lat_lon(),self.destination_node.coordinate.get_lat_lon()).km*1000
+        self.distance = hs.haversine(self.starting_node.coordinate.get_lat_lon(), self.destination_node.coordinate.get_lat_lon(), unit=hs.Unit.METERS)
         self.passed_through_distance = 0
         self.current_position = self.starting_node
         self.finished = False
