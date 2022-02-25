@@ -120,7 +120,6 @@ def create_types_from_osm_tags(kd_map: Map):
 def create_places_osm(ways, kd_map, main_road_graph, grid_size):
 	places = {}
 	road_grid = create_node_grid(kd_map, main_road_graph, grid_size)
-	problem = 0
 	for w in ways:
 		if 'building' not in w.tags:
 			continue
@@ -130,13 +129,10 @@ def create_places_osm(ways, kd_map, main_road_graph, grid_size):
 
 		centroid_grid_coord = get_grid_coordinate(centroid.coordinate.lat, centroid.coordinate.lon, kd_map, grid_size)
 		road_connection = create_road_connection(centroid, centroid_grid_coord, road_grid, kd_map)
-
-		if road_connection == None:
-			problem += 1
+	
 		render_info = Render_info([kd_map.d_nodes[n_id].coordinate for n_id in w.nodes], centroid.coordinate, w.tags)
 		p = Place(w.id, True, render_info, centroid.id, road_connection)
 		places[p.id] = p
-	print("AAAAAAAAAAAAAAAAAAAAAAAAA  ", problem)
 	return places
 
 def create_centroid(way, n_dict):
@@ -247,7 +243,6 @@ def create_types_from_csv (kd_map: Map, grid_size, csv_file_name):
 				place = kd_map.d_places[place_id]
 				place_node = kd_map.d_nodes[place.centroid]
 				if len(place_node.connections) == 0:
-					print("BBBB")
 					continue
 
 				place.type = p_type
