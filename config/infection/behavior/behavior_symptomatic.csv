@@ -3,7 +3,7 @@
 2,"switch_to_normal_recovered","is_recovered","NONE","change_behavior:normal"
 3,"switch_to_normal_asymptomatic","is_asymptomatic","NONE","change_behavior:normal"
 4,"switch_to_hospitalization","is_severe","NONE","change_behavior:severe"
-5,"switch_to_evac","is_evac","NONE","change_behavior:evacuation"
+5,"switch_to_evacuation","is_evac","NONE","change_behavior:evacuate"
 6,"go_home","not_at_home","NONE","move:$home_node_id(id),modify_attribute:location-home"
 7,"eat_at_home","hungry","NONE","wait:20-60"
 8,"sleep","sleepy","NONE","wait:6(hours)-8(hours),modify_attribute:energy-max"

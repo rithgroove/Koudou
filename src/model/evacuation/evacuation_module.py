@@ -4,7 +4,17 @@ class EvacuationModule(Module):
 	def __init__(self, distance, share_information_chance):
 		self.distance = distance
 		self.share_information_chance = share_information_chance
+
+
 		self.triggered = False
+
+	# def setup_default_knowledge(kd_map,kd_sim,value,rng):
+	# 	agent_that_know_evacuation_center = value * len(kd_sim.agents)
+	# 	temp = kd_sim.agents.copy()
+	# 	rng.shuffle(temp)
+	# 	for i in range(0,agent_that_know_evacuation_center):
+	# 		temp[i].set_attribute("target_evac",kd_map.get_closest_evacuation_center)
+
 
 	def step(self,kd_sim,kd_map,ts,step_length,rng,logger):
 		if (kd_sim.get_attribute("evacuation")):
@@ -35,6 +45,8 @@ class EvacuationModule(Module):
 					for recipient in recipients:
 						if rng.uniform(0.0,1.0) > share_information_chance:
 							recipients.set_value("target_evac",source.get_attribute("target_evac"))
+							recipients.set_value("explored_evac",source.get_attribute("explored_evac"))
+							recipients.set_attribute("know_evac",True)
 
 			for evac_center_id in kd_map.d_evacuation_centers:
 				evac_center =  kd_map.d_evacuation_centers[evac_center_id]
@@ -48,9 +60,9 @@ class EvacuationModule(Module):
 							evacuated += 1
 						else:
 							unevacuated.append(agent)
-					for x in range(0,min(capacity-evacuated,len(unevacuated))):
-						agent = unevacuated[x]
-						agent.set_attribute("evacuated",False)
+					can_accept = capacity-evacuated
+					count = 0
+					for agent in unevacuated:
 						temp = agent.get_attribute("explored_evac").lower()
 						if (temp == "none"):
 							temp = ""
@@ -58,4 +70,11 @@ class EvacuationModule(Module):
 							temp += ","
 						temp += f"{evac_center_id}"
 						agent.set_attribute("explored_evac", temp) 
+						if (count < can_accept):
+							agent.set_attribute("evacuated",True)
+						else:
+							agent.set_attribute("know_evac",True)
+						count += 1
+
+
 		# don't forget to check if the agent reached evacuation points

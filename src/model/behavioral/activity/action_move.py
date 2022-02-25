@@ -56,7 +56,8 @@ class ActionMove(Action):
                 self.destination = temp
 
     def force_reset(self):
-        self.vectors = [self.vectors[0]]
+        if (len(self.vectors) > 0):
+           self.vectors = [self.vectors[0]]
 
     def step(self,kd_sim,kd_map,ts,step_length,rng):
         # if have action do it
