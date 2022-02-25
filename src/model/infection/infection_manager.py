@@ -46,23 +46,22 @@ def initializate_disease_on_population(disease: Disease, initialization: Dict, p
     for ag in infected_ags:
         ag.set_attribute(disease.name, initialization["state"])
 
-def infection_step(step_size: int, kd_map: Map, population: List[Agent], infection_module: Infection, rng):
+def infection_step(step_size: int, kd_map: Map, population: List[Agent], infection_module: Infection, rng,logger,ts):
     # next state of the infected agents
     for disease in infection_module.diseases.values():
         infected_agents = [ag for ag in population if ag.get_attribute(disease.name) != "susceptible"]
         for ag in infected_agents:
-            infected_next_stage(step_size, ag, disease, rng)
+            infected_next_stage(step_size, ag, disease, rng, logger,ts)
 
     # infection to healthy agents
     for disease in infection_module.diseases.values():
-        disease_transmission(step_size, kd_map, population, disease, rng)
+        disease_transmission(step_size, kd_map, population, disease, rng, logger,ts)
 
     
 
-def infected_next_stage(step_size, ag: Agent, disease: Disease, rng):
+def infected_next_stage(step_size, ag: Agent, disease: Disease, rng, logger,ts):
     current_state = ag.get_attribute(disease.name)
     next_state = current_state
-
     if current_state in disease.transitions:
         rand_value = rng.uniform(0.0,1.0,1)[0]
         previous_chances = 0
@@ -70,8 +69,19 @@ def infected_next_stage(step_size, ag: Agent, disease: Disease, rng):
             chance = apply_time_scale(step_size, attr["scale"], attr["probability"])
             if rand_value < previous_chances + chance:
                 next_state = compartiment
+                data = {}
+                data["time_stamp"] = ts.step_count
+                data["disease_name"] = disease.name
+                data["agent_id"] = ag.agent_id
+                data["agent_profession"] = ag.get_attribute("profession")
+                data["agent_location"] = ag.get_attribute("location")
+                data["agent_node_id"] = ag.get_attribute("current_node_id")
+                data["current_state"] = current_state
+                data["next_state"] = next_state
+                logger.write_csv_data("disease_transition.csv", data)
                 break
             previous_chances += chance
+
     else:
         print(f"Could not find transition for state {current_state} of disease {disease.name}")
 
@@ -88,7 +98,23 @@ def apply_time_scale(step_size, time_scale, chance):
         return chance*step_size/(60*60*24)
 
 
-def disease_transmission(step_size: int, kd_map: Map, population: List[Agent], disease: Disease, rng):
+def log(infection_type,disease,infector,infectee,logger,ts):
+    data = {}
+    data["time_stamp"] = ts.step_count
+    data["type"] = infection_type
+    data["disease_name"] = disease.name
+    data["agent_id"] = infectee.agent_id
+    data["agent_profession"] = infectee.get_attribute("profession")
+    data["agent_location"] = infectee.get_attribute("location")
+    data["agent_node_id"] = infectee.get_attribute("current_node_id")
+    data["source_id"] = infector.agent_id
+    data["source_profession"] = infector.get_attribute("profession")
+    data["source_location"] = infector.get_attribute("location")
+    data["source_node_id"] = infector.get_attribute("current_node_id")
+    logger.write_csv_data("new_infection.csv", data)
+
+
+def disease_transmission(step_size: int, kd_map: Map, population: List[Agent], disease: Disease, rng, logger, ts):
     infected_ags = [ag for ag in population if ag.get_attribute(disease.name) in disease.infectious_states]
     #ags_by_location = {ag.get_attribute("current_node_id"): [] for ag in population}
     ags_by_location = {}
@@ -99,15 +125,15 @@ def disease_transmission(step_size: int, kd_map: Map, population: List[Agent], d
     for ag in infected_ags:
         loc = ag.get_attribute("current_node_id")
         if kd_map.is_businesses_node(loc):
-            business_infection(step_size, ags_by_location[loc], disease, rng)
+            business_infection(step_size, ag, ags_by_location[loc], disease, rng, logger, ts)
         elif kd_map.is_residences_node(loc):
-            residence_infection(step_size, ag, ags_by_location[loc], disease, rng)
+            residence_infection(step_size, ag, ags_by_location[loc], disease, rng, logger, ts)
         elif kd_map.is_roads_node(loc):
-            road_infection(step_size, kd_map, ag, ags_by_location, disease, rng)
+            road_infection(step_size, kd_map, ag, ags_by_location, disease, rng, logger, ts)
         else:
-            other_infection(step_size, ags_by_location[loc], disease, rng)
+            other_infection(step_size,ag, ags_by_location[loc], disease, rng, logger, ts)
 
-def business_infection(step_size, ag_same_location: List[Agent], disease, rng):
+def business_infection(step_size, infector:Agent, ag_same_location: List[Agent], disease, rng, logger,ts):
     infection_attr = disease.infection_method["businesses"]
     scale = infection_attr["scale"]
     prob = infection_attr["probability"]
@@ -118,9 +144,10 @@ def business_infection(step_size, ag_same_location: List[Agent], disease, rng):
         chance = apply_time_scale(step_size, scale, prob)
         if rng.uniform(0.0,1.0,1)[0] < chance: # infect agent
             ag.set_attribute(disease.name, disease.starting_state)
+            log("business",disease,infector,ag,logger,ts)    
 
 
-def residence_infection(step_size,infector:Agent, ag_same_location: List[Agent], disease, rng):
+def residence_infection(step_size,infector:Agent, ag_same_location: List[Agent], disease, rng, logger,ts):
     infection_attr = disease.infection_method["residences"]
     scale = infection_attr["scale"]
     prob = infection_attr["probability"]
@@ -133,9 +160,10 @@ def residence_infection(step_size,infector:Agent, ag_same_location: List[Agent],
         chance = apply_time_scale(step_size, scale, prob)
         if rng.uniform(0.0,1.0,1)[0] < chance:  # infect agent
             ag.set_attribute(disease.name, disease.starting_state)
+            log("residential",disease, infector,ag,logger,ts)    
 
 
-def other_infection(step_size, ag_same_location: List[Agent], disease, rng):
+def other_infection(step_size, infector:Agent, ag_same_location: List[Agent], disease, rng, logger,ts):
     infection_attr = disease.infection_method["other"]
     scale = infection_attr["scale"]
     prob = infection_attr["probability"]
@@ -146,9 +174,9 @@ def other_infection(step_size, ag_same_location: List[Agent], disease, rng):
         chance = apply_time_scale(step_size, scale, prob)
         if rng.uniform(0.0,1.0,1)[0] < chance:  # infect agent
             ag.set_attribute(disease.name, disease.starting_state)
+            log("other",disease, infector,ag,logger,ts)   
 
-
-def road_infection(step_size, kd_map: Map, infected_ag, ags_by_location, disease, rng):
+def road_infection(step_size, kd_map: Map, infected_ag, ags_by_location, disease, rng, logger,ts):
     infection_attr = disease.infection_method["roads"]
     scale = infection_attr["scale"]
     gradient = infection_attr["gradient_by_distance"]
@@ -169,3 +197,4 @@ def road_infection(step_size, kd_map: Map, infected_ag, ags_by_location, disease
         chance = apply_time_scale(step_size, scale, prob)
         if rng.uniform(0.0,1.0,1)[0] < chance :  # infect agent
             ag.set_attribute(disease.name, disease.starting_state)
+            log("on_the_road",disease, infected_ag,ag,logger,ts)   

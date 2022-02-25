@@ -1,5 +1,5 @@
 {
-    "EXP_NAME":       "base",
+    "EXP_NAME":       "day_3_evacuation",
     "MAP":            "osm_files/TX-To-TU.osm",
     "PATHFIND_CACHE": "cache/TX-pathfind.pkl",
 
@@ -18,7 +18,7 @@
             "basic" : ["config/behavioral/attributes/attribute_basic.csv","config/evacuation/attributes/attribute_basic_evac.csv"],
             "option" : ["config/behavioral/attributes/attribute_option.csv"],
             "updateable" : ["config/behavioral/attributes/attribute_updateable.csv"],
-            "schedule" : ["config/behavioral/attributes/attribute_schedule.csv"],
+            "schedule" : ["config/behavioral/attributes/attribute_schedule_day_3.csv"],
             "profession" : ["config/behavioral/profession.csv"]
         },
         "behaviors" :{

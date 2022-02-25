@@ -6,7 +6,7 @@ class EvacuationModule(Module):
 		self.share_information_chance = share_information_chance
 		self.triggered = False
 
-	def step(self,kd_sim,kd_map,ts,step_length,rng):
+	def step(self,kd_sim,kd_map,ts,step_length,rng,logger):
 		if (kd_sim.get_attribute("evacuation")):
 			if not self.triggered:
 				self.triggered = True

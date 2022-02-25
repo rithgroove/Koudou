@@ -235,9 +235,6 @@ class Controller():
 
         self.logger.write_data(filename="agents.csv", data=data)
 
-
-
-
 if __name__ == "__main__":
     crtl = Controller()
     crtl.use_view()

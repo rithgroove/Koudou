@@ -40,40 +40,40 @@ class Simulation:
 
 		return tempstring
 
-	def attribute_step(self,kd_sim,kd_map,ts,step_length,rng):
+	def attribute_step(self,kd_sim,kd_map,ts,step_length,rng,logger):
 		#update attribute
 		for attr in self.attributes:
 			self.attributes[attr].step(kd_sim,kd_map,ts,step_length,rng,None)
 
-	def step(self,step_length):
+	def step(self,step_length,logger):
 		self.ts.step(step_length)
-		self.attribute_step(self,self.kd_map,self.ts,step_length,self.rng)
+		self.attribute_step(self,self.kd_map,self.ts,step_length,self.rng,logger)
 		##############################################################################
 		# update all agents attribute
 		##############################################################################
 		for agent in self.agents:
-			agent.attribute_step(self,self.kd_map,self.ts,step_length,self.rng)
+			agent.attribute_step(self,self.kd_map,self.ts,step_length,self.rng,logger)
 
 		##############################################################################
 		# check for activities
 		##############################################################################
 		move_action_pool = []
 		for agent in self.agents:
-			move_actions = agent.behavior_step(self,self.kd_map,self.ts,step_length,self.rng)
+			move_actions = agent.behavior_step(self,self.kd_map,self.ts,step_length,self.rng,logger)
 			move_action_pool.extend(move_actions)
 
 		##############################################################################
 		# pathfind
 		##############################################################################
+		print(f"{len(move_action_pool)} move actions was generated")
 		if (len(move_action_pool) > 0):
-			print(f"pathfinding for = {len(move_action_pool)}")
 			self.pathfind(move_action_pool)
 
 		##############################################################################
 		# action step
 		##############################################################################
 		for agent in self.agents:
-			agent.action_step(self,self.kd_map,self.ts,step_length,self.rng)
+			agent.action_step(self,self.kd_map,self.ts,step_length,self.rng,logger)
 
 		##############################################################################
 		# construct location dictionary for ease of use
@@ -83,7 +83,7 @@ class Simulation:
 		# evacuation
 		##############################################################################
 		for module in self.modules:
-			module.step(self,self.kd_map,self.ts,step_length,self.rng)
+			module.step(self,self.kd_map,self.ts,step_length,self.rng,logger)
 		##############################################################################
 		# epidemicon
 		##############################################################################
@@ -102,6 +102,7 @@ class Simulation:
 			if (temp not in pool):
 				pool.append(temp)
 		results = a_star.parallel_a_star(self.kd_map, pool, n_threads=self.threads, cache_file_name = self.cache_file_name, report = self.report)
+		print(f"consisting of {len(pool)} unique pathfinding request")
 		for x in move_actions:
 			temp = (x.origin ,x.destination)
 			x.generate_vector(self.kd_map, results[temp])

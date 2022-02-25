@@ -57,18 +57,18 @@ class Agent:
 			tempstring +=  f"  - {x} = {self.attributes[x].get_value}\n"
 		return tempstring
 
-	def attribute_step(self,kd_sim,kd_map,ts,step_length,rng):
+	def attribute_step(self,kd_sim,kd_map,ts,step_length,rng,logger):
 		#update attribute
 		for attr in self.attributes:
 			self.attributes[attr].step(kd_sim,kd_map,ts,step_length,rng,self)
 
-	def behavior_step(self,kd_sim,kd_map,ts,step_length,rng):
+	def behavior_step(self,kd_sim,kd_map,ts,step_length,rng,logger):
 		# if idle check action
 		if len(self.actions) == 0:
-			return self.default_behavior.step(kd_sim,kd_map,ts,step_length,rng,self) #get actions
+			return self.default_behavior.step(kd_sim,kd_map,ts,step_length,rng,self,logger) #get actions
 		return []
 
-	def action_step(self,kd_sim,kd_map,ts,step_length,rng):
+	def action_step(self,kd_sim,kd_map,ts,step_length,rng,logger):
 		leftover = step_length
 		while len(self.actions) > 0:
 			act = self.actions[0]

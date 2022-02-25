@@ -46,10 +46,6 @@
             "recovered": {
                 "scale": "per_day",
                 "probability": 0.1
-            },
-            "dead": {
-                "scale": "per_day",
-                "probability": 0.1
             }
         },
         "recovered": {
