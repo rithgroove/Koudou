@@ -64,7 +64,7 @@ def infected_next_stage(step_size, ag: Agent, disease: Disease, rng):
     next_state = current_state
 
     if current_state in disease.transitions:
-        rand_value = rng.random()
+        rand_value = rng.uniform(0.0,1.0,1)[0]
         previous_chances = 0
         for compartiment, attr in disease.transitions[current_state].items():
             chance = apply_time_scale(step_size, attr["scale"], attr["probability"])
