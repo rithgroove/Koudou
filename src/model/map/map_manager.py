@@ -89,6 +89,11 @@ def create_types_from_osm_tags(kd_map: Map):
 	for p in kd_map.d_places.values():
 		centroid = kd_map.d_nodes[p.centroid]
 		p_type = None
+		
+		if len(centroid.connections) == 0:
+			print("CCCC")
+			continue
+
 		if "building" in centroid.tags:
 			if centroid.tags["building"] != "yes" and centroid.tags["building"] != "+":
 				p_type = centroid.tags["building"]
@@ -97,16 +102,17 @@ def create_types_from_osm_tags(kd_map: Map):
 
 		if p_type is not None:
 			p.type = p_type
-			kd_map.d_nodes[p.centroid].tags["type"] = "place"
-			kd_map.d_nodes[p.centroid].tags["place_subtype"] = p_type
+			
+			centroid.tags["type"] = "place"
+			centroid.tags["place_subtype"] = p_type
 
 			if p_type == "apartments" or p_type == "house" or p_type == "residential":
 				r = Residence(p.centroid, p.id, p.road_connection, 1)
 				residences[r.id] = r
-				kd_map.d_nodes[p.centroid].tags["place_type"] = "residence"
+				centroid.tags["place_type"] = "residence"
 			else:
 				b = Business(p.centroid, p.id, p.road_connection, p_type)
-				kd_map.d_nodes[p.centroid].tags["place_type"] = "business"
+				centroid.tags["place_type"] = "business"
 				businesses[b.id] = b
 
 	return businesses, residences
@@ -114,7 +120,6 @@ def create_types_from_osm_tags(kd_map: Map):
 def create_places_osm(ways, kd_map, main_road_graph, grid_size):
 	places = {}
 	road_grid = create_node_grid(kd_map, main_road_graph, grid_size)
-	problem = 0
 	for w in ways:
 		if 'building' not in w.tags:
 			continue
@@ -124,16 +129,10 @@ def create_places_osm(ways, kd_map, main_road_graph, grid_size):
 
 		centroid_grid_coord = get_grid_coordinate(centroid.coordinate.lat, centroid.coordinate.lon, kd_map, grid_size)
 		road_connection = create_road_connection(centroid, centroid_grid_coord, road_grid, kd_map)
-
-		if (road_connection == False):
-
-			problem += 1
-		else:
-			render_info = Render_info([kd_map.d_nodes[n_id].coordinate for n_id in w.nodes], centroid.coordinate, w.tags)
-			p = Place(w.id, True, render_info, centroid.id, road_connection)
-			places[p.id] = p
-	print(f"Warning: There are {problem} problematic places and {len(places)} good places")
-
+	
+		render_info = Render_info([kd_map.d_nodes[n_id].coordinate for n_id in w.nodes], centroid.coordinate, w.tags)
+		p = Place(w.id, True, render_info, centroid.id, road_connection)
+		places[p.id] = p
 	return places
 
 def create_centroid(way, n_dict):
@@ -204,22 +203,22 @@ def create_road_connection(centroid: Node, centroid_grid_coord, road_grid, kd_ma
 	road_start, road_destination, closest_coord = get_closest_road(centroid, centroid_grid_coord, road_grid, kd_map)
 
 	if road_start is None or road_destination is None:
-		return False
+		return None
 
 	# Checking if the closest coordinate is one of the nodes of the roades
 	if closest_coord.get_lat_lon() == road_start.coordinate.get_lat_lon():
 		centroid.add_connection(road_start.id)
-		road_start.add_connection(road_start.id)
+		road_start.add_connection(centroid.id)
 		create_road_sorted(kd_map, centroid, road_start)
-		return True
+		return road_start.id
 	if closest_coord.get_lat_lon() == road_destination.coordinate.get_lat_lon():
 		centroid.add_connection(road_destination.id)
-		road_destination.add_connection(road_destination.id)
+		road_destination.add_connection(centroid.id)
 		create_road_sorted(kd_map, centroid, road_destination)
-		return True	
+		return road_destination.id	
 
-	connect_centroid_to_road(centroid, road_start, road_destination, closest_coord, kd_map)
-	return True
+	road_connection = connect_centroid_to_road(centroid, road_start, road_destination, closest_coord, kd_map)
+	return road_connection.id
 
 def create_types_from_csv (kd_map: Map, grid_size, csv_file_name):
 	businesses = {}
@@ -242,17 +241,21 @@ def create_types_from_csv (kd_map: Map, grid_size, csv_file_name):
 
 			for place_id in to_create:
 				place = kd_map.d_places[place_id]
+				place_node = kd_map.d_nodes[place.centroid]
+				if len(place_node.connections) == 0:
+					continue
+
 				place.type = p_type
-				kd_map.d_nodes[place.centroid].tags["type"] = "place"
-				kd_map.d_nodes[place.centroid].tags["place_subtype"] = p_type
+				place_node.tags["type"] = "place"
+				place_node.tags["place_subtype"] = p_type
 				if p_type == "residential" or p_type == "apartments":
 					r = Residence(place.centroid, place.id, place.road_connection, 1)
 					residences[r.id] = r
-					kd_map.d_nodes[place.centroid].tags["place_type"] = "residence"
+					place_node.tags["place_type"] = "residence"
 				else:
 					b = Business(place.centroid, place.id, place.road_connection, p_type)
 					businesses[b.id] = b
-					kd_map.d_nodes[place.centroid].tags["place_type"] = "business"
+					place_node.tags["place_type"] = "business"
 
 	return businesses, residences
 
@@ -388,6 +391,8 @@ def connect_centroid_to_road(centroid, road_start, road_destination, closest_coo
 
 	kd_map.add_node(new_node)
 	kd_map.main_road.append(new_node)
+
+	return new_node
 
 # Gets the distance from a road to a node and the closest point on the road
 def get_dist_and_closest_coord(road_start, road_destination, target_node):
