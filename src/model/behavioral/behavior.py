@@ -11,8 +11,8 @@ class Behavior:
 	def step(self,kd_sim,kd_map,ts,step_length,rng,agent):
 		move_action_pool = []
 		for act in self.activities:
-			if (act.check_conditions(agent,kd_sim) == True):
-				actions = act.generate_actions(agent,kd_map,rng)
+			if act.check_conditions(agent,kd_sim, kd_map, ts,rng):
+				actions = act.generate_actions(agent,kd_map,ts,rng)
 				agent.actions.extend(actions)
 				for action in actions:
 					if action.__class__ is ActionMove:

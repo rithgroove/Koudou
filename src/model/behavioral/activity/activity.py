@@ -20,7 +20,7 @@ class Activity:
 	def add_action(self,action):
 		self.actions.append(action)
 
-	def check_conditions(self,agent,kd_sim):
+	def check_conditions(self,agent,kd_sim, kd_map, ts,rng):
 		result = True
 		for x in self.condition:
 			if (self.command.lower() == "and" or self.command.lower() == "none" ):
@@ -31,9 +31,20 @@ class Activity:
 				result = result or x.check_value(agent,kd_sim)
 				if result:
 					break
+		if result:
+			for x in self.actions:
+				temp = x.split(":")
+				temp[0] = temp[0].replace(" ","")
+				if temp[0].lower()=="move" and "id)" not in temp[1]:
+					temp[1] = temp[1].replace("(building_type)","")
+					temp[1] = temp[1].replace("(type)","")
+					temp[1] = temp[1].replace(" ","")
+					destination = kd_map.get_random_business(temp[1], 1, rng ,time_stamp = ts, only_open = True)
+					if len(destination) == 0:
+						result = False
 		return result
 
-	def generate_actions(self,agent,kd_map,rng):
+	def generate_actions(self,agent,kd_map,ts,rng):
 		actions = []
 		for x in self.actions:
 			temp = x.split(":")
@@ -41,7 +52,7 @@ class Activity:
 			if (temp[0].lower() == "wait"):
 				actions.append(ActionWait(agent,temp[1],rng))
 			elif (temp[0].lower()=="move"):
-				actions.append(ActionMove(agent,kd_map,temp[1],rng))
+				actions.append(ActionMove(agent,kd_map,temp[1],rng,ts))
 			elif (temp[0].lower()=="modify_attribute"):
 				actions.append(ActionModifyAttribute(agent,temp[1]))
 			elif (temp[0].lower()=="change_behavior"):

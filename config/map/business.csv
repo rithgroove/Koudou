@@ -3,8 +3,4 @@ restaurant,10,12,10,11,everyday,5,7,0.1
 barbershop,8,12,9,11,everyday,5,7,0
 retail,10,12,8,10,everyday,6,7,0.1
 hospital,24,24,0,0,everyday,7,7,1
-<<<<<<< HEAD
 train_station,24,24,0,0,everyday,7,7,1
-=======
-train_station,24,24,0,0,everyday,7,7,1
->>>>>>> da727320ca7144a6e2e924aa83b8f729714ca1c1

@@ -68,6 +68,8 @@ class Map():
             arr = [b for b in arr if not b.is_open(time_stamp)]
 
         arr = [b for b in arr if b.type == business_type]
+        if (len(arr) <= qtd):
+            return arr
         results = rng.choice(arr, qtd, replace=False)
         return results
 
