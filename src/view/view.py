@@ -37,7 +37,8 @@ class View():
         self.buttons = {}
         ##### main bar #####
         self.buttons["map_load"] = tk.Button(self.frame_bar, bg=bg_btn, font=font_btn, text="Load Map")
-        for i in range(4):
+        self.buttons["sim_step"] = tk.Button(self.frame_bar, bg=bg_btn, font=font_btn, text="Step")
+        for i in range(3):
             self.buttons[f"null{i}"]  = tk.Button(self.frame_bar, bg=bg_btn, font=font_btn, text=f"null_{i}")
 
         for i, (key,val) in enumerate(self.buttons.items()):

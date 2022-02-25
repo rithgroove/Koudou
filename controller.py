@@ -50,6 +50,8 @@ class Controller():
         if self.d_param["USE_VIEW"]:
             self.view.close()
 
+        self.logger.close_files()
+
     ## binding ##
     def bind_no_view(self):
         self.load_map  = self.__load_map
@@ -79,6 +81,7 @@ class Controller():
 
         # buttons
         view.buttons["map_load"]["command"] = self.load_map
+        view.buttons["sim_step"]["command"] = self.run_step
 
         # canvas
         view.canvas.bind("<MouseWheel>"     , self.on_mouse_scroll)
@@ -177,6 +180,13 @@ class Controller():
     def init_logger(self):
         self.logger = Logger(exp_name=self.d_param["EXP_NAME"])
 
+        # init all files
+        files   = ["buildings.csv",
+                   "agents.csv"]
+        headers = [",".join(["id", "lon", "lat", "tags"]),
+                   ",".join(["id", "lon", "lat"])]
+        self.logger.add_files(files, headers)
+
     ## SIM
     def step(self):
         self.thread = threading.Thread(target=self.run_step, args=())
@@ -187,9 +197,31 @@ class Controller():
         print("Processing... ", end="", flush=True)
         # self.model.step(stepSize=self.view.steps_to_advance)
         # self.update_view()
-        # self.logger.write_places_info(self.map.d_places)
+
+        # log data
+        self.prepare_log()
         print("Done!", flush=True)
         self.thread_finished = True
+
+    def prepare_log(self):
+        # file 1
+        clon = [self.map.d_places[id].render_info.center.lon for id in self.map.d_places.keys()]
+        clat = [self.map.d_places[id].render_info.center.lat for id in self.map.d_places.keys()]
+        tag1 = [",".join(self.map.d_places[id].render_info.tags) for id in self.map.d_places.keys()]
+        data = [clon, clat, tag1]
+
+        self.logger.write_data(filename="buildings.csv", data=data)
+
+        # file 2
+        attr1 = [None]
+        attr2 = [None]
+        attr3 = [None]
+        data = [attr1, attr2, attr3]
+
+        self.logger.write_data(filename="agents.csv", data=data)
+
+
+
 
 if __name__ == "__main__":
     crtl = Controller()
