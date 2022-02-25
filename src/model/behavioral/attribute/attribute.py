@@ -28,7 +28,8 @@ class Attribute:
 
     def update_value(self,value):
         if self.typing == "int" or self.typing == "integer" or self.typing == "float":
-            self.value += value
+            temp = cast(value,self.typing)
+            self.value += temp
         else:
             tempstring = "[Attribute] this attribute cannot be updated:\n"
             tempstring += self._get_object_details()

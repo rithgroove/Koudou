@@ -12,7 +12,7 @@
         "config/infection/covid.json"
     ],
     "SIM_CONFIG":{
-        "condition" : ["config/behavioral/condition.csv","config/evacuation/condition_evac.csv"],
+        "condition" : ["config/behavioral/condition.csv","config/evacuation/condition_evac.csv","config/infection/condition_infection.csv"],
         "default_behavior" : "normal",
         "attributes" : {
             "basic" : ["config/behavioral/attributes/attribute_basic.csv","config/evacuation/attributes/attribute_basic_evac.csv"],
@@ -23,7 +23,9 @@
         },
         "behaviors" :{
             "normal" : "config/behavioral/behavior/behavior_normal.csv",
-            "evacuate" : "config/evacuation/behavior/behavior_evacuate.csv"
+            "evacuate" : "config/evacuation/behavior/behavior_evacuate.csv",
+            "self_isolation" : "config/infection/behavior/behavior_symptomatic.csv",
+            "severe" : "config/infection/behavior/behavior_severe.csv"
         }
     }
 }

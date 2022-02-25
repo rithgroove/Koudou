@@ -1,4 +1,0 @@
-priority,name,conditions,conditions type
-1,go_to_hospital,not_at_hospital,NONE
-2,eat_at_hospital,"hungry,at_hospital",AND
-3,sleep_at_hospital,"sleepy,at_hospital",AND

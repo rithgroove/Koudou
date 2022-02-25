@@ -21,6 +21,9 @@ class Agent:
 			self.attributes[attribute_name].set_max()
 		elif(value.lower() == "min"):
 			self.attributes[attribute_name].set_min()
+		elif("(minus)" in value):
+			temp = f"-{value.replace('(minus)','')}"
+			self.attributes[attribute_name].update_value(temp)
 		elif(self.attributes[attribute_name].typing == "string"):
 			self.attributes[attribute_name].set_value(value)
 		else:

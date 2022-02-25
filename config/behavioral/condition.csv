@@ -15,3 +15,5 @@
 "simulation","is_not_evac","evacuation","equal","FALSE","N/A","N/A","bool"
 "random","eat_out","random","less_than","$eat_out_preference",0,1,"float"
 "agent","not_at_work","current_node_id","not_equal","$workplace_node_id","N/A","N/A","string"
+"agent","start_to_have _symptoms","covid","equal","symptomatic","N/A","N/A","string"
+"agent","fridge_empty","household_food_stock","less_than",3,"N/A","N/A","int"

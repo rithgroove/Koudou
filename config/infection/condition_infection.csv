@@ -1,0 +1,6 @@
+"target","name","attribute","operator","value","max","min","type"
+"agent","is_susceptible","covid","equal","susceptible","N/A","N/A","string"
+"agent","is_recovered","covid","equal","recovered","N/A","N/A","string"
+"agent","is_asymptomatic","covid","equal","asymptomatic","N/A","N/A","string"
+"agent","is_symptomatic","covid","equal","symptomatic","N/A","N/A","string"
+"agent","is_severe","covid","equal","severe","N/A","N/A","string"

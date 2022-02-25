@@ -117,7 +117,7 @@ def a_star_search(kd_map, start_node_id: str, goal_node_id: str, cache_dict: Dic
 
 
 def a_star_thread(thread_id, kd_map, thread_paths, report, results_dict, cache_dict={}):
-    print("starting thread ", thread_id)
+    #print("starting thread ", thread_id)
     for cont, start_goal in enumerate(thread_paths):
         start = start_goal[0] 
         goal = start_goal[1]

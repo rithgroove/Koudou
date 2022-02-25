@@ -66,6 +66,7 @@ class Simulation:
 		# pathfind
 		##############################################################################
 		if (len(move_action_pool) > 0):
+			print(f"pathfinding for = {len(move_action_pool)}")
 			self.pathfind(move_action_pool)
 
 		##############################################################################
