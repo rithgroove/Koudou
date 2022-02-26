@@ -30,6 +30,7 @@ class ActionMove(Action):
         self.vectors = []
         self.target = None
         if destination_string == "!evac":
+            # print(f"agent {self.agent.agent_id}'s' go to evac")
             node = kd_map.d_nodes[self.origin]
             self.target = kd_map.get_closest_evacuation_center(node.coordinate,agent.get_attribute("explored_evac"))
             agent.set_attribute("target_evac",self.target.centroid)
@@ -72,6 +73,8 @@ class ActionMove(Action):
                 self.sequence.pop(0)
         if len(self.sequence) == 0:
             self.finished = True
+            # if (self.destination_string == "!evac"):
+                # print(f"agent {self.agent.agent_id}'s' Evac Finished")
         return leftover
 
     @property

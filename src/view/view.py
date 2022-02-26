@@ -129,6 +129,11 @@ class View():
                 else:
                     self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="grey", width=3)
 
+    def draw_agents(self,agents,viewport):
+        for agent in sim.agents:
+            agent.oval = drawCircle(agent.currentLocation.lon, agent.currentLocation.lat, 5,"#3333CC", agent.name) 
+
+
     ## log ##
     def update_log(self, txt):
         print(txt)
