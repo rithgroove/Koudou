@@ -66,7 +66,6 @@ class EvacuationModule(Module):
                         evacuated += 1 
                     else:
                         unevacuated.append(agent)
-                print(f"unevacuated = {len(unevacuated)}")
                 for agent in unevacuated:
                     # add this evacuation center to agent's visit history
                     temp = agent.get_attribute("explored_evac").lower()

@@ -53,9 +53,6 @@ def infection_step(step_size: int, kd_map: Map, population: List[Agent], infecti
         for ag in infected_agents:
             infected_next_stage(step_size, ag, disease, rng, logger,ts)
 
-    print("---------------------------------------------------------------------")
-    print("infecting agents \n")
-
     # infection to healthy agents
     for disease in infection_module.diseases.values():
         disease_transmission_verbose(step_size, kd_map, population, disease, rng, logger,ts)
@@ -110,10 +107,16 @@ def log(infection_type,disease,infector,infectee,logger,ts):
     data["agent_profession"] = infectee.get_attribute("profession")
     data["agent_location"] = infectee.get_attribute("location")
     data["agent_node_id"] = infectee.get_attribute("current_node_id")
-    data["source_id"] = infector.agent_id
-    data["source_profession"] = infector.get_attribute("profession")
-    data["source_location"] = infector.get_attribute("location")
-    data["source_node_id"] = infector.get_attribute("current_node_id")
+    if(infector is None):
+        data["source_id"] = "None"
+        data["source_profession"] = "None"
+        data["source_location"] = "None"
+        data["source_node_id"] = "None"
+    else:   
+        data["source_id"] = infector.agent_id
+        data["source_profession"] = infector.get_attribute("profession")
+        data["source_location"] = infector.get_attribute("location")
+        data["source_node_id"] = infector.get_attribute("current_node_id")
     logger.write_csv_data("new_infection.csv", data)
 
 def disease_transmission(step_size: int, kd_map: Map, population: List[Agent], disease: Disease, rng, logger, ts):
@@ -140,36 +143,32 @@ def disease_transmission_verbose(step_size: int, kd_map: Map, population: List[A
     infected_ags = [ag for ag in population if ag.get_attribute(disease.name) in disease.infectious_states]
     infected_ags_by_location = {}
     for ag in infected_ags:
+        if ag.get_attribute("off_map") == True and ag.get_attribute("is_working_hour") == True and ag.get_attribute("current_node_id") == ag.get_attribute("workplace_node_id") : #don't include off map
+            continue 
         if ag.get_attribute("current_node_id") not in infected_ags_by_location.keys():
             infected_ags_by_location[ag.get_attribute("current_node_id")] = []
         infected_ags_by_location[ag.get_attribute("current_node_id")].append(ag)
 
     # collect susceptible agents and group by location- print out purpose
     susceptible_ags_by_location = {}
+    off_map = []
     for ag in population:
         if (ag.get_attribute(disease.name) == "susceptible"):
+            if ag.get_attribute("off_map") == True and ag.get_attribute("is_working_hour") == True and ag.get_attribute("current_node_id") == ag.get_attribute("workplace_node_id") :
+                off_map.append(ag) # separate off_map agent 
+                continue
             if ag.get_attribute("current_node_id") not in susceptible_ags_by_location.keys():
                 susceptible_ags_by_location[ag.get_attribute("current_node_id")] = []
             susceptible_ags_by_location[ag.get_attribute("current_node_id")].append(ag)
 
+    off_map_infection(step_size, off_map, disease, rng, logger,ts)
+
     # loop by location so we could see
     for loc in infected_ags_by_location:
-        print(f"Node id = {loc}")
         infected_ag = infected_ags_by_location[loc]
-        print(f"   Infectious = {len(infected_ags)}")
         susceptible_ags = []
         if loc in susceptible_ags_by_location.keys():
             susceptible_ags = susceptible_ags_by_location[loc]
-        print(f"   Susceptible = {len(susceptible_ags)}")
-
-        if kd_map.is_businesses_node(loc):
-            print("   Type = business")
-        elif kd_map.is_residences_node(loc):
-            print("   Type = residential")
-        elif kd_map.is_roads_node(loc):
-            print("   Type = road")
-        else:
-            print("   Type = other")
 
         for infector in infected_ags:
             if kd_map.is_businesses_node(loc):
@@ -208,6 +207,17 @@ def residence_infection(step_size,infector:Agent, ag_same_location: List[Agent],
         if rng.uniform(0.0,1.0,1)[0] < chance:  # infect agent
             ag.set_attribute(disease.name, disease.starting_state)
             log("residential",disease, infector,ag,logger,ts)     
+
+def off_map_infection(step_size, ag_same_location: List[Agent], disease, rng, logger,ts):
+    infection_attr = disease.infection_method["off_map"]
+    scale = infection_attr["scale"]
+    prob = infection_attr["probability"]
+    chance = apply_time_scale(step_size, scale, prob)
+
+    for ag in ag_same_location:
+        if rng.uniform(0.0,1.0,1)[0] < chance:  # infect agent
+            ag.set_attribute(disease.name, disease.starting_state)
+            log("off_map",disease, None,ag,logger,ts)     
 
 def other_infection(step_size, infector:Agent, ag_same_location: List[Agent], disease, rng, logger,ts):
     infection_attr = disease.infection_method["other"]
