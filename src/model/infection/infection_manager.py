@@ -240,10 +240,12 @@ def road_infection(step_size, kd_map: Map, infected_ag, ags_by_location, disease
 
     loc = infected_ag.get_attribute("current_node_id")
     coor = infected_ag.coordinate
-    susceptible_ags = ags_by_location[loc].copy()    
+    susceptible_ags = []
+    if loc in ags_by_location.keys():
+        susceptible_ags.extend(ags_by_location[loc])
     for conn in kd_map.d_nodes[loc].connections:        
         if (conn in ags_by_location.keys() and kd_map.is_roads_node(conn)):
-            susceptible_ags += ags_by_location[conn]
+            susceptible_ags.extend(ags_by_location[conn])
 
     for ag in susceptible_ags:
         if ag.get_attribute(disease.name) != "susceptible":  # Already infected
