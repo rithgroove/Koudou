@@ -1,0 +1,5 @@
+"priority","name","conditions","conditions_type","actions"
+1,"switch_to_hospitalization","is_severe","NONE","change_behavior:severe"
+2,"switch_to_normal_from_evac","is_not_evac","None","change_behavior:normal"
+3,"eat_at_evac","hungry","NONE","Wait:20(minute)-60(minute),modify_attribute:hunger-max"
+4,"sleep_at_evac","sleepy","NONE","wait:6(hours)-8(hours),modify_attribute:energy-max"

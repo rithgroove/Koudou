@@ -4,7 +4,7 @@
 "agent","at_home","current_node_id","equal","$home_node_id","N/A","N/A","string"
 "agent","hungry","hunger","less_than_equal",0.66,"N/A","N/A","float"
 "agent","symptomatic","symptoms","equal","Symptomatic","N/A","N/A","string"
-"agent","not_at_hospital","location","not_equal","Hospital","N/A","N/A","string"
+"agent","not_at_hospital","location","not_equal","hospital","N/A","N/A","string"
 "agent","severe","symptoms","equal","Severe","N/A","N/A","string"
 "agent","sleepy","energy","less_than",0.2,"N/A","N/A","float"
 "agent","at_hospital","location","equal","Hospital","N/A","N/A","string"

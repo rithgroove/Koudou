@@ -82,7 +82,7 @@ class Map():
             temp_place = self.d_evacuation_centers[evac_place_id]
             node = self.d_nodes[temp_place.centroid]
             temp_distance = node.coordinate.calculate_distance(lat = coordinate.lat,lon = coordinate.lon)
-            if temp_place.id not in explored_places and temp_distance < distance:
+            if temp_place.centroid not in explored_places and temp_distance < distance:
                 place = self.d_evacuation_centers[evac_place_id]
                 distance = temp_distance
         return place

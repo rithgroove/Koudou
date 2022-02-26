@@ -53,9 +53,12 @@ def infection_step(step_size: int, kd_map: Map, population: List[Agent], infecti
         for ag in infected_agents:
             infected_next_stage(step_size, ag, disease, rng, logger,ts)
 
+    print("---------------------------------------------------------------------")
+    print("infecting agents \n")
+
     # infection to healthy agents
     for disease in infection_module.diseases.values():
-        disease_transmission(step_size, kd_map, population, disease, rng, logger,ts)
+        disease_transmission_verbose(step_size, kd_map, population, disease, rng, logger,ts)
 
     
 
@@ -113,7 +116,6 @@ def log(infection_type,disease,infector,infectee,logger,ts):
     data["source_node_id"] = infector.get_attribute("current_node_id")
     logger.write_csv_data("new_infection.csv", data)
 
-
 def disease_transmission(step_size: int, kd_map: Map, population: List[Agent], disease: Disease, rng, logger, ts):
     infected_ags = [ag for ag in population if ag.get_attribute(disease.name) in disease.infectious_states]
     #ags_by_location = {ag.get_attribute("current_node_id"): [] for ag in population}
@@ -133,49 +135,93 @@ def disease_transmission(step_size: int, kd_map: Map, population: List[Agent], d
         else:
             other_infection(step_size,ag, ags_by_location[loc], disease, rng, logger, ts)
 
+def disease_transmission_verbose(step_size: int, kd_map: Map, population: List[Agent], disease: Disease, rng, logger, ts):
+    # collect infectious agents and group by location- print out purpose
+    infected_ags = [ag for ag in population if ag.get_attribute(disease.name) in disease.infectious_states]
+    infected_ags_by_location = {}
+    for ag in infected_ags:
+        if ag.get_attribute("current_node_id") not in infected_ags_by_location.keys():
+            infected_ags_by_location[ag.get_attribute("current_node_id")] = []
+        infected_ags_by_location[ag.get_attribute("current_node_id")].append(ag)
+
+    # collect susceptible agents and group by location- print out purpose
+    susceptible_ags_by_location = {}
+    for ag in population:
+        if (ag.get_attribute(disease.name) == "susceptible"):
+            if ag.get_attribute("current_node_id") not in susceptible_ags_by_location.keys():
+                susceptible_ags_by_location[ag.get_attribute("current_node_id")] = []
+            susceptible_ags_by_location[ag.get_attribute("current_node_id")].append(ag)
+
+    # loop by location so we could see
+    for loc in infected_ags_by_location:
+        print(f"Node id = {loc}")
+        infected_ag = infected_ags_by_location[loc]
+        print(f"   Infectious = {len(infected_ags)}")
+        susceptible_ags = []
+        if loc in susceptible_ags_by_location.keys():
+            susceptible_ags = susceptible_ags_by_location[loc]
+        print(f"   Susceptible = {len(susceptible_ags)}")
+
+        if kd_map.is_businesses_node(loc):
+            print("   Type = business")
+        elif kd_map.is_residences_node(loc):
+            print("   Type = residential")
+        elif kd_map.is_roads_node(loc):
+            print("   Type = road")
+        else:
+            print("   Type = other")
+
+        for infector in infected_ags:
+            if kd_map.is_businesses_node(loc):
+                business_infection(step_size, ag, susceptible_ags, disease, rng, logger, ts)
+            elif kd_map.is_residences_node(loc):
+                residence_infection(step_size, ag, susceptible_ags, disease, rng, logger, ts)
+            elif kd_map.is_roads_node(loc):
+                road_infection(step_size, kd_map, ag, susceptible_ags_by_location, disease, rng, logger, ts)
+            else:
+                other_infection(step_size,ag, susceptible_ags, disease, rng, logger, ts)
+
 def business_infection(step_size, infector:Agent, ag_same_location: List[Agent], disease, rng, logger,ts):
     infection_attr = disease.infection_method["businesses"]
     scale = infection_attr["scale"]
     prob = infection_attr["probability"]
+    chance = apply_time_scale(step_size, scale, prob)
 
     for ag in ag_same_location:
         if ag.get_attribute(disease.name) != "susceptible": #Already infected
             continue
-        chance = apply_time_scale(step_size, scale, prob)
         if rng.uniform(0.0,1.0,1)[0] < chance: # infect agent
             ag.set_attribute(disease.name, disease.starting_state)
             log("business",disease,infector,ag,logger,ts)    
-
 
 def residence_infection(step_size,infector:Agent, ag_same_location: List[Agent], disease, rng, logger,ts):
     infection_attr = disease.infection_method["residences"]
     scale = infection_attr["scale"]
     prob = infection_attr["probability"]
+    chance = apply_time_scale(step_size, scale, prob)
 
     for ag in ag_same_location:
         if ag.get_attribute(disease.name) != "susceptible":  # Already infected
             continue
         if ag.get_attribute("household_id") != infector.get_attribute("household_id"): #needs to be in the same household
             continue
-        chance = apply_time_scale(step_size, scale, prob)
         if rng.uniform(0.0,1.0,1)[0] < chance:  # infect agent
             ag.set_attribute(disease.name, disease.starting_state)
-            log("residential",disease, infector,ag,logger,ts)    
-
+            log("residential",disease, infector,ag,logger,ts)     
 
 def other_infection(step_size, infector:Agent, ag_same_location: List[Agent], disease, rng, logger,ts):
     infection_attr = disease.infection_method["other"]
     scale = infection_attr["scale"]
     prob = infection_attr["probability"]
+    chance = apply_time_scale(step_size, scale, prob)
 
     for ag in ag_same_location:
         if ag.get_attribute(disease.name) != "susceptible":  # Already infected
             continue
-        chance = apply_time_scale(step_size, scale, prob)
         if rng.uniform(0.0,1.0,1)[0] < chance:  # infect agent
             ag.set_attribute(disease.name, disease.starting_state)
             log("other",disease, infector,ag,logger,ts)   
-
+  
 def road_infection(step_size, kd_map: Map, infected_ag, ags_by_location, disease, rng, logger,ts):
     infection_attr = disease.infection_method["roads"]
     scale = infection_attr["scale"]
@@ -184,9 +230,9 @@ def road_infection(step_size, kd_map: Map, infected_ag, ags_by_location, disease
 
     loc = infected_ag.get_attribute("current_node_id")
     coor = infected_ag.coordinate
-    susceptible_ags = ags_by_location[loc]
-    for conn in kd_map.d_nodes[loc].connections:
-        if (conn in ags_by_location.keys()):
+    susceptible_ags = ags_by_location[loc].copy()    
+    for conn in kd_map.d_nodes[loc].connections:        
+        if (conn in ags_by_location.keys() and kd_map.is_roads_node(conn)):
             susceptible_ags += ags_by_location[conn]
 
     for ag in susceptible_ags:

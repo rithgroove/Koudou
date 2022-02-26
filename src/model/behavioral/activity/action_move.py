@@ -32,6 +32,7 @@ class ActionMove(Action):
         if destination_string == "!evac":
             node = kd_map.d_nodes[self.origin]
             self.target = kd_map.get_closest_evacuation_center(node.coordinate,agent.get_attribute("explored_evac"))
+            agent.set_attribute("target_evac",self.target.centroid)
             self.destination = self.target.centroid
         elif destination_string == "!random":
             self.destination = kd_map.get_random_connected_nodes(self.origin,agent.get_attribute("last_node_id"),rng)

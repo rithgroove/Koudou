@@ -24,6 +24,7 @@
         "behaviors" :{
             "normal" : "config/behavioral/behavior/behavior_normal.csv",
             "evacuate" : "config/evacuation/behavior/behavior_evacuate.csv",
+            "evacuated" : "config/evacuation/behavior/behavior_evacuated.csv",
             "self_isolation" : "config/infection/behavior/behavior_symptomatic.csv",
             "severe" : "config/infection/behavior/behavior_severe.csv"
         }
