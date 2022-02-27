@@ -139,21 +139,20 @@ def disease_transmission(step_size: int, kd_map: Map, population: List[Agent], d
             other_infection(step_size,ag, ags_by_location[loc], disease, rng, logger, ts)
 
 def disease_transmission_verbose(step_size: int, kd_map: Map, population: List[Agent], disease: Disease, rng, logger, ts):
-    # collect infectious agents and group by location- print out purpose
-    infected_ags = [ag for ag in population if ag.get_attribute(disease.name) in disease.infectious_states]
-    infected_ags_by_location = {}
-    for ag in infected_ags:
-        if ag.get_attribute("off_map") == True and ag.get_attribute("is_working_hour") == True and ag.get_attribute("current_node_id") == ag.get_attribute("workplace_node_id") : #don't include off map
-            continue 
-        if ag.get_attribute("current_node_id") not in infected_ags_by_location.keys():
-            infected_ags_by_location[ag.get_attribute("current_node_id")] = []
-        infected_ags_by_location[ag.get_attribute("current_node_id")].append(ag)
 
     # collect susceptible agents and group by location- print out purpose
+    infected_ags_by_location = {}
     susceptible_ags_by_location = {}
     off_map = []
-    for ag in population:
-        if (ag.get_attribute(disease.name) == "susceptible"):
+    for ag in population:        
+        if (ag.get_attribute(disease.name) in disease.infectious_states):
+            if ag.get_attribute("off_map") == True and ag.get_attribute("is_working_hour") == True and ag.get_attribute("current_node_id") == ag.get_attribute("workplace_node_id") : #don't include off map
+                continue 
+            else:
+                if ag.get_attribute("current_node_id") not in infected_ags_by_location.keys():
+                    infected_ags_by_location[ag.get_attribute("current_node_id")] = []
+                infected_ags_by_location[ag.get_attribute("current_node_id")].append(ag)
+        elif (ag.get_attribute(disease.name) == "susceptible"):
             if ag.get_attribute("off_map") == True and ag.get_attribute("is_working_hour") == True and ag.get_attribute("current_node_id") == ag.get_attribute("workplace_node_id") :
                 off_map.append(ag) # separate off_map agent 
                 continue
@@ -170,14 +169,18 @@ def disease_transmission_verbose(step_size: int, kd_map: Map, population: List[A
         if loc in susceptible_ags_by_location.keys():
             susceptible_ags = susceptible_ags_by_location[loc]
 
-        for infector in infected_ags:
+        for infector in infected_ag:
             if kd_map.is_businesses_node(loc):
+                print("business infection")
                 business_infection(step_size, ag, susceptible_ags, disease, rng, logger, ts)
             elif kd_map.is_residences_node(loc):
+                print("residence infection")
                 residence_infection(step_size, ag, susceptible_ags, disease, rng, logger, ts)
             elif kd_map.is_roads_node(loc):
+                print("roads infection")
                 road_infection(step_size, kd_map, ag, susceptible_ags_by_location, disease, rng, logger, ts)
             else:
+                print("other infection")
                 other_infection(step_size,ag, susceptible_ags, disease, rng, logger, ts)
 
 def business_infection(step_size, infector:Agent, ag_same_location: List[Agent], disease, rng, logger,ts):
@@ -209,6 +212,7 @@ def residence_infection(step_size,infector:Agent, ag_same_location: List[Agent],
             log("residential",disease, infector,ag,logger,ts)     
 
 def off_map_infection(step_size, ag_same_location: List[Agent], disease, rng, logger,ts):
+    print("off_map_infection")
     infection_attr = disease.infection_method["off_map"]
     scale = infection_attr["scale"]
     prob = infection_attr["probability"]
