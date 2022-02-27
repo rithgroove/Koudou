@@ -80,6 +80,8 @@ def build_map(osm_file_path, bldg_tags, business_data, grid_size=10,evacuation_c
 	if evacuation_center is not None:
 		generate_evacuation_centers(kd_map,evacuation_center)
 
+	kd_map.mark_nodes()
+	
 	return kd_map
 
 def create_types_from_osm_tags(kd_map: Map):
