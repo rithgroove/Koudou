@@ -19,33 +19,33 @@
         "exposed": {
             "asymptomatic": {
                 "scale": "per_day",
-                "probability": 0.33
+                "probability": 0.1
             }
         }, 
         "asymptomatic": {
             "symptomatic": {
                 "scale": "per_day",
-                "probability": 0.11
+                "probability": 0.1
             },
             "recovered": {
                 "scale": "per_day",
-                "probability": 0.2
+                "probability": 0.1
             }
         }, 
         "symptomatic": {
             "severe": {
                 "scale": "per_day",
-                "probability": 0.11
+                "probability": 0.1
             },
             "recovered": {
                 "scale": "per_day",
-                "probability": 0.5
+                "probability": 0.1
             }
         },
         "severe": {
             "recovered": {
                 "scale": "per_day",
-                "probability": 0.11
+                "probability": 0.1
             }
         },
         "recovered": {
