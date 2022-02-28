@@ -49,10 +49,11 @@ class Agent:
 
 	def __str__(self):
 		tempstring = "[Agent]\n"
-		tempstring += f" Agent ID         = {self.agent_id}\n"
-		tempstring += f" Current behavior = {self.default_behavior.name}\n"
-		tempstring += f" Current location = (lat = {self.coordinate.lat}, lon {self.coordinate.lon})\n"
-		tempstring += f" Current Actions  = {len(self.actions)}\n"
+		tempstring += f" Agent ID           = {self.agent_id}\n"
+		tempstring += f" Current behavior   = {self.default_behavior.name}\n"
+		tempstring += f" Current location   = (lat = {self.coordinate.lat}, lon {self.coordinate.lon})\n"
+		tempstring += f" Current Actions    = {len(self.actions)}\n"
+		tempstring += f" Current Activities = {self.previous_activity}\n"
 		tempstring += f" Attributes:\n"
 		for x in self.attributes:
 			tempstring +=  f"  - {x} = {self.attributes[x].get_value}\n"

@@ -99,13 +99,39 @@ class Map():
             return rng.choice(connection,1)[0]
 
     def is_roads_node(self, node_id):
-        aux = [x.start_id for x in self.d_roads.values()]
-        return node_id in aux
+        # aux = [x.start_id for x in self.d_roads.values()]
+        # return node_id in aux
+        return self.d_nodes[node_id].type == "road"
 
     def is_businesses_node(self, node_id):
-        aux = [x.node_id for x in self.d_businesses.values()]
-        return node_id in aux
+        # aux = [x.node_id for x in self.d_businesses.values()]
+        # return node_id in aux
+        return self.d_nodes[node_id].type == "business"
 
     def is_residences_node(self, node_id):
-        aux = [x.node_id for x in self.d_residences.values()]
-        return node_id in aux
+        # aux = [x.node_id for x in self.d_residences.values()] 
+        # return node_id in aux
+        return self.d_nodes[node_id].type == "residence"
+
+    def mark_nodes(self):
+        for road_id in self.d_roads:
+            road = self.d_roads[road_id]
+            node = self.d_nodes[road.start_id]
+            node.type = "road"
+            node = self.d_nodes[road.goal_id]
+            node.type = "road"
+
+        for business_id in self.d_businesses:
+            business = self.d_businesses[business_id]
+            node = self.d_nodes[business.node_id]
+            node.type = "business"
+
+        for evac_id in self.d_evacuation_centers:
+            evac = self.d_evacuation_centers[evac_id]
+            node = self.d_nodes[evac.centroid]
+            node.type = "business"
+
+        for residence_id in self.d_residences:
+            residence = self.d_residences[residence_id]
+            node = self.d_nodes[residence.node_id]
+            node.type = "residence"
