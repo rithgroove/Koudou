@@ -212,7 +212,7 @@ def off_map_infection(step_size, ag_same_location: List[Agent], disease, rng, lo
     scale = infection_attr["scale"]
     prob = infection_attr["probability"]
     chance = apply_time_scale(step_size, scale, prob)
-
+    print(f"off_map = {len(ag_same_location)}")
     for ag in ag_same_location:
         if rng.uniform(0.0,1.0,1)[0] < chance:  # infect agent
             ag.set_attribute(disease.name, disease.starting_state)
