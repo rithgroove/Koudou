@@ -171,13 +171,13 @@ def disease_transmission_verbose(step_size: int, kd_map: Map, population: List[A
 
         for infector in infected_ag:
             if kd_map.is_businesses_node(loc):
-                business_infection(step_size, ag, susceptible_ags, disease, rng, logger, ts)
+                business_infection(step_size, infector, susceptible_ags, disease, rng, logger, ts)
             elif kd_map.is_residences_node(loc):
-                residence_infection(step_size, ag, susceptible_ags, disease, rng, logger, ts)
+                residence_infection(step_size, infector, susceptible_ags, disease, rng, logger, ts)
             elif kd_map.is_roads_node(loc):
-                road_infection(step_size, kd_map, ag, susceptible_ags_by_location, disease, rng, logger, ts)
+                road_infection(step_size, kd_map, infector, susceptible_ags_by_location, disease, rng, logger, ts)
             else:
-                other_infection(step_size,ag, susceptible_ags, disease, rng, logger, ts)
+                other_infection(step_size,infector, susceptible_ags, disease, rng, logger, ts)
 
 def business_infection(step_size, infector:Agent, ag_same_location: List[Agent], disease, rng, logger,ts):
     infection_attr = disease.infection_method["businesses"]
@@ -197,7 +197,10 @@ def residence_infection(step_size,infector:Agent, ag_same_location: List[Agent],
     prob = infection_attr["probability"]
     chance = apply_time_scale(step_size, scale, prob)
     for ag in ag_same_location:
-        #print(f"inf household {infector.get_attribute('household_id')} vs target household {ag.get_attribute('household_id')}")
+        # print(f"inf household {infector.get_attribute('household_id')} vs target household {ag.get_attribute('household_id')}")
+        # print(f"scale = {scale}")
+        # print(f"prob = {prob}")
+        # print(f"chance = {chance}")
         if ag.get_attribute(disease.name) != "susceptible":  # Already infected
             continue
         if ag.get_attribute("household_id") != infector.get_attribute("household_id"): #needs to be in the same household
