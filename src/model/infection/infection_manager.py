@@ -208,7 +208,6 @@ def residence_infection(step_size,infector:Agent, ag_same_location: List[Agent],
             log("residential",disease, infector,ag,logger,ts)     
 
 def off_map_infection(step_size, ag_same_location: List[Agent], disease, rng, logger,ts):
-    print("off_map_infection")
     infection_attr = disease.infection_method["off_map"]
     scale = infection_attr["scale"]
     prob = infection_attr["probability"]
