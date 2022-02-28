@@ -80,6 +80,7 @@ class MovementVector:
             leftOver = (distance - current_traveled_distance)
             agent.set_attribute("last_node_id",agent.get_attribute("current_node_id"))
             agent.set_attribute("current_node_id",self.destination_node.id)
+            agent.set_attribute("location",self.destination_node.type)
         else:
             self.progress = self.passed_through_distance/self.distance
             lat = self.starting_node.coordinate.lat +(self.progress * self.total_translation[0])

@@ -111,7 +111,7 @@ class Map():
     def is_residences_node(self, node_id):
         # aux = [x.node_id for x in self.d_residences.values()] 
         # return node_id in aux
-        return self.d_nodes[node_id].type == "residence"
+        return self.d_nodes[node_id].type == "home"
 
     def mark_nodes(self):
         for road_id in self.d_roads:
@@ -134,4 +134,4 @@ class Map():
         for residence_id in self.d_residences:
             residence = self.d_residences[residence_id]
             node = self.d_nodes[residence.node_id]
-            node.type = "residence"
+            node.type = "home"

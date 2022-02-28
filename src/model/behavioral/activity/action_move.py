@@ -29,37 +29,43 @@ class ActionMove(Action):
         self.origin = agent.get_attribute("current_node_id")
         self.vectors = []
         self.target = None
+        self.typing = ""
+        self.target_type = None
         if destination_string == "!evac":
             # print(f"agent {self.agent.agent_id}'s' go to evac")
             node = kd_map.d_nodes[self.origin]
             self.target = kd_map.get_closest_evacuation_center(node.coordinate,agent.get_attribute("explored_evac"))
             agent.set_attribute("target_evac",self.target.centroid)
             self.destination = self.target.centroid
+            self.target_type = "Evacuation Point"
         elif destination_string == "!random":
             self.destination = kd_map.get_random_connected_nodes(self.origin,agent.get_attribute("last_node_id"),rng)
         else:
-            typing = "destination_type"
+            self.typing = "destination_type"
             if ("(" in temp):
                 temp2 = temp.split("(")
                 temp = temp2[0]
                 if (temp2[1].lower() == "destination_id") or (temp2[1].lower() == "id"):
-                    typing = "destination_id"
+                    self.typing = "destination_id"
                 elif (temp2[1].lower() == "destination_type") or (temp2[1].lower() == "type"):
-                    typing = "destination_type"
+                    self.typing = "destination_type"
                 else:
                     raise ValueError(f"Unknown destination type : {temp2[1].lower()}")
     
             if ("$" in temp):
                 temp = agent.get_attribute(temp.replace("$",""))
 
-            if typing == "destination_type":
+            if self.typing == "destination_type":
+                self.target_type = temp
                 self.destination = kd_map.get_random_business(temp, 1, rng,time_stamp = ts, only_open = True)[0].node_id
-            elif typing == "destination_id":
+            elif self.typing == "destination_id":
                 self.destination = temp
+        self.reseted = False
 
     def force_reset(self):
         if (len(self.vectors) > 0):
            self.vectors = [self.vectors[0]]
+           self.reseted = True
 
     def step(self,kd_sim,kd_map,ts,step_length,rng):
         # if have action do it
@@ -73,6 +79,9 @@ class ActionMove(Action):
                 self.sequence.pop(0)
         if len(self.sequence) == 0:
             self.finished = True
+            if (not self.reseted):
+                if self.target_type is not None:
+                    self.agent.set_attribute("location",self.target_type)
             # if (self.destination_string == "!evac"):
                 # print(f"agent {self.agent.agent_id}'s' Evac Finished")
         return leftover

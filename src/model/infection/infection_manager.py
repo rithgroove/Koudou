@@ -184,7 +184,6 @@ def business_infection(step_size, infector:Agent, ag_same_location: List[Agent],
     scale = infection_attr["scale"]
     prob = infection_attr["probability"]
     chance = apply_time_scale(step_size, scale, prob)
-
     for ag in ag_same_location:
         if ag.get_attribute(disease.name) != "susceptible": #Already infected
             continue
@@ -198,7 +197,7 @@ def residence_infection(step_size,infector:Agent, ag_same_location: List[Agent],
     prob = infection_attr["probability"]
     chance = apply_time_scale(step_size, scale, prob)
     for ag in ag_same_location:
-        print(f"inf household {infector.get_attribute('household_id')} vs target household {ag.get_attribute('household_id')}")
+        #print(f"inf household {infector.get_attribute('household_id')} vs target household {ag.get_attribute('household_id')}")
         if ag.get_attribute(disease.name) != "susceptible":  # Already infected
             continue
         if ag.get_attribute("household_id") != infector.get_attribute("household_id"): #needs to be in the same household
