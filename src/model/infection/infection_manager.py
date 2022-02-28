@@ -171,16 +171,16 @@ def disease_transmission_verbose(step_size: int, kd_map: Map, population: List[A
 
         for infector in infected_ag:
             if kd_map.is_businesses_node(loc):
-                print("business infection")
+                #print("business infection")
                 business_infection(step_size, ag, susceptible_ags, disease, rng, logger, ts)
             elif kd_map.is_residences_node(loc):
-                print("residence infection")
+                #print("residence infection")
                 residence_infection(step_size, ag, susceptible_ags, disease, rng, logger, ts)
             elif kd_map.is_roads_node(loc):
-                print("roads infection")
+                #print("roads infection")
                 road_infection(step_size, kd_map, ag, susceptible_ags_by_location, disease, rng, logger, ts)
             else:
-                print("other infection")
+                #print("other infection")
                 other_infection(step_size,ag, susceptible_ags, disease, rng, logger, ts)
 
 def business_infection(step_size, infector:Agent, ag_same_location: List[Agent], disease, rng, logger,ts):
