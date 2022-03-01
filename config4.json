@@ -1,7 +1,7 @@
 {
-    "EXP_NAME":       "base-epidemicon",
+    "EXP_NAME":       "base-new_config",
     "MAP":            "osm_files/TX-To-TU.osm",
-    "PATHFIND_CACHE": "cache/TX-pathfind2.pkl",
+    "PATHFIND_CACHE": "cache/TX-pathfind4.pkl",
 
     "BUILDING_TAGS":  "config/map/tsukuba-tu-building-data.csv",
     "BUSINESS":       "config/map/business.csv",
@@ -9,7 +9,7 @@
     "EVAC_CENTER" : "config/map/evacuation_center.json",
     "step_length" : 300,
     "DISEASES": [
-        "config/infection/covid-epidemicon.json"
+        "config/infection/covid.json"
     ],
     "SIM_CONFIG":{
         "condition" : ["config/behavioral/condition.csv","config/evacuation/condition_evac.csv","config/infection/condition_infection.csv"],

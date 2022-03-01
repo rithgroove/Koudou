@@ -8,7 +8,7 @@
     "attributes": {
         "symptoms": ["cough", "loss of taste"]
     },
-    "infection_file": "config/infection/covid_infection.json",
+    "infection_file": "config/infection/covid_infection-epidemicon.json",
     "infectious_states": [
         "asymptomatic",
         "symptomatic",
@@ -19,33 +19,33 @@
         "exposed": {
             "asymptomatic": {
                 "scale": "per_day",
-                "probability": 0.1
+                "probability": 0.5
             }
         }, 
         "asymptomatic": {
             "symptomatic": {
                 "scale": "per_day",
-                "probability": 0.1
+                "probability": 0.11
             },
             "recovered": {
                 "scale": "per_day",
-                "probability": 0.1
+                "probability": 0.11
             }
         }, 
         "symptomatic": {
             "severe": {
                 "scale": "per_day",
-                "probability": 0.1
+                "probability": 0.5
             },
             "recovered": {
                 "scale": "per_day",
-                "probability": 0.1
+                "probability": 0.11
             }
         },
         "severe": {
             "recovered": {
                 "scale": "per_day",
-                "probability": 0.1
+                "probability": 0.11
             }
         },
         "recovered": {

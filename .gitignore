@@ -144,10 +144,13 @@ cache/
 test.py
 test2.py
 test3.py
+test4.py
 output.txt
 output2.txt
 output3.txt
+output4.txt
 output-2.txt
 output2-2.txt
 output3-2.txt
+output4-2.txt
 

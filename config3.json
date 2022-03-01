@@ -1,7 +1,7 @@
 {
-    "EXP_NAME":       "day_10_evacuation",
+    "EXP_NAME":       "base-new_config",
     "MAP":            "osm_files/TX-To-TU.osm",
-    "PATHFIND_CACHE": "cache/TX-pathfind.pkl",
+    "PATHFIND_CACHE": "cache/TX-pathfind3.pkl",
 
     "BUILDING_TAGS":  "config/map/tsukuba-tu-building-data.csv",
     "BUSINESS":       "config/map/business.csv",
@@ -18,7 +18,7 @@
             "basic" : ["config/behavioral/attributes/attribute_basic.csv","config/evacuation/attributes/attribute_basic_evac.csv"],
             "option" : ["config/behavioral/attributes/attribute_option.csv","config/evacuation/attributes/attribute_option_evac.csv"],
             "updateable" : ["config/behavioral/attributes/attribute_updateable.csv"],
-            "schedule" : ["config/behavioral/attributes/attribute_schedule_day_10.csv"],
+            "schedule" : ["config/behavioral/attributes/attribute_schedule.csv"],
             "profession" : ["config/behavioral/profession.csv"]
         },
         "behaviors" :{

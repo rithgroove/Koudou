@@ -6,14 +6,18 @@
     },
     "businesses":{
         "scale": "per_day",
-        "probability": 0.1
+        "probability": 0.09
     },
     "residences":{
         "scale": "per_day",
-        "probability": 0.1
+        "probability": 0.09
     },
     "other":{
         "scale": "per_day",
-        "probability": 0.1
+        "probability": 0.09
+    },
+    "off_map":{
+        "scale": "per_day",
+        "probability": 0.09
     }
 }
