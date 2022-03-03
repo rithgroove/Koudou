@@ -131,7 +131,7 @@ def a_star_thread(thread_id, kd_map, thread_paths, report, results_dict, cache_d
     return 
 
 
-def parallel_a_star(kd_map, start_goals_arr, n_threads=1, cache_file_name = None, report = None):
+def parallel_a_star(kd_map, start_goals_arr, n_threads=1, pathfind_cache = {}, report=None):
     """
     [Function] parallel_a_start
     This function performs the A* algorithm for an array of starting and ending points. It can also
@@ -141,8 +141,6 @@ def parallel_a_star(kd_map, start_goals_arr, n_threads=1, cache_file_name = None
         - kd_map:   (Map) The map object that contain information about the nodes and roads 
         - start_goals_arr: (List[Tuple[str, str]]) An array that contain tuples, each tuple represent the pair (starting, goal) nodes
         - n_threads: Optional(int) The number of threads to be used by this function
-        - cache_file: Optional(str) the name of the file to use as cache, if this file do not exist, it will create a new one and write the results into it
-                            please note that at the end of the function, this file is also updated with the new discovered paths
         - report:   Optional(int) the interval for the report of each thread, None is if you do not want any report
 
     Return:
@@ -153,12 +151,7 @@ def parallel_a_star(kd_map, start_goals_arr, n_threads=1, cache_file_name = None
     thread_paths = np.array_split(start_goals_arr, n_threads)
 
     with Manager() as manager:
-
-        cache_dict = {}
-        if cache_file_name != None and os.path.exists(cache_file_name):
-            with open(cache_file_name, "rb") as f:
-                cache_dict = pickle.load(f)
-        cache_dict = manager.dict(cache_dict)
+        cache_dict = manager.dict(pathfind_cache)
         path_dict = manager.dict()
         tasks = []
         for i in range(n_threads):
@@ -174,11 +167,7 @@ def parallel_a_star(kd_map, start_goals_arr, n_threads=1, cache_file_name = None
         for k, v in path_dict.items():
             response[k] = v
             
-        if cache_file_name is not None:
-            new_cache = {}
-            for k, v in cache_dict.items():
-                new_cache[k] = v
-            with open(cache_file_name, "wb") as f:
-                pickle.dump(new_cache, f)
+        for k, v in cache_dict.items():
+            pathfind_cache[k] = v
 
     return response
