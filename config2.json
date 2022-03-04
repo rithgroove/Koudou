@@ -8,7 +8,7 @@
     "EVAC_CENTER" : "config/map/evacuation_center.json",
     "step_length" : 300,
     "DISEASES": [
-        "config/infection/covid-epidemicon.json"
+        "config/infection/covid.json"
     ],
     "SIM_CONFIG":{
         "condition" : ["config/behavioral/condition.csv","config/evacuation/condition_evac.csv","config/infection/condition_infection.csv"],
