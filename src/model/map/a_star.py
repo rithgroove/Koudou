@@ -74,19 +74,19 @@ def a_star_search(kd_map, start_node_id: str, goal_node_id: str, cache_dict: Dic
 
         # Checking for cache
 
-        t = get_ordered_tuple(current, goal_node_id)
-        if t in cache_dict:
-            #print("found in cache")
-            cached_path = cache_dict[t]
-            if cached_path[0] == goal_node_id:
-                cached_path.reverse()
+        # t = get_ordered_tuple(current, goal_node_id)
+        # if t in cache_dict:
+        #     #print("found in cache")
+        #     cached_path = cache_dict[t]
+        #     if cached_path[0] == goal_node_id:
+        #         cached_path.reverse()
             
-            path = reconstruct_path(came_from, start_node_id, current)
-            path = path + cached_path[1:]
+        #     path = reconstruct_path(came_from, start_node_id, current)
+        #     path = path + cached_path[1:]
 
-            cache_dict[start_goal_tuple] = path
+        #     cache_dict[start_goal_tuple] = path
 
-            return path
+        #     return path
 
         current_node = kd_map.d_nodes[current]
         for conn in current_node.connections:
@@ -151,7 +151,7 @@ def parallel_a_star(kd_map, start_goals_arr, n_threads=1, pathfind_cache = {}, r
     thread_paths = np.array_split(start_goals_arr, n_threads)
 
     with Manager() as manager:
-        cache_dict = manager.dict(pathfind_cache)
+        cache_dict = manager.dict()
         path_dict = manager.dict()
         tasks = []
         for i in range(n_threads):
@@ -167,7 +167,8 @@ def parallel_a_star(kd_map, start_goals_arr, n_threads=1, pathfind_cache = {}, r
         for k, v in path_dict.items():
             response[k] = v
             
-        for k, v in cache_dict.items():
-            pathfind_cache[k] = v
+        # pathfind_cache = cache_dict
+        # for k, v in cache_dict.items():
+        #     pathfind_cache[k] = v
 
     return response

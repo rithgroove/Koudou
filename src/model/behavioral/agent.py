@@ -74,7 +74,7 @@ class Agent:
 		leftover = step_length
 		while len(self.actions) > 0:
 			act = self.actions[0]
-			leftover = act.step(kd_sim,kd_map,ts,step_length,rng)
+			leftover = act.step(kd_sim,kd_map,ts,leftover,rng)
 			if act.is_finished:
 				self.actions.pop(0)
 			else:

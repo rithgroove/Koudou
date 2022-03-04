@@ -1,7 +1,6 @@
 {
-    "EXP_NAME":       "base-epidemicon",
-    "MAP":            "osm_files/TX-To-TU.osm",
-    "PATHFIND_CACHE": "cache/TX-pathfind2.pkl",
+    "EXP_NAME":       "new_config-no_evac",
+    "MAP":            "osm_files/TX-To-TU.osm"
 
     "BUILDING_TAGS":  "config/map/tsukuba-tu-building-data.csv",
     "BUSINESS":       "config/map/business.csv",
