@@ -135,9 +135,9 @@ def log(infection_type,disease,infector,infectee,logger,ts):
         data["source_lat"] = infector.coordinate.lat
         data["source_lon"] = infector.coordinate.lon
         data["source_home_node_id"] = infector.get_attribute("home_node_id")
-        data["source_workplace_node_id"] = infector.get_attribute("agent_agent_workplace_node_id")
-        data["source_workplace_type"] = infector.get_attribute("agent_agent_workplace_type")
-        data["source_workplace_id"] = infecctor.get_attribute("agent_agent_workplace_id")
+        data["source_workplace_node_id"] = infector.get_attribute("workplace_node_id")
+        data["source_workplace_type"] = infector.get_attribute("workplace_type")
+        data["source_workplace_id"] = infector.get_attribute("workplace_id")
         data["source_health"] = infector.get_attribute("covid")
         data["source_current_activity"] = infector.previous_activity
     logger.write_csv_data("new_infection.csv", data)
