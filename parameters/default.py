@@ -13,8 +13,8 @@ parameters = {
     "BUSINESS":       "config/map/business.csv",
     "GRID_SIZE":      20,
     "EVAC_CENTER" :   "config/map/evacuation_center.json",
-    "STEP_LENGTH" :   300,
-    "MAX_DAYS"    :   3,#49*24*12,
+    "STEP_LENGTH" :   1,#300,
+    "MAX_DAYS"    :   49*24*12,
 
 
     "DISEASES": ["config/infection/covid.json"],

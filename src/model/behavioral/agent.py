@@ -8,15 +8,17 @@ class Agent:
 		self.behaviors = {}
 		self.actions = []
 		self.active_action = None
-		self.coordinate = Coordinate(0.0,0.0)
+		self._coordinate = Coordinate(0.0,0.0)
+		self.prev_coordinate = Coordinate(0.0,0.0)
 		self.previous_activity = ""
+		self.color = "#3333CC"
 
 	def add_attribute(self,attr):
 		self.attributes[attr.name] = attr
 
 	def get_attribute(self,name):
 		return self.attributes[name].get_value
-	
+
 	def update_attribute(self,attribute_name,value):
 		if (value.lower() == "max"):
 			self.attributes[attribute_name].set_max()
@@ -79,3 +81,12 @@ class Agent:
 				self.actions.pop(0)
 			else:
 				break
+
+	@property
+	def coordinate(self):
+		return self._coordinate
+
+	@coordinate.setter
+	def coordinate(self, value):
+		self.prev_coordinate = self._coordinate
+		self._coordinate     = value

@@ -94,6 +94,7 @@ class Controller():
         # buttons
         view.buttons["map_load"]["command"] = self.load_map
         view.buttons["sim_step"]["command"] = self.run_step
+        view.buttons["sim_run"]["command"]  = self.cmd_auto
 
         # canvas
         view.canvas.bind("<MouseWheel>"     , self.on_mouse_scroll)
@@ -162,6 +163,9 @@ class Controller():
             self.sim.modules.append(
                 EvacuationModule(distance = self.d_param["EVACUATION"]["DISTANCE"],
                                  share_information_chance = self.d_param["EVACUATION"]["SHARE_INFO_CHANCE"]))
+
+        if self.d_param["USE_VIEW"]:
+            self.view.draw_agents(agent_list=self.sim.agents, viewport=self.ViewPort)
 
     def __load_map_view(self, osm_file=None):
         if osm_file is None:
@@ -288,7 +292,9 @@ class Controller():
         self.sim.step(step_length = self.d_param["STEP_LENGTH"],
                       logger      = self.logger)
 
-        # self.update_view()
+        # self.update_view() #todo: create an update loop, where we add move methods
+        if self.d_param["USE_VIEW"]:
+            self.view.move_agents(agent_list=self.sim.agents, viewport=self.ViewPort)
 
         # print("Done!", flush=True)
         self.thread_finished = True
@@ -300,6 +306,22 @@ class Controller():
 
         self.print_msg(f"{d+1}/{self.d_param['MAX_DAYS']} days done")
         self.print_msg("")
+
+    def run_auto(self):
+        self.thread_finished = False
+        while not self.thread_ask_stop:
+            self.run_step()
+        self.thread_finished = True
+
+    def cmd_auto(self):
+        self.view.btn_start_change_method(text="Pause", method=self.cmd_pause)
+        self.thread = threading.Thread(target=self.run_auto, args=())
+        self.thread_ask_stop = False
+        self.thread.start()
+
+    def cmd_pause(self):
+        self.view.btn_start_change_method(text="Play ", method=self.cmd_auto)
+        self.thread_ask_stop = True
 
 
 if __name__ == "__main__":
