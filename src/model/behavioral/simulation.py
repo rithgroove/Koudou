@@ -2,10 +2,10 @@ from src.model.behavioral import agent_manager
 from src.util.time_stamp import TimeStamp
 import src.model.map.a_star as a_star
 class Simulation:
-	def __init__(self,config,kd_map,rng,agents_count,threads = 1, cache_file_name = None, report = None):
+	def __init__(self, config, kd_map,rng, agents_count, threads=1, cache_file_name=None, report=None):
 		self.agents = []
 		attribute_generator = agent_manager.load_attributes_generator(config["attributes"],rng)
-		self.agents = agent_manager.generate_agents(kd_map,attribute_generator,agents_count)		
+		self.agents = agent_manager.generate_agents(kd_map,attribute_generator,agents_count)
 		self.conditions = agent_manager.load_conditions(config["condition"],rng)
 		self.behaviors = {}
 		for key in config["behaviors"]:
