@@ -23,8 +23,11 @@ def load_parameters(filename):
 def load_defaults():
     parameters = {
 
+        # EXPERIMENT
         "EXP_NAME": "default",
+        "SEED"    : 3333,
 
+        # MAP
         "MAP":               None,
         "MAP_CACHE":         None,
         "PATHFIND_CACHE":    None,
@@ -32,9 +35,16 @@ def load_defaults():
         "BUSINESS":          None,
         "GRID_SIZE":         20,
 
+        # VIEW
         "USE_VIEW":         False,
         "ZOOM_IN":          1.1,
         "ZOOM_OUT":         (10.0/11.0),
+
+        # SIMULATION
+        "SIM_CONFIG":       None,
+        "DISEASES":         None,
+        "EVACUATION":       None,
+
 
         "OS": system(),
 

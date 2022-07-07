@@ -1,18 +1,21 @@
-import osmium
+import pickle
+import threading
+import numpy as np
+
 from pathlib import Path
 from os import path, mkdir#join, exists
-import threading
 
 from src.view.view import View
-from src.model.map.map_manager import build_map
+from src.view.draw import ViewPort
+
 from src.logger import Logger
 
-from src.view.draw import ViewPort
+from src.model.map.map_manager import build_map
+
 from src.model.behavioral.simulation import Simulation
-import pickle
-from platform import system
-import numpy as np
-from src.utils.parser import load_parameters
+from src.model.infection.infection_module import InfectionModule
+from src.model.evacuation.evacuation_module import EvacuationModule
+
 class Controller():
     def __init__(self, parameters):
         self.d_param = parameters
@@ -24,8 +27,8 @@ class Controller():
         self.sim    = None
 
         self.thread_finished = True
-        self.rng = np.random.default_rng(seed = 101512)
-        self.step_length = self.d_param["step_length"]
+        self.rng = np.random.default_rng(seed=self.d_param["SEED"])
+        # self.step_length = self.d_param["STEP_LENGTH"]
 
         # bindings
         if self.d_param["USE_VIEW"]:
@@ -33,12 +36,12 @@ class Controller():
         else:
             self.bind_no_view()
 
-        if self.d_param["MAP_CACHE"] is None:
-            self.load_map(self.d_param["MAP"])
-        else:
-            self.load_map(self.d_param["MAP_CACHE"])
+        map = self.d_param["MAP_CACHE"] if self.d_param["MAP_CACHE"] else self.d_param["MAP"]
+        if map is not None:
+            self.load_map(map)
 
-        self.__load_sim(self.d_param["SIM_CONFIG"])
+        if self.d_param["SIM_CONFIG"]:
+            self.load_sim()
 
         self.init_logger()
 
@@ -48,9 +51,12 @@ class Controller():
     ## open and close ##
     def main_loop(self):
         if self.d_param["USE_VIEW"]:
-            self.step()
+            # self.step()
             self.view.main_loop()
-            #need to call sim.step here
+
+        else:
+            self.run_simulation()
+            self.on_closing()
 
     def on_closing(self):
         if self.d_param["USE_VIEW"]:
@@ -134,12 +140,28 @@ class Controller():
             return
 
     ## load sim
-    def load_sim(self, config): pass
-    def __load_sim(self, config):
-        self.sim = Simulation(config,self.map,self.rng,1,threads = 1)
+    def load_sim(self):
+        self.sim = Simulation(config       = self.d_param["SIM_CONFIG"],
+                              kd_map       = self.map,
+                              rng          = self.rng,
+                              agents_count = self.d_param["N_AGENTS"],
+                              threads      = self.d_param["THREADS"],
+                              cache_file_name = self.d_param["PATHFIND_CACHE"],
+                              report       = None
+        )
 
+        if self.d_param["DISEASES"]:
+            # todo: we shouldnt pass thw whole simulator, just the necessary things
+            # i guess just agents, but Im not changing this to avoid bugs
+            self.sim.modules.append(
+                InfectionModule(parameters = self.d_param["DISEASES"],
+                                kd_sim     = self.sim,
+                                rng        = self.rng))
 
-
+        if self.d_param["EVACUATION"]:
+            self.sim.modules.append(
+                EvacuationModule(distance = self.d_param["EVACUATION"]["DISTANCE"],
+                                 share_information_chance = self.d_param["EVACUATION"]["SHARE_INFO_CHANCE"]))
 
     def __load_map_view(self, osm_file=None):
         if osm_file is None:
@@ -195,12 +217,38 @@ class Controller():
     def init_logger(self):
         self.logger = Logger(exp_name=self.d_param["EXP_NAME"])
 
-        # init all files
-        files   = ["buildings.csv",
-                   "agents.csv"]
-        headers = [",".join(["id", "lon", "lat", "tags"]),
-                   ",".join(["id", "lon", "lat"])]
-        self.logger.add_files(files, headers)
+        # health
+        header = ["time_stamp","susceptible","exposed",
+                  "asymptomatic","symptomatic","severe","recovered"]
+        self.logger.add_csv_file("infection_summary.csv", header)
+
+        # position
+        header = ["time_stamp","location","count"]
+        self.logger.add_csv_file("agent_position_summary.csv", header)
+
+        # activity
+        header = ["time_stamp","agent_id","profession","location",
+                  "current_node_id","household_id","home_node_id","activy_name"]
+        self.logger.add_csv_file("activity_history.csv", header)
+
+        # new infections
+        header = ["time_stamp","type","disease_name","agent_id",
+                  "agent_profession","agent_location","agent_node_id",
+                  "source_id","source_profession","source_location","source_node_id"]
+        self.logger.add_csv_file("new_infection.csv", header)
+
+        # infection transition
+        header = ["time_stamp","disease_name","agent_id","agent_profession",
+                  "agent_location","agent_node_id","current_state","next_state"]
+        self.logger.add_csv_file("disease_transition.csv", header)
+
+        # evacuation
+        header = ["time_stamp","evacuated","unevacuated_ERI","unevacuated_no_ERI"]
+        self.logger.add_csv_file("evacuation.csv", header)
+
+        # time stamp?
+        header = ["time_stamp","","",""]
+        self.logger.add_csv_file("infection_transition.csv", header)
 
     ## SIM
     def step(self):
@@ -209,31 +257,50 @@ class Controller():
 
     def run_step(self):
         self.thread_finished = False
-        print("Processing... ", end="", flush=True)
-        # self.model.step(stepSize=self.view.steps_to_advance)
+        # print("Processing... ", end="", flush=True)
+
+        # LOGGING
+        # infection summary
+        temp = self.sim.summarized_attribute("covid")
+        temp2 = {}
+        temp2["time_stamp"] = self.sim.ts.step_count
+        health_header = ["time_stamp","susceptible","exposed",
+                  "asymptomatic","symptomatic","severe","recovered"]
+        for x in health_header:
+            if x in temp.keys():
+                temp2[x] = temp[x]
+            else:
+                temp2[x] = 0
+
+        self.logger.write_csv_data("infection_summary.csv", temp2)
+
+        # agent position
+        temp = self.sim.summarized_attribute("location")
+        for x in temp.keys():
+            temp2 = {}
+            temp2["time_stamp"] = self.sim.ts.step_count
+            temp2["location"]   = x
+            temp2["count"]      = temp[x]
+
+        self.logger.write_csv_data("agent_position_summary.csv", temp2)
+
+        # STEP
+        self.sim.step(step_length = self.d_param["STEP_LENGTH"],
+                      logger      = self.logger)
+
         # self.update_view()
 
-        # log data
-        self.prepare_log()
-        print("Done!", flush=True)
+        # print("Done!", flush=True)
         self.thread_finished = True
 
-    def prepare_log(self):
-        # file 1
-        clon = [self.map.d_places[id].render_info.center.lon for id in self.map.d_places.keys()]
-        clat = [self.map.d_places[id].render_info.center.lat for id in self.map.d_places.keys()]
-        tag1 = [",".join(self.map.d_places[id].render_info.tags) for id in self.map.d_places.keys()]
-        data = [clon, clat, tag1]
+    def run_simulation(self):
+        self.print_msg(f"Running simulation... 0/{self.d_param['MAX_DAYS']} days")
+        for d in range(0, self.d_param["MAX_DAYS"]):
+            self.run_step()
 
-        self.logger.write_data(filename="buildings.csv", data=data)
+        self.print_msg(f"{d+1}/{self.d_param['MAX_DAYS']} days done")
+        self.print_msg("")
 
-        # file 2
-        attr1 = [None]
-        attr2 = [None]
-        attr3 = [None]
-        data = [attr1, attr2, attr3]
-
-        self.logger.write_data(filename="agents.csv", data=data)
 
 if __name__ == "__main__":
     crtl = Controller()
