@@ -1,2 +1,3 @@
-name,value,type
-walking_speed,1.46,float
+target,name,value,min,max,type
+agent,walking_speed,1.46,-,-,float
+agent,eat_out_preference,!random,0.1,0.9,float

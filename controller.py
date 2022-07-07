@@ -8,10 +8,10 @@ from src.model.map.map_manager import build_map
 from src.logger import Logger
 
 from src.view.draw import ViewPort
-
+from src.model.behavioral.simulation import Simulation
 import pickle
 from platform import system
-
+import numpy as np
 class Controller():
     def __init__(self, parameters):
         self.d_param = parameters
@@ -23,6 +23,8 @@ class Controller():
         self.sim    = None
 
         self.thread_finished = True
+        self.rng = np.random.default_rng(seed = 101512)
+        self.step_length = self.d_param["step_length"]
 
         # bindings
         if self.d_param["USE_VIEW"]:
@@ -35,6 +37,7 @@ class Controller():
         else:
             self.load_map(self.d_param["MAP_CACHE"])
 
+        self.__load_sim(self.d_param["sim_config"])
 
         self.init_logger()
 
@@ -46,6 +49,8 @@ class Controller():
         if self.d_param["USE_VIEW"]:
             self.step()
             self.view.main_loop()
+            #need to call sim.step here
+
     def on_closing(self):
         if self.d_param["USE_VIEW"]:
             self.view.close()
@@ -125,6 +130,14 @@ class Controller():
         else:
             self.print_msg(f"Not a valid map file")
             return
+
+    ## load sim
+    def load_sim(self, config): pass
+    def __load_sim(self, config):
+        self.sim = Simulation(config,self.map,self.rng,1,threads = 1)
+
+
+
 
     def __load_map_view(self, osm_file=None):
         if osm_file is None:
