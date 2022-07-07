@@ -1,6 +1,7 @@
 parameters = {
 
-    "EXP_NAME":       "test_config_file",
+    "EXP_NAME":       "default",
+    "USE_VIEW":       True,
 
     # MAP
     "MAP":            "osm_files/TX-To-TU.osm",
