@@ -26,12 +26,18 @@ def reconstruct_path(came_from: Dict[str, str], start: str, goal: str):
     current: str = goal
     path: List[str] = []
     while current != start:  # note: this will fail if no path is found
+        if current in path:
+            raise RecursionError("Found loop on path")
         path.append(current)
         current = came_from[current]
     path.append(start)  
     path.reverse()  
     return path
 
+def get_ordered_tuple(a, b):
+    first = min(a, b)
+    second = max(a, b)
+    return (first, second)
 
 def a_star_search(kd_map, start_node_id: str, goal_node_id: str, cache_dict: Dict[Tuple[str, str], List[str]] = {}):
     """
@@ -57,6 +63,7 @@ def a_star_search(kd_map, start_node_id: str, goal_node_id: str, cache_dict: Dic
     cost_so_far[start_node_id] = 0
 
     goal_node = kd_map.d_nodes[goal_node_id]
+    start_goal_tuple = get_ordered_tuple(start_node_id, goal_node_id)
 
     while not frontier.empty():
         current: str = frontier.get()
@@ -65,14 +72,19 @@ def a_star_search(kd_map, start_node_id: str, goal_node_id: str, cache_dict: Dic
             break
 
         # Checking for cache
-        first = min(current, goal_node_id)
-        second = max(current, goal_node_id)
-        t = (first, second)
+        t = get_ordered_tuple(current, goal_node_id)
         if t in cache_dict:
             print("found in cache")
-            for previous, step in zip(cache_dict[t][:], cache_dict[t][1:]):
-                came_from[step] = previous
-            break
+            cached_path = cache_dict[t]
+            if cached_path[0] == goal_node_id:
+                cached_path.reverse()
+            
+            path = reconstruct_path(came_from, start_node_id, current)
+            path = path + cached_path[1:]
+
+            cache_dict[start_goal_tuple] = path
+
+            return path
 
         current_node = kd_map.d_nodes[current]
         for conn in current_node.connections:
@@ -96,11 +108,8 @@ def a_star_search(kd_map, start_node_id: str, goal_node_id: str, cache_dict: Dic
         return None
 
     path = reconstruct_path(came_from, start_node_id, goal_node_id)
-    
-    first = min(start_node_id, goal_node_id)
-    second = max(start_node_id, goal_node_id)
-    t = (first, second)
-    cache_dict[t] = path
+
+    cache_dict[start_goal_tuple] = path
     
     return path
 
@@ -148,7 +157,6 @@ def parallel_a_star(kd_map, start_goals_arr, n_threads=1, cache_file_name = None
             with open(cache_file_name, "rb") as f:
                 cache_dict = pickle.load(f)
         cache_dict = manager.dict(cache_dict)
-        print(len(cache_dict))
         path_dict = manager.dict()
         tasks = []
         for i in range(n_threads):
