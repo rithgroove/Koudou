@@ -139,8 +139,14 @@ def create_places_osm(ways, kd_map, main_road_graph, grid_size):
 
 def create_centroid(way, n_dict):
 	lat, lon = 0, 0
+
+#	size = len(way.nodes)
+#	if way.nodes[0] == way.nodes[-1] and size != 1:
+#		size -= 1
+
 	size = len(way.nodes)-1
 	tags = {"centroid": True,  "type": "place"}
+
 
 	for i in range(size):
 		n_id = way.nodes[i]
@@ -156,7 +162,7 @@ def create_centroid(way, n_dict):
 
 
 def get_grid_coordinate(lat, lon, kd_map, grid_size):
-	cell_height = (kd_map.max_coord.lon - kd_map.min_coord.lon)/grid_size
+	cell_height = (kd_map.max_coord.lat - kd_map.min_coord.lat)/grid_size
 	cell_width = (kd_map.max_coord.lon - kd_map.min_coord.lon)/grid_size
 
 	x = int((lon - kd_map.min_coord.lon) / cell_width)
@@ -164,8 +170,12 @@ def get_grid_coordinate(lat, lon, kd_map, grid_size):
 
 	if x >= grid_size:
 		x = grid_size-1
+	elif x < 0:
+		x = 0
 	if y >= grid_size:
 		y = grid_size-1
+	elif y < 0:
+		y = 0
 	return (x, y)
 
 
@@ -191,6 +201,10 @@ def get_closest_road(centroid: Node, centroid_grid_coord, road_grid, kd_map: Map
 			visited_roads[index] = True
 
 			n_2 = kd_map.d_nodes[node2]
+
+			if n_1 == n_2:
+				continue
+
 			dist, c = get_dist_and_closest_coord(n_1, n_2, centroid)
 			if dist < road_dist:
 				road_dist = dist
