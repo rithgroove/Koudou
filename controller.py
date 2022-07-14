@@ -264,6 +264,7 @@ class Controller():
 
         # LOGGING
         # infection summary
+        ########################### LOGGING ###########################################
         temp = self.sim.summarized_attribute("covid")
         temp2 = {}
         temp2["time_stamp"] = self.sim.ts.step_count
@@ -287,6 +288,8 @@ class Controller():
 
         self.logger.write_csv_data("agent_position_summary.csv", temp2)
 
+
+        ###########################################################################
         # STEP
         self.sim.step(step_length = self.d_param["STEP_LENGTH"],
                       logger      = self.logger)

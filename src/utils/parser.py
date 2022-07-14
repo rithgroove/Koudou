@@ -26,6 +26,8 @@ def load_defaults():
         # EXPERIMENT
         "EXP_NAME": "default",
         "SEED"    : 3333,
+        "MAX_DAYS"    :   49*24*12,
+
 
         # MAP
         "MAP":               None,

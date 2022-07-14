@@ -49,6 +49,7 @@ class Attribute:
         tempstring += "set min value is not available for this attribute.\n"
         warnings.warn(tempstring)
 
+    # todo: this func just cast types, shouldnt it update the values ionstead?
     def step(self,kd_sim,kd_map,ts,step_length,rng,agent):
         self._cast_value() # just to make sure the data is safe
 

@@ -47,6 +47,8 @@ class Simulation:
 
 	def step(self,step_length,logger):
 		self.ts.step(step_length)
+		# todo: this function basically cast types to the attrs, change its names
+		# why doesnt this happen on init?
 		self.attribute_step(self,self.kd_map,self.ts,step_length,self.rng,logger)
 		##############################################################################
 		# update all agents attribute

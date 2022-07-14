@@ -292,8 +292,8 @@ class GeneratorAttribute:
 
 		# generate and add schedule attribute
 		profession = AttributeGroupedSchedule("is_working_hour")
-		for x in workdays:
-			profession.add_schedule(AttributeSchedule(f"work-{x}", start_time*3600,end_time*3600, day_str = x,repeat = True))
+		for day in workdays:
+			profession.add_schedule(AttributeSchedule(f"work-{day}", start_time*3600,end_time*3600, day_str = day,repeat = True))
 		agent.add_attribute(profession)
 
 		return agent

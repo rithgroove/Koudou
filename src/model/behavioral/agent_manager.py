@@ -15,18 +15,17 @@ def load_conditions(condition_files,rng):
 	for condition_file in condition_files:
 		data = read_csv_as_dict(condition_file)
 		for x in data:
-			attribute = x["attribute"]
 			if x["target"] == "random":
 				conditions[x["name"]] = ConditionRandom(x["name"],x["value"],x["min"],x["max"],rng,x["operator"],x["type"],x["target"])
 			else:
 				conditions[x["name"]] = Condition(x["name"],x["attribute"],x["value"],x["operator"],x["type"],x["target"])
 	return conditions
 	
-def generate_agents(kd_map,attribute_generator,count):
+def generate_agents(kd_map,attribute_generator,n_agents):
 	agents = []
-	for x in range(0,count):
-		agent = Agent(x)
-		attribute_generator.generate_attribute(agent,kd_map)
+	for ag_id in range(n_agents):
+		agent = Agent(ag_id)
+		attribute_generator.generate_attribute(agent, kd_map)
 		agents.append(agent)
 	attribute_generator.generate_household_attribute(agents,kd_map)
 	return agents
