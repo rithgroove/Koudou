@@ -107,16 +107,39 @@ def log(infection_type,disease,infector,infectee,logger,ts):
     data["agent_profession"] = infectee.get_attribute("profession")
     data["agent_location"] = infectee.get_attribute("location")
     data["agent_node_id"] = infectee.get_attribute("current_node_id")
+    data["agent_lat"] = infectee.coordinate.lat
+    data["agent_lon"] = infectee.coordinate.lon
+    data["agent_home_node_id"] = infectee.get_attribute("home_node_id")
+    data["agent_workplace_node_id"] = infectee.get_attribute("workplace_node_id")
+    data["agent_workplace_type"] = infectee.get_attribute("workplace_type")
+    data["agent_workplace_id"] = infectee.get_attribute("workplace_id")
+    data["agent_current_activity"] = infectee.previous_activity
     if(infector is None):
         data["source_id"] = "None"
         data["source_profession"] = "None"
         data["source_location"] = "None"
         data["source_node_id"] = "None"
+        data["source_lat"] = "None"
+        data["source_lon"] = "None"
+        data["source_home_node_id"] = "None"
+        data["source_workplace_node_id"] = "None"
+        data["source_workplace_type"] = "None"
+        data["source_workplace_id"] = "None"
+        data["source_health"] = "None"
+        data["source_current_activity"] = "None"
     else:   
         data["source_id"] = infector.agent_id
         data["source_profession"] = infector.get_attribute("profession")
         data["source_location"] = infector.get_attribute("location")
         data["source_node_id"] = infector.get_attribute("current_node_id")
+        data["source_lat"] = infector.coordinate.lat
+        data["source_lon"] = infector.coordinate.lon
+        data["source_home_node_id"] = infector.get_attribute("home_node_id")
+        data["source_workplace_node_id"] = infector.get_attribute("workplace_node_id")
+        data["source_workplace_type"] = infector.get_attribute("workplace_type")
+        data["source_workplace_id"] = infector.get_attribute("workplace_id")
+        data["source_health"] = infector.get_attribute("covid")
+        data["source_current_activity"] = infector.previous_activity
     logger.write_csv_data("new_infection.csv", data)
 
 def disease_transmission(step_size: int, kd_map: Map, population: List[Agent], disease: Disease, rng, logger, ts):

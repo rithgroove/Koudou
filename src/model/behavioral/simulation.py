@@ -2,7 +2,7 @@ from src.model.behavioral import agent_manager
 from src.util.time_stamp import TimeStamp
 import src.model.map.a_star as a_star
 class Simulation:
-	def __init__(self, config, kd_map,rng, agents_count, threads=1, cache_file_name=None, report=None):
+	def __init__(self,config,kd_map,rng,agents_count,threads = 1, report = None):
 		self.agents = []
 		attribute_generator = agent_manager.load_attributes_generator(config["attributes"],rng)
 		self.agents = agent_manager.generate_agents(kd_map,attribute_generator,agents_count)
@@ -19,10 +19,10 @@ class Simulation:
 		self.ts = TimeStamp(0)
 		self.threads = threads
 		self.kd_map = kd_map
-		self.cache_file_name = cache_file_name
 		self.report = report
 		self.d_agents_by_location = {}
 		self.modules = []
+		self.pathfind_cache = {}
 
 	def add_attribute(self,attr):
 		self.attributes[attr.name] = attr
@@ -101,7 +101,7 @@ class Simulation:
 			temp = (x.origin ,x.destination)
 			if (temp not in pool):
 				pool.append(temp)
-		results = a_star.parallel_a_star(self.kd_map, pool, n_threads=self.threads, cache_file_name = self.cache_file_name, report = self.report)
+		results = a_star.parallel_a_star(self.kd_map, pool, n_threads=self.threads, pathfind_cache=self.pathfind_cache, report = self.report)
 		print(f"consisting of {len(pool)} unique pathfinding request")
 		for x in move_actions:
 			temp = (x.origin ,x.destination)

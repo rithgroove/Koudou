@@ -1,8 +1,8 @@
 {
     "roads":{
         "scale": "per_day",
-        "close_contact_probability": 0.63,
-        "gradient_by_distance": -0.46
+        "close_contact_probability": 0.632,
+        "gradient_by_distance": -0.41455
     },
     "businesses":{
         "scale": "per_day",

@@ -146,7 +146,6 @@ class Controller():
                               rng          = self.rng,
                               agents_count = self.d_param["N_AGENTS"],
                               threads      = self.d_param["THREADS"],
-                              cache_file_name = self.d_param["PATHFIND_CACHE"],
                               report       = None
         )
 
