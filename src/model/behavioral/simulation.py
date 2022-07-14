@@ -65,7 +65,7 @@ class Simulation:
 		##############################################################################
 		# pathfind
 		##############################################################################
-		print(f"{len(move_action_pool)} move actions was generated")
+		# print(f"{len(move_action_pool)} move actions was generated")
 		if (len(move_action_pool) > 0):
 			self.pathfind(move_action_pool)
 

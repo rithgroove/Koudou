@@ -109,11 +109,10 @@ class ActionMove(Action):
         return tempString
 
     def generate_vector(self,kd_map,path):
-        working = None
-        for x in path:
+        working = kd_map.get_node(path[0])
+        for x in path[1:]:
             temp = kd_map.get_node(x)
-            if working is not None:
-                self.sequence.append(MovementVector(working,temp))
+            self.sequence.append(MovementVector(working,temp))
             working = temp
 
 
