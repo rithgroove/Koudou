@@ -120,6 +120,7 @@ class Controller():
 
         if fileext==".osm":
             self.print_msg(f"Loading map: {filename}{fileext}")
+            # todo: evac center should be in a module
             self.map = build_map(osm_file,
                                  bldg_tags    = self.d_param["BUILDING_TAGS"],
                                  business_data= self.d_param["BUSINESS"],

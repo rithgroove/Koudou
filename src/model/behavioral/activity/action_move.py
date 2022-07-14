@@ -31,6 +31,7 @@ class ActionMove(Action):
         self.target = None
         self.typing = ""
         self.target_type = None
+        # todo: this evac logic should be part of a separate plugin
         if destination_string == "!evac":
             # print(f"agent {self.agent.agent_id}'s' go to evac")
             node = kd_map.d_nodes[self.origin]

@@ -1,9 +1,11 @@
+from typing import List
 from src.model.behavioral import agent_manager
+from src.model.behavioral.agent import Agent
 from src.util.time_stamp import TimeStamp
 import src.model.map.a_star as a_star
 class Simulation:
 	def __init__(self,config,kd_map,rng,agents_count,threads = 1, report = None):
-		self.agents = []
+		self.agents: List[Agent] = []
 		attribute_generator = agent_manager.load_attributes_generator(config["attributes"],rng)
 		self.agents = agent_manager.generate_agents(kd_map,attribute_generator,agents_count)
 		self.conditions = agent_manager.load_conditions(config["condition"],rng)
@@ -61,6 +63,7 @@ class Simulation:
 		##############################################################################
 		move_action_pool = []
 		for agent in self.agents:
+			# function below create all agents action but just returns the move actions, the others are saved on the agent
 			move_actions = agent.behavior_step(self,self.kd_map,self.ts,step_length,self.rng,logger)
 			move_action_pool.extend(move_actions)
 
@@ -82,7 +85,7 @@ class Simulation:
 		##############################################################################
 		self.group_agents_by_location()
 		##############################################################################
-		# evacuation
+		# Plugins steps
 		##############################################################################
 		for module in self.modules:
 			module.step(self,self.kd_map,self.ts,step_length,self.rng,logger)
