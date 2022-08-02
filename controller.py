@@ -1,3 +1,4 @@
+import os
 import osmium
 from pathlib import Path
 from os import path, mkdir#join, exists
@@ -32,10 +33,10 @@ class Controller():
         else:
             self.bind_no_view()
 
-        if self.d_param["MAP_CACHE"] is None:
-            self.load_map(self.d_param["MAP"])
-        else:
+        if self.d_param["MAP_CACHE"] is not None and os.path.isfile(self.d_param["MAP_CACHE"]):
             self.load_map(self.d_param["MAP_CACHE"])
+        else:
+            self.load_map(self.d_param["MAP"])
 
         self.__load_sim(self.d_param["sim_config"])
 
