@@ -61,7 +61,7 @@ def build_map(osm_file_path, bldg_tags, business_data, grid_size=10):
 	st = time.time()
 
 	bussinesses, residences = create_types_from_osm_tags(kd_map)
-	bussinesses_csv, residences_csv = create_types_from_csv(kd_map, 10, bldg_tags)
+	bussinesses_csv, residences_csv = create_types_from_csv(kd_map, grid_size, bldg_tags)
 
 	bussinesses.update(bussinesses_csv)
 	residences.update(residences_csv)

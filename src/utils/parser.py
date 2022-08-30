@@ -37,6 +37,8 @@ def load_defaults():
         "ZOOM_OUT":         (10.0/11.0),
 
         "OS": system(),
+        "step_length": 300,
+        "n_agents": 16,
 
     }
     return parameters

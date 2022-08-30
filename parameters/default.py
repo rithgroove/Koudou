@@ -10,8 +10,9 @@ parameters = {
 
     "BUILDING_TAGS":  "config/map/tsukuba-tu-building-data.csv",
     "BUSINESS":       "config/map/business.csv",
-    "GRID_SIZE":      20,
+    "GRID_SIZE":      10,
     "step_length" : 300,
+    "n_agents": 5000,
     "sim_config":{
         "condition" : "config/behavioral/condition.csv",
         "default_behavior" : "normal",

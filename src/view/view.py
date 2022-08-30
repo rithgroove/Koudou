@@ -55,11 +55,17 @@ class View():
         self.tab1.frame_canvas = tk.Frame(self.tab1)
         self.canvas = tk.Canvas(self.tab1.frame_canvas)
 
+        button1 = tk.Button(self.root, text="AAAAA", anchor=tk.W)
+        button1.configure(width=10, activebackground="#33B5E5", relief=tk.FLAT)
+        button1_window = self.canvas.create_window(10, 10, anchor=tk.NE, window=button1)
+
         ### tab 2
 
         # tab 1: canvas pack and size
         self.canvas.pack(expand=True)
         self.canvas.config(width=self.window_size[0], height=self.window_size[1])
+
+
 
         self.tab1.frame_canvas.pack(expand=True)
 
@@ -115,6 +121,11 @@ class View():
             else:#note: equivalent to "others" in epidemicon
                 #self.canvas.create_polygon(path_flat, outline=place.outline, fill="pink", width=2)
                 pass
+
+    def draw_agents(self, agents, viewport):   
+        for agent in agents:
+            agent.oval = self.draw_circle(agent.coordinate.lon, agent.coordinate.lat, 5, "#3333CC", viewport, agent.agent_id)
+
     def draw_roads(self, roads, d_nodes, viewport):
         for road in roads:
             lon_a, lat_a = viewport.apply(*road.coordinate.get_lon_lat())
@@ -168,6 +179,12 @@ class View():
     def make_geometry_string(self, window_size):
         self.center_x, self.center_y = self.get_center_screen(window_size)
         return f"{window_size[0]}x{window_size[1]}+{self.center_x}+{self.center_y}"
+
+    def draw_circle(self, lon, lat, radius, color, viewport, id):
+        x, y = viewport.apply(lon, lat)
+        circle = None
+        circle = self.canvas.create_oval(x-radius, y-radius, x+radius, y+radius, fill=color,tag = id)
+        return circle
 
 if __name__ == "__main__":
     view = View()

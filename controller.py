@@ -38,7 +38,7 @@ class Controller():
         else:
             self.load_map(self.d_param["MAP"])
 
-        self.__load_sim(self.d_param["sim_config"])
+        self.__load_sim(self.d_param)
 
         self.init_logger()
 
@@ -49,6 +49,8 @@ class Controller():
     def main_loop(self):
         if self.d_param["USE_VIEW"]:
             self.step()
+            if self.sim is not None:
+                self.view.draw_agents(agents=self.sim.agents, viewport=self.ViewPort)
             self.view.main_loop()
             #need to call sim.step here
 
@@ -135,7 +137,8 @@ class Controller():
     ## load sim
     def load_sim(self, config): pass
     def __load_sim(self, config):
-        self.sim = Simulation(config,self.map,self.rng,1,threads = 1)
+        self.sim = Simulation(config["sim_config"],
+                              self.map, self.rng, config["n_agents"], threads=1)
 
 
 
