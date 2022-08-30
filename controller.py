@@ -79,6 +79,7 @@ class Controller():
         self.on_mouse_scroll = self.__scroll_mouse_wheel
         if self.OS == "Linux":
             self.on_mouse_scroll = self.__scroll_linux
+            view.canvas.bind("<Button>", self.on_mouse_scroll)
 
         self.mouse_prev_position = None
 
