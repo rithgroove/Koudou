@@ -38,7 +38,9 @@ class View():
         ##### main bar #####
         self.buttons["map_load"] = tk.Button(self.frame_bar, bg=bg_btn, font=font_btn, text="Load Map")
         self.buttons["sim_step"] = tk.Button(self.frame_bar, bg=bg_btn, font=font_btn, text="Step")
-        for i in range(3):
+        self.buttons["rnd_ag"] = tk.Button(self.frame_bar, bg=bg_btn, font=font_btn, text=f"Random Agent")
+        
+        for i in range(2):
             self.buttons[f"null{i}"]  = tk.Button(self.frame_bar, bg=bg_btn, font=font_btn, text=f"null_{i}")
 
         for i, (key,val) in enumerate(self.buttons.items()):
@@ -127,7 +129,7 @@ class View():
 
     def draw_agents(self, agents, viewport):   
         for agent in agents:
-            agent.oval = self.draw_circle(agent.coordinate.lon, agent.coordinate.lat, 5, "#3333CC", viewport, agent.agent_id)
+            agent.oval = self.draw_circle(agent.coordinate.lon, agent.coordinate.lat, 50, "#3333CC", viewport, agent.agent_id)
 
     def draw_roads(self, roads, d_nodes, viewport):
         for road in roads:
@@ -186,6 +188,7 @@ class View():
     def draw_circle(self, lon, lat, radius, color, viewport, id):
         x, y = viewport.apply(lon, lat)
         circle = None
+        print(x,y)
         circle = self.canvas.create_oval(x-radius, y-radius, x+radius, y+radius, fill=color,tag = id)
         return circle
 

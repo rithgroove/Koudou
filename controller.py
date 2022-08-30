@@ -1,8 +1,9 @@
 import os
 import osmium
 from pathlib import Path
-from os import path, mkdir#join, exists
+from os import path, mkdir
 import threading
+from src.model.behavioral.agent import Agent
 
 from src.view.view import View
 from src.model.map.map_manager import build_map
@@ -50,7 +51,7 @@ class Controller():
         if self.d_param["USE_VIEW"]:
             self.step()
             if self.sim is not None:
-                self.view.draw_agents(agents=self.sim.agents, viewport=self.ViewPort)
+                self.view.draw_agents(agents=self.sim.agents, viewport=self.viewport)
             self.view.main_loop()
             #need to call sim.step here
 
@@ -91,6 +92,7 @@ class Controller():
         # buttons
         view.buttons["map_load"]["command"] = self.load_map
         view.buttons["sim_step"]["command"] = self.run_step
+        view.buttons["rnd_ag"]["command"] = self.focus_random_agent
         view.zoom_in_btn["command"] = self.on_zoom_in
         view.zoom_out_btn["command"] = self.on_zoom_out
 
@@ -151,13 +153,13 @@ class Controller():
 
         self.__load_map(osm_file)
 
-        self.ViewPort = ViewPort(height=self.view.canvas.winfo_height(),
+        self.viewport = ViewPort(height=self.view.canvas.winfo_height(),
                                  width=self.view.canvas.winfo_width(),
                                  wmin=self.map.min_coord.get_lon_lat(),
                                  wmax=self.map.max_coord.get_lon_lat())
 
-        self.view.draw_places(d_places=self.map.d_places, viewport=self.ViewPort)
-        self.view.draw_roads (roads=self.map.main_road, d_nodes=self.map.d_nodes, viewport=self.ViewPort)
+        self.view.draw_places(d_places=self.map.d_places, viewport=self.viewport)
+        self.view.draw_roads (roads=self.map.main_road, d_nodes=self.map.d_nodes, viewport=self.viewport)
 
     ## ZOOM ##
     def on_mouse_scroll(self, event):   pass
@@ -175,11 +177,11 @@ class Controller():
             self.on_zoom_out()
 
     def on_zoom_in(self):
-        self.ViewPort.update_scale(self.d_param["ZOOM_IN"])
+        self.viewport.update_scale(self.d_param["ZOOM_IN"])
         self.view.zoom(self.d_param["ZOOM_IN"])
 
     def on_zoom_out(self):
-        self.ViewPort.update_scale(self.d_param["ZOOM_OUT"])
+        self.viewport.update_scale(self.d_param["ZOOM_OUT"])
         self.view.zoom(self.d_param["ZOOM_OUT"])
 
     ## MOVING THE MAP ##
@@ -190,10 +192,21 @@ class Controller():
         x, y  = event.x, event.y
         if self.mouse_prev_position is not None:
             px, py = self.mouse_prev_position
-            self.ViewPort.update_center(px-x, py-y)
+            self.viewport.update_center(px-x, py-y)
 
         self.mouse_prev_position = (x, y)
-        self.view.canvas.scan_dragto(self.ViewPort.x, self.ViewPort.y, gain=1)
+        self.view.canvas.scan_dragto(int(self.viewport.x), int(self.viewport.y), gain=1)
+
+    def focus_random_agent(self):
+        ag: Agent = self.rng.choice(self.sim.agents)
+        x, y = self.viewport.apply(*ag.coordinate.get_lon_lat())
+
+        new_x = -1*x + self.view.canvas.winfo_height()/2
+        new_y = -1*y + self.view.canvas.winfo_width()/2
+
+        self.viewport.change_center(new_x, new_y)
+        self.view.canvas.scan_dragto(int(self.viewport.x), int(self.viewport.y), gain=1)
+
 
     ## LOGGER
     def init_logger(self):

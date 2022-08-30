@@ -1,7 +1,7 @@
 import argparse
 import json
 
-from src.utils.parser import load_parameters
+from src.util.parser import load_parameters
 from controller import Controller
 from os.path import join
 

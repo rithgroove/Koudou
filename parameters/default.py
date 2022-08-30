@@ -12,7 +12,7 @@ parameters = {
     "BUSINESS":       "config/map/business.csv",
     "GRID_SIZE":      10,
     "step_length" : 300,
-    "n_agents": 5000,
+    "n_agents": 10,
     "sim_config":{
         "condition" : "config/behavioral/condition.csv",
         "default_behavior" : "normal",
