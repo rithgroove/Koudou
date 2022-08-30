@@ -22,7 +22,7 @@ class View():
         #self.root.configure(background="black")
         self.root.title("Community Simulator")
         self.root.geometry(self.make_geometry_string(window_size))
-        self.root.resizable(False, False)
+        self.root.resizable(True, True)
 
         ## main bar and notebooks
         self.frame_bar = ttk.Frame(self.root)
@@ -54,6 +54,13 @@ class View():
         #### notebook tab 1
         self.tab1.frame_canvas = tk.Frame(self.tab1)
         self.canvas = tk.Canvas(self.tab1.frame_canvas)
+
+        self.zoom_in_btn = tk.Button(self.canvas, text='+', bg=bg_btn, font=font_btn)
+        self.zoom_in_btn.place(relx= .95, rely=.01)
+
+        self.zoom_out_btn = tk.Button(self.canvas, text='-', bg=bg_btn, font=font_btn)
+        self.zoom_out_btn.place(relx= .95, rely=.01, y=self.zoom_in_btn.winfo_height()+20)
+
 
         ### tab 2
 
