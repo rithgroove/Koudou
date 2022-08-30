@@ -81,6 +81,7 @@ class Controller():
         self.on_mouse_scroll = self.__scroll_mouse_wheel
         if self.OS == "Linux":
             self.on_mouse_scroll = self.__scroll_linux
+            view.canvas.bind("<Button>", self.on_mouse_scroll)
 
         self.mouse_prev_position = None
 
@@ -90,12 +91,13 @@ class Controller():
         # buttons
         view.buttons["map_load"]["command"] = self.load_map
         view.buttons["sim_step"]["command"] = self.run_step
+        view.zoom_in_btn["command"] = self.on_zoom_in
+        view.zoom_out_btn["command"] = self.on_zoom_out
 
         # canvas
         view.canvas.bind("<MouseWheel>"     , self.on_mouse_scroll)
         view.canvas.bind("<B1-Motion>"      , self.on_mouse_hold)
         view.canvas.bind("<ButtonRelease-1>", self.on_mouse_release)
-
 
     ## print messages
     def print_msg(self):    pass
