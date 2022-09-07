@@ -6,7 +6,7 @@ parameters = {
 
 
     "SEED":            101512,
-    "N_AGENTS":        2000,
+    "N_AGENTS":        500,
     "THREADS":         10,
 
     "BUILDING_TAGS":  "config/map/tsukuba-tu-building-data.csv",

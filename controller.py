@@ -36,9 +36,10 @@ class Controller():
         else:
             self.bind_no_view()
 
-        map = self.d_param["MAP_CACHE"] if self.d_param["MAP_CACHE"] else self.d_param["MAP"]
-        if map is not None:
-            self.load_map(map)
+        if self.d_param["MAP_CACHE"] is not None and path.isfile(self.d_param["MAP_CACHE"]):
+            self.load_map(self.d_param["MAP_CACHE"])
+        else:
+            self.load_map(self.d_param["MAP"])
 
         if self.d_param["SIM_CONFIG"]:
             self.load_sim()
@@ -85,6 +86,7 @@ class Controller():
         self.on_mouse_scroll = self.__scroll_mouse_wheel
         if self.OS == "Linux":
             self.on_mouse_scroll = self.__scroll_linux
+            view.canvas.bind("<Button>", self.on_mouse_scroll)
 
         self.mouse_prev_position = None
 
@@ -95,6 +97,10 @@ class Controller():
         view.buttons["map_load"]["command"] = self.load_map
         view.buttons["sim_step"]["command"] = self.run_step
         view.buttons["sim_run"]["command"]  = self.cmd_auto
+        view.buttons["rnd_ag"]["command"] = self.focus_random_agent
+        view.zoom_in_btn["command"] = self.on_zoom_in
+        view.zoom_out_btn["command"] = self.on_zoom_out
+
 
         # canvas
         view.canvas.bind("<MouseWheel>"     , self.on_mouse_scroll)
@@ -165,21 +171,20 @@ class Controller():
                                  share_information_chance = self.d_param["EVACUATION"]["SHARE_INFO_CHANCE"]))
 
         if self.d_param["USE_VIEW"]:
-            self.view.draw_agents(agent_list=self.sim.agents, viewport=self.ViewPort)
+            self.view.draw_agents(agent_list=self.sim.agents, viewport=self.view_port)
 
     def __load_map_view(self, osm_file=None):
         if osm_file is None:
             osm_file = self.view.ask_load_file()
 
         self.__load_map(osm_file)
-
-        self.ViewPort = ViewPort(height=self.view.canvas.winfo_height(),
+        self.view_port = ViewPort(height=self.view.canvas.winfo_height(),
                                  width=self.view.canvas.winfo_width(),
                                  wmin=self.map.min_coord.get_lon_lat(),
                                  wmax=self.map.max_coord.get_lon_lat())
 
-        self.view.draw_places(d_places=self.map.d_places, viewport=self.ViewPort)
-        self.view.draw_roads (roads=self.map.main_road, d_nodes=self.map.d_nodes, viewport=self.ViewPort)
+        self.view.draw_places(d_places=self.map.d_places, viewport=self.view_port)
+        self.view.draw_roads (roads=self.map.main_road, d_nodes=self.map.d_nodes, viewport=self.view_port)
 
     ## ZOOM ##
     def on_mouse_scroll(self, event):   pass
@@ -196,12 +201,22 @@ class Controller():
         elif event.delta > 0:
             self.on_zoom_out()
 
+    def focus_random_agent(self):
+        ag = self.rng.choice(self.sim.agents)
+        x, y = self.view_port.apply(*ag.coordinate.get_lon_lat())
+
+        new_x = -1*x + self.view.canvas.winfo_width()/2
+        new_y = -1*y + self.view.canvas.winfo_height()/2
+
+        self.view_port.change_center(new_x, new_y)
+        self.view.canvas.scan_dragto(int(self.view_port.x), int(self.view_port.y), gain=1)
+
     def on_zoom_in(self):
-        self.ViewPort.update_scale(self.d_param["ZOOM_IN"])
+        self.view_port.update_scale(self.d_param["ZOOM_IN"])
         self.view.zoom(self.d_param["ZOOM_IN"])
 
     def on_zoom_out(self):
-        self.ViewPort.update_scale(self.d_param["ZOOM_OUT"])
+        self.view_port.update_scale(self.d_param["ZOOM_OUT"])
         self.view.zoom(self.d_param["ZOOM_OUT"])
 
     ## MOVING THE MAP ##
@@ -212,10 +227,10 @@ class Controller():
         x, y  = event.x, event.y
         if self.mouse_prev_position is not None:
             px, py = self.mouse_prev_position
-            self.ViewPort.update_center(px-x, py-y)
+            self.view_port.update_center(px-x, py-y)
 
         self.mouse_prev_position = (x, y)
-        self.view.canvas.scan_dragto(self.ViewPort.x, self.ViewPort.y, gain=1)
+        self.view.canvas.scan_dragto(self.view_port.x, self.view_port.y, gain=1)
 
     ## LOGGER
     def init_logger(self):
@@ -297,7 +312,7 @@ class Controller():
 
         # self.update_view() #todo: create an update loop, where we add move methods
         if self.d_param["USE_VIEW"]:
-            self.view.move_agents(agent_list=self.sim.agents, viewport=self.ViewPort)
+            self.view.move_agents(agent_list=self.sim.agents, viewport=self.view_port)
 
         # print("Done!", flush=True)
         self.thread_finished = True

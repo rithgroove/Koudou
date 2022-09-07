@@ -39,8 +39,10 @@ class View():
         self.buttons["map_load"] = tk.Button(self.frame_bar, bg=bg_btn, font=font_btn, text="Load Map")
         self.buttons["sim_run"] = tk.Button(self.frame_bar, bg=bg_btn, font=font_btn, text="Run")
         self.buttons["sim_step"] = tk.Button(self.frame_bar, bg=bg_btn, font=font_btn, text="Step")
-        for i in range(3):
-            self.buttons[f"null{i}"]  = tk.Button(self.frame_bar, bg=bg_btn, font=font_btn, text=f"null_{i}")
+        self.buttons["rnd_ag"] = tk.Button(self.frame_bar, bg=bg_btn, font=font_btn, text=f"Random Agent")
+
+        # for i in range(1):
+        #     self.buttons[f"null{i}"]  = tk.Button(self.frame_bar, bg=bg_btn, font=font_btn, text=f"null_{i}")
 
         for i, (key,val) in enumerate(self.buttons.items()):
             self.frame_bar.columnconfigure(i, weight=1)
@@ -55,6 +57,12 @@ class View():
         #### notebook tab 1
         self.tab1.frame_canvas = tk.Frame(self.tab1)
         self.canvas = tk.Canvas(self.tab1.frame_canvas)
+
+        self.zoom_in_btn = tk.Button(self.canvas, text='+', bg=bg_btn, font=font_btn)
+        self.zoom_in_btn.place(relx= .95, rely=.01)
+        self.zoom_out_btn = tk.Button(self.canvas, text='-', bg=bg_btn, font=font_btn)
+        self.zoom_out_btn.place(relx= .95, rely=.01, y=self.zoom_in_btn.winfo_height()+20)
+
 
         ### tab 2
 
@@ -131,7 +139,6 @@ class View():
                     self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="grey", width=3)
 
     def draw_agents(self, agent_list, viewport):
-        i=0
         for agent in agent_list:
             lon, lat = viewport.apply(*agent.coordinate.get_lon_lat())
             r=viewport.s*0.00005
