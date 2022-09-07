@@ -201,8 +201,8 @@ class Controller():
         ag: Agent = self.rng.choice(self.sim.agents)
         x, y = self.viewport.apply(*ag.coordinate.get_lon_lat())
 
-        new_x = -1*x + self.view.canvas.winfo_height()/2
-        new_y = -1*y + self.view.canvas.winfo_width()/2
+        new_x = -1*x + self.view.canvas.winfo_width()/2
+        new_y = -1*y + self.view.canvas.winfo_height()/2
 
         self.viewport.change_center(new_x, new_y)
         self.view.canvas.scan_dragto(int(self.viewport.x), int(self.viewport.y), gain=1)
