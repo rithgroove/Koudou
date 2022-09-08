@@ -1,0 +1,58 @@
+{
+    "name": "covid",
+    "initialization": {
+        "type": "absolute",
+        "value": 10,
+        "state": "asymptomatic"
+    },
+    "attributes": {
+        "symptoms": ["cough", "loss of taste"]
+    },
+    "infection_file": "config/infection/covid_infection.json",
+    "infectious_states": [
+        "asymptomatic",
+        "symptomatic",
+        "severe"
+    ],
+    "infected_starting_state": "exposed",
+    "transition_states": {
+        "exposed": {
+            "asymptomatic": {
+                "scale": "per_day",
+                "probability": 0.5
+            }
+        }, 
+        "asymptomatic": {
+            "symptomatic": {
+                "scale": "per_day",
+                "probability": 0.5
+            },
+            "recovered": {
+                "scale": "per_day",
+                "probability": 0.23
+            }
+        }, 
+        "symptomatic": {
+            "severe": {
+                "scale": "per_day",
+                "probability": 0.1
+            },
+            "recovered": {
+                "scale": "per_day",
+                "probability": 0.23
+            }
+        },
+        "severe": {
+            "recovered": {
+                "scale": "per_day",
+                "probability": 0.23
+            }
+        }
+,        "recovered": {
+            "susceptible": {
+                "scale": "per_day",
+                "probability": 0.0
+            }
+        }
+    }
+}

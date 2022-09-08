@@ -10,23 +10,24 @@ from .behavior import Behavior
 def load_attributes_generator(file_names,rng):
 	return GeneratorAttribute(file_names,rng)
 
-def load_conditions(condition_file,rng):
-	data = read_csv_as_dict(condition_file)
+def load_conditions(condition_files,rng):
 	conditions = {}
-	for x in data:
-		attribute = x["attribute"]
-		if x["target"] == "random":
-			conditions[x["name"]] = ConditionRandom(x["name"],x["value"],x["min"],x["max"],rng,x["operator"],x["type"],x["target"])
-		else:
-			conditions[x["name"]] = Condition(x["name"],x["attribute"],x["value"],x["operator"],x["type"],x["target"])
+	for condition_file in condition_files:
+		data = read_csv_as_dict(condition_file)
+		for x in data:
+			if x["target"] == "random":
+				conditions[x["name"]] = ConditionRandom(x["name"],x["value"],x["min"],x["max"],rng,x["operator"],x["type"],x["target"])
+			else:
+				conditions[x["name"]] = Condition(x["name"],x["attribute"],x["value"],x["operator"],x["type"],x["target"])
 	return conditions
 	
-def generate_agents(kd_map,attribute_generator,count):
+def generate_agents(kd_map,attribute_generator,n_agents):
 	agents = []
-	for x in range(0,count):
-		agent = Agent(x)
-		attribute_generator.generate_attribute(agent,kd_map)
+	for ag_id in range(n_agents):
+		agent = Agent(ag_id)
+		attribute_generator.generate_attribute(agent, kd_map)
 		agents.append(agent)
+	attribute_generator.generate_household_attribute(agents,kd_map)
 	return agents
 
 def load_activities(activity_file,conditions_dict, rng):
@@ -46,6 +47,3 @@ def load_behavior(name,file_name,condition_dict, rng):
 	activities = load_activities(file_name,condition_dict, rng)
 	behavior.activities = activities
 	return behavior
-
-def test():
-	print("test")

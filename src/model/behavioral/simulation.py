@@ -1,12 +1,13 @@
+from typing import List
 from src.model.behavioral import agent_manager
+from src.model.behavioral.agent import Agent
 from src.util.time_stamp import TimeStamp
 import src.model.map.a_star as a_star
 class Simulation:
-	def __init__(self,config,kd_map,rng,agents_count,threads = 1, cache_file_name = None, report = None):
-		self.agents = []
+	def __init__(self,config,kd_map,rng,agents_count,threads = 1, report = None):
+		self.agents: List[Agent] = []
 		attribute_generator = agent_manager.load_attributes_generator(config["attributes"],rng)
-		#print(attribute_generator)
-		self.agents = agent_manager.generate_agents(kd_map,attribute_generator,agents_count)		
+		self.agents = agent_manager.generate_agents(kd_map,attribute_generator,agents_count)
 		self.conditions = agent_manager.load_conditions(config["condition"],rng)
 		self.behaviors = {}
 		for key in config["behaviors"]:
@@ -20,8 +21,10 @@ class Simulation:
 		self.ts = TimeStamp(0)
 		self.threads = threads
 		self.kd_map = kd_map
-		self.cache_file_name = cache_file_name
 		self.report = report
+		self.d_agents_by_location = {}
+		self.modules = []
+		self.pathfind_cache = {}
 
 	def add_attribute(self,attr):
 		self.attributes[attr.name] = attr
@@ -39,38 +42,35 @@ class Simulation:
 
 		return tempstring
 
-	def test(self):
-		for x in self.agents:
-			print(x)
-
-	def attribute_step(self,kd_sim,kd_map,ts,step_length,rng):
+	def attribute_step(self,kd_sim,kd_map,ts,step_length,rng,logger):
 		#update attribute
 		for attr in self.attributes:
 			self.attributes[attr].step(kd_sim,kd_map,ts,step_length,rng,None)
 
-	def step(self,step_length):
+	def step(self,step_length,logger):
 		self.ts.step(step_length)
-		self.attribute_step(self,self.kd_map,self.ts,step_length,self.rng)
+		# todo: this function basically cast types to the attrs, change its names
+		# why doesnt this happen on init?
+		self.attribute_step(self,self.kd_map,self.ts,step_length,self.rng,logger)
 		##############################################################################
 		# update all agents attribute
 		##############################################################################
 		for agent in self.agents:
-			agent.attribute_step(self,self.kd_map,self.ts,step_length,self.rng)
+			agent.attribute_step(self,self.kd_map,self.ts,step_length,self.rng,logger)
 
 		##############################################################################
 		# check for activities
 		##############################################################################
 		move_action_pool = []
 		for agent in self.agents:
-			move_actions = agent.behavior_step(self,self.kd_map,self.ts,step_length,self.rng)
+			# function below create all agents action but just returns the move actions, the others are saved on the agent
+			move_actions = agent.behavior_step(self,self.kd_map,self.ts,step_length,self.rng,logger)
 			move_action_pool.extend(move_actions)
-
-		for x in move_action_pool:
-			print(x)
 
 		##############################################################################
 		# pathfind
 		##############################################################################
+		# print(f"{len(move_action_pool)} move actions was generated")
 		if (len(move_action_pool) > 0):
 			self.pathfind(move_action_pool)
 
@@ -78,15 +78,27 @@ class Simulation:
 		# action step
 		##############################################################################
 		for agent in self.agents:
-			agent.action_step(self,self.kd_map,self.ts,step_length,self.rng)
+			agent.action_step(self,self.kd_map,self.ts,step_length,self.rng,logger)
 
 		##############################################################################
-		# evacuation
+		# construct location dictionary for ease of use
 		##############################################################################
-
+		self.group_agents_by_location()
+		##############################################################################
+		# Plugins steps
+		##############################################################################
+		for module in self.modules:
+			module.step(self,self.kd_map,self.ts,step_length,self.rng,logger)
 		##############################################################################
 		# epidemicon
 		##############################################################################
+
+	def group_agents_by_location(self):
+		self.d_agents_by_location = {}
+		for agent in self.agents:
+			if (agent.get_attribute("current_node_id") not in self.d_agents_by_location.keys()):
+				self.d_agents_by_location[agent.get_attribute('current_node_id')] = []
+			self.d_agents_by_location[agent.get_attribute('current_node_id')].append(agent)
 
 	def pathfind(self,move_actions):
 		pool = []
@@ -94,8 +106,17 @@ class Simulation:
 			temp = (x.origin ,x.destination)
 			if (temp not in pool):
 				pool.append(temp)
-		results = a_star.parallel_a_star(self.kd_map, pool, n_threads=self.threads, cache_file_name = self.cache_file_name, report = self.report)
+		results = a_star.parallel_a_star(self.kd_map, pool, n_threads=self.threads, pathfind_cache=self.pathfind_cache, report = self.report)
+		print(f"consisting of {len(pool)} unique pathfinding request")
 		for x in move_actions:
 			temp = (x.origin ,x.destination)
 			x.generate_vector(self.kd_map, results[temp])
 
+	def summarized_attribute(self,attribute_name):
+		temp = {}
+		for agent in self.agents:
+			key = agent.get_attribute(attribute_name)
+			if key not in temp.keys():
+				temp[key] = 0
+			temp[key] += 1
+		return temp

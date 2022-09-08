@@ -1,4 +1,0 @@
-"priority","name","conditions","conditions type","actions"
-1,"go_to_work","is_working","NONE","move:$workplace_node_id(id), wait:$workhour(hours)"
-2,"eat_at_restaurant","hungry","NONE","move:restaurant, wait:20(minutes)-40(minutes), modify_attribute:hunger-max"
-3,"go_home","not_at_home","NONE","move:$home_node_id(id)"

@@ -6,7 +6,7 @@ from .place import Place
 from .node import Node
 from .way import Way
 from .coordinate import Coordinate
-
+import sys
 class Map():
     def __init__(self, bounding_box: Any, nodes: List[Node], ways: List[Way]):
         self.d_nodes: Dict[str, Node] = {}
@@ -25,6 +25,7 @@ class Map():
         self.d_roads: Dict[Tuple[str, str], Road] = {} # the tuple of id is ordered, NOT start, goal
         self.d_businesses: Dict[str, Business] = {} 
         self.d_residences: Dict[str, Residence] = {}
+        self.d_evacuation_centers: Dict[str, Place] = {}
 
     def add_node(self, node):
         self.d_nodes[node.id] = node
@@ -49,7 +50,9 @@ class Map():
         tempstring = "[Map]\n"
         tempstring += f"Simulated area = ({self.min_coord.lon},{self.min_coord.lat}) to ({self.max_coord.lon},{self.max_coord.lat})\n"
         tempstring += f"Number of nodes = {len(self.d_nodes)}\n"
-        tempstring += f"Number of ways = {len(self.d_ways)}"
+        tempstring += f"Number of ways = {len(self.d_ways)}\n"
+        tempstring += f"Number of residence = {len(self.d_residences)}\n"
+        tempstring += f"Number of evacuation centers = {len(self.d_evacuation_centers)}"
         return tempstring
 
     def set_main_road(self, main_road):
@@ -67,6 +70,68 @@ class Map():
             arr = [b for b in arr if not b.is_open(time_stamp)]
 
         arr = [b for b in arr if b.type == business_type]
-        
+        if (len(arr) <= qtd):
+            return arr
         results = rng.choice(arr, qtd, replace=False)
         return results
+
+    def get_closest_evacuation_center(self,coordinate, explored_places):
+        explored_evac_center = explored_places.split(",")
+        distance = sys.float_info.max
+        place = None
+        for evac_place_id in self.d_evacuation_centers:
+            temp_place = self.d_evacuation_centers[evac_place_id]
+            node = self.d_nodes[temp_place.centroid]
+            temp_distance = node.coordinate.calculate_distance(lat = coordinate.lat,lon = coordinate.lon)
+            if temp_place.centroid not in explored_places and temp_distance < distance:
+                place = self.d_evacuation_centers[evac_place_id]
+                distance = temp_distance
+        return place
+
+    def get_random_connected_nodes(self,node_id, last_visited,rng):
+        node = self.d_nodes[node_id]
+        connection = node.connections.copy()
+        if (last_visited in connection):
+            connection.remove(last_visited)
+        if len(connection) == 0:
+            return last_visited
+        else:
+            return rng.choice(connection,1)[0]
+
+    def is_roads_node(self, node_id):
+        # aux = [x.start_id for x in self.d_roads.values()]
+        # return node_id in aux
+        return self.d_nodes[node_id].type == "road"
+
+    def is_businesses_node(self, node_id):
+        # aux = [x.node_id for x in self.d_businesses.values()]
+        # return node_id in aux
+        return self.d_nodes[node_id].type == "business"
+
+    def is_residences_node(self, node_id):
+        # aux = [x.node_id for x in self.d_residences.values()] 
+        # return node_id in aux
+        return self.d_nodes[node_id].type == "home"
+
+    def mark_nodes(self):
+        for road_id in self.d_roads:
+            road = self.d_roads[road_id]
+            node = self.d_nodes[road.start_id]
+            node.type = "road"
+            node = self.d_nodes[road.goal_id]
+            node.type = "road"
+
+        for business_id in self.d_businesses:
+            business = self.d_businesses[business_id]
+            node = self.d_nodes[business.node_id]
+            node.type = "business"
+
+        for evac_id in self.d_evacuation_centers:
+            evac = self.d_evacuation_centers[evac_id]
+            node = self.d_nodes[evac.centroid]
+            node.type = "business"
+
+        for residence_id in self.d_residences:
+            residence = self.d_residences[residence_id]
+            node = self.d_nodes[residence.node_id]
+            node.type = "home"

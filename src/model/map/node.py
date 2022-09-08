@@ -22,6 +22,7 @@ class Node():
         self.coordinate = location
         self.tags = tags
         self.connections: List[str] = []
+        self.type = "undefined"
 
     def __str__(self):
         """

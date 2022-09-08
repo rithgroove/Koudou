@@ -1,4 +1,4 @@
-import geopy.distance as distance
+import haversine as hs
 
 class Coordinate():  
     
@@ -106,7 +106,7 @@ class Coordinate():
             
         Return: [Double] Distance in Meter
         """
-        return distance.distance(self.get_lat_lon(), (lat, lon)).km * 1000
+        return hs.haversine(self.get_lat_lon(), (lat, lon), unit=hs.Unit.METERS)
     
     def get_vector_distance(self,targetCoordinate):
         """

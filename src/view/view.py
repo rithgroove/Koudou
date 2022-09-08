@@ -37,6 +37,7 @@ class View():
         self.buttons = {}
         ##### main bar #####
         self.buttons["map_load"] = tk.Button(self.frame_bar, bg=bg_btn, font=font_btn, text="Load Map")
+        self.buttons["sim_run"] = tk.Button(self.frame_bar, bg=bg_btn, font=font_btn, text="Run")
         self.buttons["sim_step"] = tk.Button(self.frame_bar, bg=bg_btn, font=font_btn, text="Step")
         for i in range(3):
             self.buttons[f"null{i}"]  = tk.Button(self.frame_bar, bg=bg_btn, font=font_btn, text=f"null_{i}")
@@ -92,7 +93,7 @@ class View():
 
             path_trans = [viewport.apply(*c.get_lon_lat()) for c in place.coords]
             path_flat = [e for c in path_trans for e in c]
-            clat, clon = viewport.apply(*place.center.get_lon_lat())
+            clon, clat = viewport.apply(*place.center.get_lon_lat())
 
             w=viewport.s*0.000015
             if "building" in place.tags.keys():
@@ -100,7 +101,7 @@ class View():
                     #print(f"drawing {id} {path_flat[:4]}")
                     self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=w)
                     r=viewport.s*0.000015
-                    self.canvas.create_oval(clat-r, clon-r, clat+r, clon+r, fill="black")
+                    self.canvas.create_oval(clon-r, clat-r, clon+r, clat+r, fill="black")
                 else:
                     1#print("not renderable")
             elif "natural" in place.tags.keys():
@@ -128,6 +129,48 @@ class View():
                     self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="black", width=1)
                 else:
                     self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="grey", width=3)
+
+    def draw_agents(self, agent_list, viewport):
+        i=0
+        for agent in agent_list:
+            lon, lat = viewport.apply(*agent.coordinate.get_lon_lat())
+            r=viewport.s*0.00005
+            oval = self.canvas.create_oval(lon-r, lat-r, lon+r, lat+r, fill=agent.color, tag=agent.agent_id)
+            agent.oval = oval
+
+    def move_agents(self, agent_list, viewport):
+        i=0
+        for agent in agent_list:
+            # world coordinate to view coordinate
+            lon, lat = viewport.apply(*agent.coordinate.get_lon_lat())
+            # currlon, currlat = viewport.apply(*agent.coordinate.get_lon_lat())
+            # prevlon, prevlat = viewport.apply(*agent.prev_coordinate.get_lon_lat())
+
+
+            # get distance
+            x1,y1,x2,y2 = self.canvas.coords(agent.oval)
+            x = x1 + ((x2-x1)/2)
+            y = y1 + ((y2-y1)/2)
+
+            # move
+            self.canvas.move(agent.oval, (lon-x), (lat-y))
+            # self.canvas.move(agent.oval, (currlon-prevlon), (currlat-prevlat))
+
+            # update color
+            self.canvas.itemconfig(agent.oval, fill=agent.color)
+
+
+    def update_view(self):
+        pass
+
+    def btn_start_change_method(self, text, method):
+        self.buttons["sim_run"]["text"]    = text
+        self.buttons["sim_run"]["command"] = method
+
+
+        self.buttons["sim_step"]["state"] = tk.NORMAL
+        if text == "Pause": # auto-running
+            self.buttons["sim_step"]["state"] = tk.DISABLED
 
     ## log ##
     def update_log(self, txt):

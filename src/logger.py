@@ -1,14 +1,16 @@
 import os
 import time
+import datetime
 # import pandas as pd
 
 class Logger():
     def __init__(self, exp_name):
         self.exp_name = exp_name
-        self.path     = f"./results/{exp_name}/{time.time_ns()}"
+        self.path     = os.path.join("results",exp_name,f"{int(time.time())}")
         self.files    = {}
-
+        self.headers ={}
         os.makedirs(self.path, exist_ok=True)
+
 
     def write_data(self, filename, data):
         data = "\n".join([",".join(map(str, e)) for e in zip(*data)])
@@ -19,6 +21,22 @@ class Logger():
 
         if header is not None:
             self.files[filename].write(header)
+
+    def write_csv_data(self, filename, data):
+        header = self.headers[filename]
+        temp = ""
+        for x in header:
+            if temp != "":
+                temp += ","
+            temp += f"{data[x]}"
+        self.files[filename].write(temp+"\n")
+
+    def add_csv_file(self, filename, header):
+        path = os.path.join(self.path,filename)
+        self.files[filename] = open(path, "a")
+        self.headers[filename] = header.copy()
+        temp = ",".join(header) + "\n"
+        self.files[filename].write(temp)
 
     def add_files(self, filename_list, headers_list):
         for filename, header in zip(filename_list, headers_list):

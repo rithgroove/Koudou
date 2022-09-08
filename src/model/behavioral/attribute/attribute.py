@@ -1,3 +1,4 @@
+from typing import Dict
 import warnings
 
 class Attribute:
@@ -27,12 +28,13 @@ class Attribute:
 
     def update_value(self,value):
         if self.typing == "int" or self.typing == "integer" or self.typing == "float":
-            self.value += value
+            temp = cast(value,self.typing)
+            self.value += temp
         else:
             tempstring = "[Attribute] this attribute cannot be updated:\n"
             tempstring += self._get_object_details()
-            tempstring = "Only integer or float type are updatable.\n"
-            tempstring = "Use set_value(value) for other type.\n"
+            tempstring += "Only integer or float type are updatable.\n"
+            tempstring += "Use set_value(value) for other type.\n"
             raise(ValueError(tempstring))
 
     def set_max(self):
@@ -47,6 +49,7 @@ class Attribute:
         tempstring += "set min value is not available for this attribute.\n"
         warnings.warn(tempstring)
 
+    # todo: this func just cast types, shouldnt it update the values ionstead?
     def step(self,kd_sim,kd_map,ts,step_length,rng,agent):
         self._cast_value() # just to make sure the data is safe
 
@@ -78,14 +81,17 @@ class Attribute:
 
     def __str__(self):
         tempstring = "[Attribute]\n"
-        tempstring += _get_object_details()
+        tempstring += self._get_object_details()
         return tempstring
 
 def cast(value,typing):
     if typing == "string":
         return f"{value}"
     elif typing == "bool":
-        return bool(value)
+        temp = value
+        if isinstance(temp, str):
+            temp = temp.lower()== "true"
+        return bool(temp)
     elif typing == "int" or typing == "integer":
         return int(value)
     elif typing == "float":

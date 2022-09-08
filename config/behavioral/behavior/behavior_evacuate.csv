@@ -1,3 +1,0 @@
-"priority","name","conditions","conditions_type","actions"
-1,"switch_to_normal","is_not_evac","NONE","change_behavior:normal"
-2,"go_to_hospital","is_evac","None","move:hospital,wait:3(day)"

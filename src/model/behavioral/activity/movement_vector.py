@@ -1,4 +1,4 @@
-import geopy.distance as gdistance
+import haversine as hs
 from src.model.map.coordinate import Coordinate
 class MovementVector:
     """
@@ -27,7 +27,7 @@ class MovementVector:
         """
         self.starting_node = starting_node
         self.destination_node = destination_node
-        self.distance = gdistance.distance(self.starting_node.coordinate.get_lat_lon(),self.destination_node.coordinate.get_lat_lon()).km*1000
+        self.distance = hs.haversine(self.starting_node.coordinate.get_lat_lon(), self.destination_node.coordinate.get_lat_lon(), unit=hs.Unit.METERS)
         self.passed_through_distance = 0
         self.current_position = self.starting_node
         self.finished = False
@@ -48,7 +48,7 @@ class MovementVector:
         """
         return (self.current_position[0] - current_position.lat, self.current_position[1] - current_position.lon)
         
-    def step(self,agent,step_length):
+    def step(self,agent,step_length,kd_map):
         """
         [Method] step    
         Travel a certain number of distances in this vector, if the distance is higher than our remaining distance in this vector, the leftover will be returned.
@@ -61,7 +61,14 @@ class MovementVector:
             - [float] the leftover of the distance            
         """
         # calculate is there any left over translation
-        distance = float(agent.get_attribute("walking_speed"))*step_length
+        first = min(self.starting_node.id, self.destination_node.id)
+        second = max(self.starting_node.id, self.destination_node.id)
+        t = (first, second)
+        road = kd_map.d_roads[t]
+        speed = float(agent.get_attribute("walking_speed")) 
+        if road is not None:
+            speed *= road.modifier
+        distance =  speed*step_length 
         untraveled_distance = self.distance - self.passed_through_distance
         current_traveled_distance = min(distance,untraveled_distance)
         self.passed_through_distance += current_traveled_distance
@@ -71,14 +78,16 @@ class MovementVector:
             self.finished = True
             self.current_position =  self.destination_node.coordinate
             leftOver = (distance - current_traveled_distance)
+            agent.set_attribute("last_node_id",agent.get_attribute("current_node_id"))
             agent.set_attribute("current_node_id",self.destination_node.id)
+            agent.set_attribute("location",self.destination_node.type)
         else:
             self.progress = self.passed_through_distance/self.distance
             lat = self.starting_node.coordinate.lat +(self.progress * self.total_translation[0])
             lon = self.starting_node.coordinate.lon +(self.progress * self.total_translation[1])
             self.current_position = Coordinate(lat=lat, lon=lon)
         agent.coordinate = self.current_position
-        return leftOver/float(agent.get_attribute("walking_speed"))
+        return leftOver/speed
     
     def extract(self):
         """
