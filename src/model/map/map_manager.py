@@ -93,7 +93,7 @@ def create_types_from_osm_tags(kd_map: Map):
 		p_type = None
 		
 		if len(centroid.connections) == 0:
-			print("CCCC")
+			print("Place without centroid: ", p.id)
 			continue
 
 		if "building" in centroid.tags:

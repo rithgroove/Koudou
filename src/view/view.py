@@ -62,6 +62,11 @@ class View():
         self.zoom_in_btn.place(relx= .95, rely=.01)
         self.zoom_out_btn = tk.Button(self.canvas, text='-', bg=bg_btn, font=font_btn)
         self.zoom_out_btn.place(relx= .95, rely=.01, y=self.zoom_in_btn.winfo_height()+20)
+        self.coord_label = tk.Label(self.canvas, text="", fg="Red", font=("Helvetica", 12), background="White")
+        self.coord_label.place(relx=.01, rely=.95)
+
+        self.clock = tk.Label(self.canvas, text="", fg="Green", font=("Helvetica", 18), background="White")
+        self.clock.place(relx=.01, rely=.01)
 
 
         ### tab 2

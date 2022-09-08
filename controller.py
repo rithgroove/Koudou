@@ -3,7 +3,8 @@ import threading
 import numpy as np
 
 from pathlib import Path
-from os import path, mkdir#join, exists
+from os import path, mkdir
+from src.model.map.map import Map#join, exists
 
 from src.view.view import View
 from src.view.draw import ViewPort
@@ -16,15 +17,17 @@ from src.model.behavioral.simulation import Simulation
 from src.model.infection.infection_module import InfectionModule
 from src.model.evacuation.evacuation_module import EvacuationModule
 
+from src.model.behavioral.agent import Agent
+
 class Controller():
     def __init__(self, parameters):
         self.d_param = parameters
         self.OS = self.d_param["OS"]
 
-        self.logger = None
-        self.view   = None
-        self.map    = None
-        self.sim    = None
+        self.logger: Logger = None
+        self.view: View   = None
+        self.map: Map    = None
+        self.sim: Simulation    = None
 
         self.thread_finished = True
         self.rng = np.random.default_rng(seed=self.d_param["SEED"])
@@ -78,6 +81,7 @@ class Controller():
         self.view = View()
         self.bind_with_view()
         self.set_view_events()
+
     def set_view_events(self):
         # shortcuts
         view = self.view
@@ -106,7 +110,6 @@ class Controller():
         view.canvas.bind("<MouseWheel>"     , self.on_mouse_scroll)
         view.canvas.bind("<B1-Motion>"      , self.on_mouse_hold)
         view.canvas.bind("<ButtonRelease-1>", self.on_mouse_release)
-
 
     ## print messages
     def print_msg(self):    pass
@@ -172,6 +175,8 @@ class Controller():
 
         if self.d_param["USE_VIEW"]:
             self.view.draw_agents(agent_list=self.sim.agents, viewport=self.view_port)
+            self.view.clock.configure(text=self.sim.ts.get_hour_min_str())
+
 
     def __load_map_view(self, osm_file=None):
         if osm_file is None:
@@ -202,14 +207,17 @@ class Controller():
             self.on_zoom_out()
 
     def focus_random_agent(self):
-        ag = self.rng.choice(self.sim.agents)
+        ag: Agent = self.rng.choice(self.sim.agents)
         x, y = self.view_port.apply(*ag.coordinate.get_lon_lat())
 
-        new_x = -1*x + self.view.canvas.winfo_width()/2
-        new_y = -1*y + self.view.canvas.winfo_height()/2
+        new_x = int(-1*x + self.view.canvas.winfo_width()/2)
+        new_y = int(-1*y + self.view.canvas.winfo_height()/2)
 
         self.view_port.change_center(new_x, new_y)
-        self.view.canvas.scan_dragto(int(self.view_port.x), int(self.view_port.y), gain=1)
+        self.view.canvas.scan_dragto(self.view_port.x, self.view_port.y, gain=1)
+
+        print("Agent info:")
+        print(ag.__dict__, "\n")
 
     def on_zoom_in(self):
         self.view_port.update_scale(self.d_param["ZOOM_IN"])
@@ -228,6 +236,7 @@ class Controller():
         if self.mouse_prev_position is not None:
             px, py = self.mouse_prev_position
             self.view_port.update_center(px-x, py-y)
+            self.view.coord_label.configure(text=f"{px-x}, {py-y}")
 
         self.mouse_prev_position = (x, y)
         self.view.canvas.scan_dragto(self.view_port.x, self.view_port.y, gain=1)
@@ -316,6 +325,8 @@ class Controller():
 
         # print("Done!", flush=True)
         self.thread_finished = True
+        self.view.clock.configure(text=self.sim.ts.get_hour_min_str())
+
 
     def run_simulation(self):
         self.print_msg(f"Running simulation... 0/{self.d_param['MAX_DAYS']} days")
