@@ -10,5 +10,7 @@ This repository contains the simulator used for the paper: Mitsuteru Abe, Fabio 
         - minlon="140.0921000" 
         - maxlat="36.1217000"
         - maxlon="140.1201000"
+    - Or download using the API req:
+        https://www.openstreetmap.org/api/0.6/map?bbox=140.0921%2C36.0777%2C140.1201%2C36.1217
 - change the configurations on 
 - run: $ python main.py -p parameters/default.py
