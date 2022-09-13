@@ -2,8 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 import tkinter.filedialog as tk_fdialog
 import numpy as np
-#
-# from .draw import ViewPort
+
+from src.view.draw import Draw
 
 class View():
     def __init__(self, window_size=(1024, 768)):
@@ -55,8 +55,8 @@ class View():
         self.frame_nb.add(self.tab2, text ='Settings')
 
         #### notebook tab 1
-        self.tab1.frame_canvas = tk.Frame(self.tab1)
-        self.canvas = tk.Canvas(self.tab1.frame_canvas)
+        self.canvas_frame = tk.Frame(self.tab1)
+        self.canvas = tk.Canvas(self.canvas_frame)
 
         self.zoom_in_btn = tk.Button(self.canvas, text='+', bg=bg_btn, font=font_btn)
         self.zoom_in_btn.place(relx= .95, rely=.01)
@@ -75,20 +75,15 @@ class View():
         self.canvas.pack(expand=True)
         self.canvas.config(width=self.window_size[0], height=self.window_size[1])
 
-        self.tab1.frame_canvas.pack(expand=True)
+        self.canvas_frame.pack(expand=True)
+        self.draw = Draw(canvas=self.canvas)
 
-        ##
-        self.load_drawing_methods()
 
     ## main methods ##
     def main_loop(self):
         self.root.mainloop()
     def close(self):
         self.root.destroy()
-    def load_drawing_methods(self):
-        #self.draw = Draw(canvas=self.canvas)
-        #self.draw_map = self.draw.draw_map(map)
-        pass
 
     ## dialog methods
     def ask_load_file(self):
@@ -99,77 +94,7 @@ class View():
     def zoom(self, scale):
         self.canvas.scale('all', 0, 0, scale, scale)
 
-    ## drawing methods
-    def draw_places(self, d_places, viewport):
-        for id, place in d_places.items():
-            place = place.render_info
 
-            path_trans = [viewport.apply(*c.get_lon_lat()) for c in place.coords]
-            path_flat = [e for c in path_trans for e in c]
-            clon, clat = viewport.apply(*place.center.get_lon_lat())
-
-            w=viewport.s*0.000015
-            if "building" in place.tags.keys():
-                if len(path_flat)>=6:
-                    #print(f"drawing {id} {path_flat[:4]}")
-                    self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=w)
-                    r=viewport.s*0.000015
-                    self.canvas.create_oval(clon-r, clat-r, clon+r, clat+r, fill="black")
-                else:
-                    1#print("not renderable")
-            elif "natural" in place.tags.keys():
-                self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=w)
-            elif "leisure" in place.tags.keys():
-                self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=w)
-            elif "amenity" in place.tags.keys():
-                self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=w)
-            # elif 'highway' in place.tags.keys():
-            #     for (lon_a, lat_a), (lon_b, lat_b) in zip(path[:-1], path[1:]):
-            #         self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="grey", width=3)
-            else:#note: equivalent to "others" in epidemicon
-                #self.canvas.create_polygon(path_flat, outline=place.outline, fill="pink", width=2)
-                pass
-    def draw_roads(self, roads, d_nodes, viewport):
-        for road in roads:
-            lon_a, lat_a = viewport.apply(*road.coordinate.get_lon_lat())
-
-            conn_tmp = np.array(road.connections) #maybe refactor all lists to numpy array?
-            conn_filtered = conn_tmp[conn_tmp<road.id] #dont draw twice
-            for conn_id in conn_filtered:
-                conn = d_nodes[conn_id]
-                lon_b, lat_b = viewport.apply(*conn.coordinate.get_lon_lat())
-                if "centroid" in conn.tags:
-                    self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="black", width=1)
-                else:
-                    self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="grey", width=3)
-
-    def draw_agents(self, agent_list, viewport):
-        for agent in agent_list:
-            lon, lat = viewport.apply(*agent.coordinate.get_lon_lat())
-            r=viewport.s*0.00005
-            oval = self.canvas.create_oval(lon-r, lat-r, lon+r, lat+r, fill=agent.color, tag=agent.agent_id)
-            agent.oval = oval
-
-    def move_agents(self, agent_list, viewport):
-        i=0
-        for agent in agent_list:
-            # world coordinate to view coordinate
-            lon, lat = viewport.apply(*agent.coordinate.get_lon_lat())
-            # currlon, currlat = viewport.apply(*agent.coordinate.get_lon_lat())
-            # prevlon, prevlat = viewport.apply(*agent.prev_coordinate.get_lon_lat())
-
-
-            # get distance
-            x1,y1,x2,y2 = self.canvas.coords(agent.oval)
-            x = x1 + ((x2-x1)/2)
-            y = y1 + ((y2-y1)/2)
-
-            # move
-            self.canvas.move(agent.oval, (lon-x), (lat-y))
-            # self.canvas.move(agent.oval, (currlon-prevlon), (currlat-prevlat))
-
-            # update color
-            self.canvas.itemconfig(agent.oval, fill=agent.color)
 
 
     def update_view(self):
