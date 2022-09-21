@@ -200,12 +200,15 @@ class Controller():
         self.print_msg(ag.__dict__, "\n")
 
     def on_zoom_in(self):
-        self.view_port.update_scale(self.d_param["ZOOM_IN"])
-        self.view.zoom(self.d_param["ZOOM_IN"])
+        scale = self.d_param["ZOOM_IN"]
+        self.view_port.update_scale(scale)
+        self.view.canvas.scale("all", 0, 0, scale, scale)
 
     def on_zoom_out(self):
-        self.view_port.update_scale(self.d_param["ZOOM_OUT"])
-        self.view.zoom(self.d_param["ZOOM_OUT"])
+        scale = self.d_param["ZOOM_OUT"]
+        self.view_port.update_scale(scale)
+        self.view.canvas.scale("all", 0, 0, scale, scale)
+
 
     ## MOVING THE MAP ##
     def on_mouse_release(self, event):
