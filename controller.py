@@ -66,41 +66,7 @@ class Controller():
             self.view.close()
 
         self.logger.close_files()
-
-
-
-
-    def set_view_events(self):
-        # shortcuts
-        view = self.view
-
-        # scroll
-        self.on_mouse_scroll = self.__scroll_mouse_wheel
-        if self.OS == "Linux":
-            self.on_mouse_scroll = self.__scroll_linux
-            view.canvas.bind("<Button>", self.on_mouse_scroll)
-
-        self.mouse_prev_position = None
-
-        # window
-        view.root.protocol("WM_DELETE_WINDOW", self.on_closing)
-
-        # buttons
-        view.buttons["map_load"]["command"] = self.load_map
-        view.buttons["sim_step"]["command"] = self.run_step
-        view.buttons["sim_run"]["command"]  = self.cmd_auto
-        view.buttons["rnd_ag"]["command"] = self.focus_random_agent
-        view.zoom_in_btn["command"] = self.on_zoom_in
-        view.zoom_out_btn["command"] = self.on_zoom_out
-
-
-        # canvas
-        view.canvas.bind("<MouseWheel>"     , self.on_mouse_scroll)
-        view.canvas.bind("<B1-Motion>"      , self.on_mouse_hold)
-        view.canvas.bind("<ButtonRelease-1>", self.on_mouse_release)
-
   
-
     ## load map
     def load_map(self, osm_file=None):
         if osm_file is None and  self.d_param["USE_VIEW"]:
@@ -136,16 +102,21 @@ class Controller():
 
     def load_view(self):
         self.view = View()
-        self.view_port = ViewPort(height=self.view.canvas.winfo_height(),
-                                 width=self.view.canvas.winfo_width(),
-                                 wmin=self.map.min_coord.get_lon_lat(),
-                                 wmax=self.map.max_coord.get_lon_lat())
-
-        self.view.draw.draw_places(d_places=self.map.d_places, viewport=self.view_port)
-        self.view.draw.draw_roads(roads=self.map.main_road, d_nodes=self.map.d_nodes, viewport=self.view_port)
-        self.view.draw.draw_agents(agent_list=self.sim.agents, viewport=self.view_port)
-        self.view.clock.configure(text=self.sim.ts.get_hour_min_str())
-        self.set_view_events()
+        self.view.init_viewport(self.map.min_coord.get_lon_lat(), self.map.max_coord.get_lon_lat())
+        self.view.draw_initial_osm_map(self.map)
+        self.view.draw_initial_agents(self.sim.agents)
+        
+        self.view.update_clock(self.sim.ts.get_hour_min_str())
+        self.view.set_btn_funcs(
+            self.rng,
+            self.sim.agents,
+            self.d_param["ZOOM_IN"],
+            self.d_param["ZOOM_OUT"],
+            self.d_param["OS"],
+            lambda: self.load_map(),
+            lambda: self.run_step(),
+            lambda: self.cmd_auto() 
+        )
 
     ## load sim
     def load_sim(self):
@@ -169,60 +140,6 @@ class Controller():
             self.sim.modules.append(
                 EvacuationModule(distance = self.d_param["EVACUATION"]["DISTANCE"],
                                  share_information_chance = self.d_param["EVACUATION"]["SHARE_INFO_CHANCE"]))
-
-
-    ## ZOOM ##
-    def on_mouse_scroll(self, event):   pass
-
-    def __scroll_linux(self, event):
-        if event.num == 4:
-            self.on_zoom_in()
-        elif event.num == 5:
-            self.on_zoom_out()
-
-    def __scroll_mouse_wheel(self, event):
-        if event.delta < 0:
-            self.on_zoom_in()
-        elif event.delta > 0:
-            self.on_zoom_out()
-
-    def focus_random_agent(self):
-        ag: Agent = self.rng.choice(self.sim.agents)
-        x, y = self.view_port.apply(*ag.coordinate.get_lon_lat())
-
-        new_x = int(-1*x + self.view.canvas.winfo_width()/2)
-        new_y = int(-1*y + self.view.canvas.winfo_height()/2)
-
-        self.view_port.change_center(new_x, new_y)
-        self.view.canvas.scan_dragto(self.view_port.x, self.view_port.y, gain=1)
-
-        self.print_msg("Agent info:")
-        self.print_msg(ag.__dict__, "\n")
-
-    def on_zoom_in(self):
-        scale = self.d_param["ZOOM_IN"]
-        self.view_port.update_scale(scale)
-        self.view.canvas.scale("all", 0, 0, scale, scale)
-
-    def on_zoom_out(self):
-        scale = self.d_param["ZOOM_OUT"]
-        self.view_port.update_scale(scale)
-        self.view.canvas.scale("all", 0, 0, scale, scale)
-
-
-    ## MOVING THE MAP ##
-    def on_mouse_release(self, event):
-        self.mouse_prev_position = None
-
-    def on_mouse_hold(self, event):
-        x, y  = event.x, event.y
-        if self.mouse_prev_position is not None:
-            px, py = self.mouse_prev_position
-            self.view_port.update_center(px-x, py-y)
-            self.view.coord_label.configure(text=f"{px-x}, {py-y}")
-
-        self.mouse_prev_position = (x, y)
-        self.view.canvas.scan_dragto(self.view_port.x, self.view_port.y, gain=1)
 
     ## LOGGER
     def init_logger(self):
@@ -307,8 +224,8 @@ class Controller():
 
         # self.update_view() #todo: create an update loop, where we add move methods
         if self.d_param["USE_VIEW"]:
-            self.view.draw.move_agents(agent_list=self.sim.agents, viewport=self.view_port)
-            self.view.clock.configure(text=self.sim.ts.get_hour_min_str())
+            self.view.move_agents(self.sim.agents)
+            self.view.update_clock(self.sim.ts.get_hour_min_str())
 
         # print("Done!", flush=True)
         self.thread_finished = True
