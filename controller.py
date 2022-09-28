@@ -232,11 +232,14 @@ class Controller():
 
 
     def run_simulation(self):
-        self.print_msg(f"Running simulation... 0/{self.d_param['MAX_DAYS']} days")
-        for d in range(0, self.d_param["MAX_DAYS"]):
+        steps_in_a_hour =  (60*60)
+        for d in range(0, self.d_param["MAX_STEPS"]):
             self.run_step()
+            if d%steps_in_a_hour == 0:
+                hours =  d//steps_in_a_hour
+                self.print_msg(f"Running simulation... {hours}/{self.d_param['MAX_STEPS']/steps_in_a_hour} hours")
 
-        self.print_msg(f"{d+1}/{self.d_param['MAX_DAYS']} days done")
+        self.print_msg(f"{d+1}/{self.d_param['MAX_STEPS']} hours done")
         self.print_msg("")
 
     def run_auto(self):

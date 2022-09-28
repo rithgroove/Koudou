@@ -106,7 +106,7 @@ class Simulation:
 			temp = (x.origin ,x.destination)
 			if (temp not in pool):
 				pool.append(temp)
-		print(f"Starting pathfinding consisting of {len(pool)} unique pathfinding request")
+		# print(f"Starting pathfinding consisting of {len(pool)} unique pathfinding request")
 		results = a_star.parallel_a_star(self.kd_map, pool, n_threads=self.threads, pathfind_cache=self.pathfind_cache, report = self.report)
 		for x in move_actions:
 			temp = (x.origin ,x.destination)

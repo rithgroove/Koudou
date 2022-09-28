@@ -38,7 +38,7 @@ def on_mouse_hold(event, view):
     if view.mouse_prev_position is not None:
         px, py = view.mouse_prev_position
         view.view_port.update_center(px-x, py-y)
-        view.coord_label.configure(text=f"{px-x}, {py-y}")
+        # view.coord_label.configure(text=f"{px-x}, {py-y}")
 
     view.mouse_prev_position = (x, y)
     view.canvas.scan_dragto (view.view_port.x, view.view_port.y, gain=1)
