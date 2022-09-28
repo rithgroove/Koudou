@@ -60,4 +60,4 @@ class TimeStamp:
     def get_hour_min_str(self):
         h = self.get_hour()
         m = self.get_minute()
-        return f"{h}:{m}"
+        return f"{h:02d}:{m:02d}"

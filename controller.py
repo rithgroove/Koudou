@@ -3,10 +3,11 @@ import threading
 import numpy as np
 
 from pathlib import Path
-from os import path, mkdir#join, exists
+from os import path, mkdir
+from src.model.map.map import Map#join, exists
 
 from src.view.view import View
-from src.view.draw import ViewPort
+from src.view.viewport import ViewPort
 
 from src.logger import Logger
 
@@ -16,32 +17,34 @@ from src.model.behavioral.simulation import Simulation
 from src.model.infection.infection_module import InfectionModule
 from src.model.evacuation.evacuation_module import EvacuationModule
 
+from src.model.behavioral.agent import Agent
+
 class Controller():
     def __init__(self, parameters):
         self.d_param = parameters
         self.OS = self.d_param["OS"]
 
-        self.logger = None
-        self.view   = None
-        self.map    = None
-        self.sim    = None
+        self.logger: Logger = None
+        self.view: View   = None
+        self.map: Map    = None
+        self.sim: Simulation    = None
 
         self.thread_finished = True
         self.rng = np.random.default_rng(seed=self.d_param["SEED"])
         # self.step_length = self.d_param["STEP_LENGTH"]
 
-        # bindings
-        if self.d_param["USE_VIEW"]:
-            self.use_view()
-        else:
-            self.bind_no_view()
 
-        map = self.d_param["MAP_CACHE"] if self.d_param["MAP_CACHE"] else self.d_param["MAP"]
-        if map is not None:
-            self.load_map(map)
+        if self.d_param["MAP_CACHE"] is not None and path.isfile(self.d_param["MAP_CACHE"]):
+            self.load_map(self.d_param["MAP_CACHE"])
+        else:
+            self.load_map(self.d_param["MAP"])
 
         if self.d_param["SIM_CONFIG"]:
             self.load_sim()
+
+        # bindings
+        if self.d_param["USE_VIEW"]:
+            self.load_view()
 
         self.init_logger()
 
@@ -63,56 +66,12 @@ class Controller():
             self.view.close()
 
         self.logger.close_files()
-
-    ## binding ##
-    def bind_no_view(self):
-        self.load_map  = self.__load_map
-        self.print_msg = self.__print_msg_noview
-    def bind_with_view(self):
-        self.load_map = self.__load_map_view
-        self.print_msg = self.__print_msg_view
-
-    ## view enable ##
-    def use_view(self):
-        self.view = View()
-        self.bind_with_view()
-        self.set_view_events()
-    def set_view_events(self):
-        # shortcuts
-        view = self.view
-
-        # scroll
-        self.on_mouse_scroll = self.__scroll_mouse_wheel
-        if self.OS == "Linux":
-            self.on_mouse_scroll = self.__scroll_linux
-
-        self.mouse_prev_position = None
-
-        # window
-        view.root.protocol("WM_DELETE_WINDOW", self.on_closing)
-
-        # buttons
-        view.buttons["map_load"]["command"] = self.load_map
-        view.buttons["sim_step"]["command"] = self.run_step
-        view.buttons["sim_run"]["command"]  = self.cmd_auto
-
-        # canvas
-        view.canvas.bind("<MouseWheel>"     , self.on_mouse_scroll)
-        view.canvas.bind("<B1-Motion>"      , self.on_mouse_hold)
-        view.canvas.bind("<ButtonRelease-1>", self.on_mouse_release)
-
-
-    ## print messages
-    def print_msg(self):    pass
-    def __print_msg_noview(self, msg):
-        print(msg)
-    def __print_msg_view(self, msg):
-        self.view.update_log(msg)
-
+  
     ## load map
-    def load_map(self): pass
-    def __load_map(self, osm_file=None):
-        if osm_file is None:
+    def load_map(self, osm_file=None):
+        if osm_file is None and  self.d_param["USE_VIEW"]:
+            osm_file = self.view.ask_load_file()
+        elif osm_file is None:
             raise Exception(f"Map file not specified!")
 
         filename = Path(osm_file).stem
@@ -141,6 +100,24 @@ class Controller():
             self.print_msg(f"Not a valid map file")
             return
 
+    def load_view(self):
+        self.view = View()
+        self.view.init_viewport(self.map.min_coord.get_lon_lat(), self.map.max_coord.get_lon_lat())
+        self.view.draw_initial_osm_map(self.map)
+        self.view.draw_initial_agents(self.sim.agents)
+        
+        self.view.update_clock(self.sim.ts.get_hour_min_str())
+        self.view.set_btn_funcs(
+            self.rng,
+            self.sim.agents,
+            self.d_param["ZOOM_IN"],
+            self.d_param["ZOOM_OUT"],
+            self.d_param["OS"],
+            lambda: self.load_map(),
+            lambda: self.run_step(),
+            lambda: self.cmd_auto() 
+        )
+
     ## load sim
     def load_sim(self):
         self.sim = Simulation(config       = self.d_param["SIM_CONFIG"],
@@ -163,59 +140,6 @@ class Controller():
             self.sim.modules.append(
                 EvacuationModule(distance = self.d_param["EVACUATION"]["DISTANCE"],
                                  share_information_chance = self.d_param["EVACUATION"]["SHARE_INFO_CHANCE"]))
-
-        if self.d_param["USE_VIEW"]:
-            self.view.draw_agents(agent_list=self.sim.agents, viewport=self.ViewPort)
-
-    def __load_map_view(self, osm_file=None):
-        if osm_file is None:
-            osm_file = self.view.ask_load_file()
-
-        self.__load_map(osm_file)
-
-        self.ViewPort = ViewPort(height=self.view.canvas.winfo_height(),
-                                 width=self.view.canvas.winfo_width(),
-                                 wmin=self.map.min_coord.get_lon_lat(),
-                                 wmax=self.map.max_coord.get_lon_lat())
-
-        self.view.draw_places(d_places=self.map.d_places, viewport=self.ViewPort)
-        self.view.draw_roads (roads=self.map.main_road, d_nodes=self.map.d_nodes, viewport=self.ViewPort)
-
-    ## ZOOM ##
-    def on_mouse_scroll(self, event):   pass
-
-    def __scroll_linux(self, event):
-        if event.num == 4:
-            self.on_zoom_in()
-        elif event.num == 5:
-            self.on_zoom_out()
-
-    def __scroll_mouse_wheel(self, event):
-        if event.delta < 0:
-            self.on_zoom_in()
-        elif event.delta > 0:
-            self.on_zoom_out()
-
-    def on_zoom_in(self):
-        self.ViewPort.update_scale(self.d_param["ZOOM_IN"])
-        self.view.zoom(self.d_param["ZOOM_IN"])
-
-    def on_zoom_out(self):
-        self.ViewPort.update_scale(self.d_param["ZOOM_OUT"])
-        self.view.zoom(self.d_param["ZOOM_OUT"])
-
-    ## MOVING THE MAP ##
-    def on_mouse_release(self, event):
-        self.mouse_prev_position = None
-
-    def on_mouse_hold(self, event):
-        x, y  = event.x, event.y
-        if self.mouse_prev_position is not None:
-            px, py = self.mouse_prev_position
-            self.ViewPort.update_center(px-x, py-y)
-
-        self.mouse_prev_position = (x, y)
-        self.view.canvas.scan_dragto(self.ViewPort.x, self.ViewPort.y, gain=1)
 
     ## LOGGER
     def init_logger(self):
@@ -259,6 +183,9 @@ class Controller():
         self.thread = threading.Thread(target=self.run_step, args=())
         self.thread.start()
 
+    def print_msg(self, msg):
+        print(msg)
+
     def run_step(self):
         self.thread_finished = False
         # print("Processing... ", end="", flush=True)
@@ -297,17 +224,22 @@ class Controller():
 
         # self.update_view() #todo: create an update loop, where we add move methods
         if self.d_param["USE_VIEW"]:
-            self.view.move_agents(agent_list=self.sim.agents, viewport=self.ViewPort)
+            self.view.move_agents(self.sim.agents)
+            self.view.update_clock(self.sim.ts.get_hour_min_str())
 
         # print("Done!", flush=True)
         self.thread_finished = True
 
-    def run_simulation(self):
-        self.print_msg(f"Running simulation... 0/{self.d_param['MAX_DAYS']} days")
-        for d in range(0, self.d_param["MAX_DAYS"]):
-            self.run_step()
 
-        self.print_msg(f"{d+1}/{self.d_param['MAX_DAYS']} days done")
+    def run_simulation(self):
+        steps_in_a_hour =  (60*60)
+        for d in range(0, self.d_param["MAX_STEPS"]):
+            self.run_step()
+            if d%steps_in_a_hour == 0:
+                hours =  d//steps_in_a_hour
+                self.print_msg(f"Running simulation... {hours}/{self.d_param['MAX_STEPS']/steps_in_a_hour} hours")
+
+        self.print_msg(f"{d+1}/{self.d_param['MAX_STEPS']} hours done")
         self.print_msg("")
 
     def run_auto(self):
