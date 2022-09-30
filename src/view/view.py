@@ -137,7 +137,7 @@ class View():
         if os == "Linux":
             self.canvas.bind("<Button>", lambda event: scroll_linux(event, zoom_in, zoom_out, self.view_port, self.canvas))
         else:
-            view.canvas.bind("<MouseWheel>", lambda event: scroll_mouse_wheel(event, zoom_in, zoom_out, self.view_port, self.canvas))
+            self.canvas.bind("<MouseWheel>", lambda event: scroll_mouse_wheel(event, zoom_in, zoom_out, self.view_port, self.canvas))
 
         # window
         self.root.protocol("WM_DELETE_WINDOW", lambda: self.close())
