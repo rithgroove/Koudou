@@ -4,13 +4,20 @@ import datetime
 # import pandas as pd
 
 class Logger():
-    def __init__(self, exp_name):
+    def __init__(self, exp_name, level):
         self.exp_name = exp_name
         self.path     = os.path.join("results",exp_name,f"{int(time.time())}")
         self.files    = {}
-        self.headers ={}
+        self.headers = {}
         os.makedirs(self.path, exist_ok=True)
+        self.lvl_dic = {"all": 1, "debug": 2, "info": 3, "warn": 4, "error": 5, "fatal": 6, "off": 7}
+        self.level = self.lvl_dic[level]
 
+    def write_log(self, data, level="debug", filename="log.txt"):
+        if (self.lvl_dic[level] >= self.level):
+            line = "[" + level + "] : "
+            line += data
+            self.files[filename].write(line+"\n")
 
     def write_data(self, filename, data):
         data = "\n".join([",".join(map(str, e)) for e in zip(*data)])
@@ -51,3 +58,8 @@ class Logger():
             self.files[filename].close()
 
         self.files.clear()
+
+    def set_level(self, level):
+        return {
+            
+        } [level]
