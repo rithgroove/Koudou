@@ -31,7 +31,8 @@ parameters = {
         "attributes" : {
             "basic"      : ["config/behavioral/attributes/attribute_basic.csv",
                             "config/evacuation/attributes/attribute_basic_evac.csv"],
-            "option"     : ["config/behavioral/attributes/attribute_option.csv"],
+            "option"     : ["config/behavioral/attributes/attribute_option.csv",
+                            "config/evacuation/attributes/attribute_option_evac.csv"],
             "updateable" : ["config/behavioral/attributes/attribute_updateable.csv"],
             "schedule"   : ["config/behavioral/attributes/attribute_schedule.csv"],
             "profession" : ["config/behavioral/profession.csv"]
