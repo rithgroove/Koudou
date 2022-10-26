@@ -8,7 +8,7 @@ from src.model.map.map import Map
 from .disease import Disease
 
 
-def initialize_infection(disease_files, population: List[Agent], rng):
+def initialize_infection(disease_files, population: List[Agent], rng, logger):
     diseases = []
 
     for file_name in disease_files:
@@ -25,12 +25,12 @@ def initialize_infection(disease_files, population: List[Agent], rng):
         )
         diseases.append(d)
 
-        initializate_disease_on_population(d, d_config["initialization"], population, rng)
+        initializate_disease_on_population(d, d_config["initialization"], population, rng, logger)
 
     return Infection(diseases)
 
 
-def initializate_disease_on_population(disease: Disease, initialization: Dict, population: List[Agent], rng):
+def initializate_disease_on_population(disease: Disease, initialization: Dict, population: List[Agent], rng, logger):
     for ag in population:
         new_attr = Attribute(disease.name, "susceptible")
         ag.add_attribute(new_attr)
@@ -45,6 +45,7 @@ def initializate_disease_on_population(disease: Disease, initialization: Dict, p
     infected_ags = rng.choice(population, qtd, replace = False)
     for ag in infected_ags:
         ag.set_attribute(disease.name, initialization["state"])
+    logger.write_log(str(qtd) + " agents infected to " + disease.name)
 
 def infection_step(step_size: int, kd_map: Map, population: List[Agent], infection_module: Infection, rng,logger,ts):
     # next state of the infected agents
