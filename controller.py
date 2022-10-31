@@ -195,7 +195,6 @@ class Controller():
         ########################### LOGGING ###########################################
         temp = self.sim.summarized_attribute("covid")
         temp2 = {}
-        temp2["time_stamp"] = self.sim.ts.step_count
         health_header = ["time_stamp","susceptible","exposed",
                   "asymptomatic","symptomatic","severe","recovered"]
         for x in health_header:
@@ -203,6 +202,7 @@ class Controller():
                 temp2[x] = temp[x]
             else:
                 temp2[x] = 0
+        temp2["time_stamp"] = self.sim.ts.step_count
 
         self.logger.write_csv_data("infection_summary.csv", temp2)
 
