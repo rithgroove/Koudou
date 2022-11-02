@@ -197,19 +197,19 @@ class Controller():
         log_data = {}
         health_header = ["time_stamp","susceptible","exposed",
                   "asymptomatic","symptomatic","severe","recovered"]
-        for x in health_header:
-            log_data[x] = summarized_attr[x] if x in summarized_attr.keys() else 0
+        for h in health_header:
+            log_data[h] = summarized_attr[h] if h in summarized_attr.keys() else 0
 
         log_data["time_stamp"] = self.sim.ts.step_count
         self.logger.write_csv_data("infection_summary.csv", log_data)
 
         # agent position
-        temp = self.sim.summarized_attribute("location")
-        for x in temp.keys():
+        summarized_attr = self.sim.summarized_attribute("location")
+        for k in summarized_attr.keys():
             log_data = {}
             log_data["time_stamp"] = self.sim.ts.step_count
-            log_data["location"]   = x
-            log_data["count"]      = temp[x]
+            log_data["location"]   = k
+            log_data["count"]      = summarized_attr[k]
             self.logger.write_csv_data("agent_position_summary.csv", log_data)
 
         ###########################################################################
