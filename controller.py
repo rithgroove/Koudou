@@ -211,29 +211,24 @@ class Controller():
         # LOGGING
         # infection summary
         ########################### LOGGING ###########################################
-        temp = self.sim.summarized_attribute("covid")
-        temp2 = {}
-        temp2["time_stamp"] = self.sim.ts.step_count
+        summarized_attr = self.sim.summarized_attribute("covid")
+        log_data = {}
         health_header = ["time_stamp","susceptible","exposed",
                   "asymptomatic","symptomatic","severe","recovered"]
-        for x in health_header:
-            if x in temp.keys():
-                temp2[x] = temp[x]
-            else:
-                temp2[x] = 0
+        for h in health_header:
+            log_data[h] = summarized_attr[h] if h in summarized_attr.keys() else 0
 
-        self.logger.write_csv_data("infection_summary.csv", temp2)
+        log_data["time_stamp"] = self.sim.ts.step_count
+        self.logger.write_csv_data("infection_summary.csv", log_data)
 
         # agent position
-        temp = self.sim.summarized_attribute("location")
-        for x in temp.keys():
-            temp2 = {}
-            temp2["time_stamp"] = self.sim.ts.step_count
-            temp2["location"]   = x
-            temp2["count"]      = temp[x]
-
-        self.logger.write_csv_data("agent_position_summary.csv", temp2)
-
+        summarized_attr = self.sim.summarized_attribute("location")
+        for k in summarized_attr.keys():
+            log_data = {}
+            log_data["time_stamp"] = self.sim.ts.step_count
+            log_data["location"]   = k
+            log_data["count"]      = summarized_attr[k]
+            self.logger.write_csv_data("agent_position_summary.csv", log_data)
 
         ###########################################################################
         # STEP
