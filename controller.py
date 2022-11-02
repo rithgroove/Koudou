@@ -33,20 +33,28 @@ class Controller():
         self.rng = np.random.default_rng(seed=self.d_param["SEED"])
         # self.step_length = self.d_param["STEP_LENGTH"]
 
-
+        self.init_logger()
+        self.logger.write_log("List of Parameters")
+        self.logger.write_log("--------------------START--------------------")
+        for key in self.d_param:
+            self.logger.write_log(key)
+        self.logger.write_log("--------------------END---------------------")
+        
         if self.d_param["MAP_CACHE"] is not None and path.isfile(self.d_param["MAP_CACHE"]):
+            self.logger.write_log("Found Map Cache")
             self.load_map(self.d_param["MAP_CACHE"])
         else:
+            self.logger.write_log("Unable to find Map Cache")
             self.load_map(self.d_param["MAP"])
 
         if self.d_param["SIM_CONFIG"]:
+            self.logger.write_log("--------------------Loading Simulation--------------------")
             self.load_sim()
+            self.logger.write_log("--------------------Finished Loading Simulation--------------------")
 
         # bindings
         if self.d_param["USE_VIEW"]:
             self.load_view()
-
-        self.init_logger()
 
     def print_map(self):
         self.print_msg(self.map)
@@ -123,6 +131,7 @@ class Controller():
         self.sim = Simulation(config       = self.d_param["SIM_CONFIG"],
                               kd_map       = self.map,
                               rng          = self.rng,
+                              logger       = self.logger,
                               agents_count = self.d_param["N_AGENTS"],
                               threads      = self.d_param["THREADS"],
                               report       = None
@@ -131,19 +140,25 @@ class Controller():
         if self.d_param["DISEASES"]:
             # todo: we shouldnt pass thw whole simulator, just the necessary things
             # i guess just agents, but Im not changing this to avoid bugs
+            self.logger.write_log("--------------------Loading Disease Module--------------------")
             self.sim.modules.append(
                 InfectionModule(parameters = self.d_param["DISEASES"],
                                 kd_sim     = self.sim,
-                                rng        = self.rng))
+                                rng        = self.rng,
+                                logger     = self.logger))
+            self.logger.write_log("--------------------Finished Loading Disease Module--------------------")
+                                
 
         if self.d_param["EVACUATION"]:
+            self.logger.write_log("--------------------Loading Evacuation Module--------------------")
             self.sim.modules.append(
                 EvacuationModule(distance = self.d_param["EVACUATION"]["DISTANCE"],
                                  share_information_chance = self.d_param["EVACUATION"]["SHARE_INFO_CHANCE"]))
+            self.logger.write_log("--------------------Finished Loading Disease Module--------------------")
 
     ## LOGGER
     def init_logger(self):
-        self.logger = Logger(exp_name=self.d_param["EXP_NAME"])
+        self.logger = Logger(exp_name=self.d_param["EXP_NAME"], level=self.d_param["LOG_LEVEL"])
 
         # health
         header = ["time_stamp","susceptible","exposed",
@@ -178,6 +193,9 @@ class Controller():
         header = ["time_stamp","","",""]
         self.logger.add_csv_file("infection_transition.csv", header)
 
+        # logs
+        self.logger.add_file("log.txt")
+
     ## SIM
     def step(self):
         self.thread = threading.Thread(target=self.run_step, args=())
@@ -193,29 +211,24 @@ class Controller():
         # LOGGING
         # infection summary
         ########################### LOGGING ###########################################
-        temp = self.sim.summarized_attribute("covid")
-        temp2 = {}
-        temp2["time_stamp"] = self.sim.ts.step_count
+        summarized_attr = self.sim.summarized_attribute("covid")
+        log_data = {}
         health_header = ["time_stamp","susceptible","exposed",
                   "asymptomatic","symptomatic","severe","recovered"]
-        for x in health_header:
-            if x in temp.keys():
-                temp2[x] = temp[x]
-            else:
-                temp2[x] = 0
+        for h in health_header:
+            log_data[h] = summarized_attr[h] if h in summarized_attr.keys() else 0
 
-        self.logger.write_csv_data("infection_summary.csv", temp2)
+        log_data["time_stamp"] = self.sim.ts.step_count
+        self.logger.write_csv_data("infection_summary.csv", log_data)
 
         # agent position
-        temp = self.sim.summarized_attribute("location")
-        for x in temp.keys():
-            temp2 = {}
-            temp2["time_stamp"] = self.sim.ts.step_count
-            temp2["location"]   = x
-            temp2["count"]      = temp[x]
-
-        self.logger.write_csv_data("agent_position_summary.csv", temp2)
-
+        summarized_attr = self.sim.summarized_attribute("location")
+        for k in summarized_attr.keys():
+            log_data = {}
+            log_data["time_stamp"] = self.sim.ts.step_count
+            log_data["location"]   = k
+            log_data["count"]      = summarized_attr[k]
+            self.logger.write_csv_data("agent_position_summary.csv", log_data)
 
         ###########################################################################
         # STEP

@@ -14,8 +14,8 @@ parameters = {
     "GRID_SIZE":      20, # Grid size used when calculating the centroid for buildings, NOT recommended to change
     "EVAC_CENTER" :   "config/map/evacuation_center.json", # Path for the file that describes where the evac centers should be
     "STEP_LENGTH" :   5, #Each step is one second,
-    "MAX_STEPS"    :   49*24*60*60, # This is simulating for 7 weeks (49 daysm 24 hours, 60 minutes, 60 seconds), 
-
+    "MAX_STEPS"    :   5*60, # This is simulating for 7 weeks (49 daysm 24 hours, 60 minutes, 60 seconds), 
+    "LOG_LEVEL"     : "debug",
 
     "DISEASES": ["config/infection/covid.json"], # Path to the diseases that will be simualted, it will use this path and the config/infection/covid-infection.json
 
@@ -31,7 +31,8 @@ parameters = {
         "attributes" : {
             "basic"      : ["config/behavioral/attributes/attribute_basic.csv",
                             "config/evacuation/attributes/attribute_basic_evac.csv"],
-            "option"     : ["config/behavioral/attributes/attribute_option.csv"],
+            "option"     : ["config/behavioral/attributes/attribute_option.csv",
+                            "config/evacuation/attributes/attribute_option_evac.csv"],
             "updateable" : ["config/behavioral/attributes/attribute_updateable.csv"],
             "schedule"   : ["config/behavioral/attributes/attribute_schedule.csv"],
             "profession" : ["config/behavioral/profession.csv"]
