@@ -1,5 +1,5 @@
 from .attribute import Attribute,cast
-
+import numpy as np
 class AttributeUpdateable(Attribute):
     
     def __init__(self,name, value, min_val, max_val, step_change, typing):
@@ -11,9 +11,8 @@ class AttributeUpdateable(Attribute):
 
     def step(self,kd_sim,kd_map,ts,step_length,rng,agent):
         self.value += self.step_change*step_length
-        self.value = max(self.value,self.min_val) #protect minimum cap
-        self.value = min(self.value, self.max_val) #protect max cap
-
+        self.value = np.clip(self.value, self.min_val, self.max_val)
+        
     def set_max(self):
         self.value = self.max_val
 
