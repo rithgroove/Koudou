@@ -246,13 +246,13 @@ class Controller():
 
     def run_simulation(self):
         steps_in_a_minute =  (60)
-        for d in range(0, self.d_param["MAX_STEPS"]):
+        for d in range(0, self.d_param["MAX_STEPS"], self.d_param["STEP_LENGTH"]):
             self.run_step()
             if d%steps_in_a_minute == 0:
                 minutes =  d//steps_in_a_minute
                 self.print_msg(f"Running simulation... {minutes}/{self.d_param['MAX_STEPS']/steps_in_a_minute} minutes")
 
-        self.print_msg(f"{d+1}/{self.d_param['MAX_STEPS']} minutes done")
+        self.print_msg(f"{d+self.d_param['STEP_LENGTH']}/{self.d_param['MAX_STEPS']} steps done")
         self.print_msg("")
 
     def run_auto(self):
