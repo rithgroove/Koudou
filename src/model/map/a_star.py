@@ -149,7 +149,7 @@ def parallel_a_star(kd_map, start_goals_arr, n_threads=1, pathfind_cache = {}, r
     """
     response = {}
     n_threads = min(n_threads, len(start_goals_arr))
-    if n_threads <= 10:
+    if n_threads <= 8:
         a_star_thread(0, kd_map, start_goals_arr, report, response, pathfind_cache)
     else:
         thread_paths = np.array_split(start_goals_arr, n_threads)
