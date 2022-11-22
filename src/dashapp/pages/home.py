@@ -11,7 +11,7 @@ style_markdown = {
     'margin-left': '250px'
 }
 
-markdown_text = open('data/markdown_text_demo', encoding='utf-8').read()
+markdown_text = open('data/home/markdown_files/markdown_text_demo', encoding='utf-8').read()
 
 dash.register_page(__name__)
 

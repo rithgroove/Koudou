@@ -22,7 +22,7 @@ style_markdown = {
 }
 
 
-markdown_text = open('data/markdown_text_demo', encoding='utf-8').read()
+markdown_text = open('data/home/markdown_files/markdown_text_demo', encoding='utf-8').read()
 
 app = Dash(__name__, use_pages=True)
 
