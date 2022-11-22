@@ -19,7 +19,6 @@ layout = html.Div(
     children=[
         html.Div(
             children=[
-                html.H2(style=style_title, children="Dashboard Introduction"),
                 html.H3(style=style_title, id='datetime-text'),
                 dcc.Interval(
                     id='datetime',

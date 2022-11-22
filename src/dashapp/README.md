@@ -11,7 +11,8 @@ Deployment resource for Simulator Dashboard: [Dash Plotly](https://plotly.com/da
 ## Deployment
 ``pip install plotly`` <br>
 ``pip install dash``<br>
-``pip install jupyter -dash``
+``pip install jupyter -dash``<br>
+``pip install dash-bootstrap-components``
 ### File Deployment (Rough Version)
 1. Directly modify markdown files content from `./dashapp/data/home/markdown_files/*`.
 2. Move all csv files from `Koudou/results/test_config_file/*/*` to `./dashapp/data/test_result` directory.
@@ -55,6 +56,8 @@ From the log module, more parameters will be generated during the simulation, wh
 ### Home Page
 1. Draft description and abstract about the simulator and research.
 2. Diagram suitable for demonstration.
+### About Page
+1. Other Information
 ### Configuration Page
 1. Show all configuration files by category (behavioral, evacuation, infection, map)
 2. List selective key parameters at the top of the page
@@ -80,3 +83,6 @@ From the log module, more parameters will be generated during the simulation, wh
    1. Range
    2. To be Added...
 2. How to interpret?   
+### Map Result (TODO?)
+### Page Styles
+1. Bootstrap installed to polish the page

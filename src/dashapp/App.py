@@ -1,5 +1,8 @@
 from dash import Dash, html, dcc
 import dash
+import dash_bootstrap_components as dbc
+
+BS = 'https://bootswatch.com/5/lumen/bootstrap.min.css'
 
 style_title = {
     'textAlign': 'center',
@@ -24,20 +27,42 @@ style_markdown = {
 
 markdown_text = open('data/home/markdown_files/markdown_text_demo', encoding='utf-8').read()
 
-app = Dash(__name__, use_pages=True)
+app = Dash(__name__, use_pages=True, external_stylesheets=[BS])
+
+navbar = dbc.NavbarSimple(
+    children=[
+        dbc.NavItem(dbc.NavLink("About", href="/about")),
+        dbc.NavItem(dbc.NavLink("Configuration", href="/config")),
+        dbc.NavItem(dbc.NavLink("Map Brief", href="/map")),
+        dbc.NavItem(dbc.NavLink("Simulation Result", href="/result")),
+        dbc.DropdownMenu(
+            children=[
+                dbc.DropdownMenuItem("Infection", href="/infection"),
+                dbc.DropdownMenuItem("Evacuation", href="/evacuation"),
+                dbc.DropdownMenuItem("Geographical", href="/geographical"),
+            ],
+            nav=True,
+            in_navbar=True,
+            label="Simulation Analysis",
+        ),
+    ],
+    brand="Simulator Dashboard",
+    brand_href="/home",
+    color="dark",
+    dark=True,
+)
+
+navIncluded = html.Div(
+    [
+        dbc.Row(
+            dbc.Col(html.Div([navbar])),
+        )
+    ]
+)
+
 
 app.layout = html.Div([
-	html.H1('Modular Small Community Simulator Dashboard Demo', style=style_title),
-
-    html.Div(style=style_navLink, children=[
-            html.Div(
-                dcc.Link(
-                    f"{page['name']} - {page['path']}", href=page["relative_path"]
-                )
-            )
-            for page in dash.page_registry.values()
-        ]
-    ),
+    navIncluded,
 	dash.page_container,
 ])
 
