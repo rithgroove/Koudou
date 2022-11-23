@@ -8,7 +8,8 @@ Deployment resource for Simulator Dashboard: [Dash Plotly](https://plotly.com/da
 4. Clear instructions for file deployment.
 
 **Updates in V3**
-1. 
+1. Built frameworks.
+2. Deploy Bootstrap 
 
 ## Deployment
 ``pip install plotly`` <br>
@@ -54,7 +55,7 @@ From the log module, more parameters will be generated during the simulation, wh
 1. TBD
 
 
-## TODO List
+## TODO List for V3
 ### Home Page
 1. Draft description and abstract about the simulator and research.
 2. Diagram suitable for demonstration.
@@ -73,8 +74,8 @@ From the log module, more parameters will be generated during the simulation, wh
 2. Present plain log from log files (waiting for categorizing)
 ### Infection Page
 1. A filter to search a single agent health condition during the infection process
-2. <strong>[DONE]</strong> List all related result files using filtering
-3. <strong>[DONE]</strong> Infection line chart and pie chart
+2. <strong>DONE</strong> List all related result files using filtering
+3. <strong>DONE</strong> Infection line chart and pie chart
 4. To be Added...
 ### Evacuation Page
 1. A filter to search a single agent every movement during the evacuation
@@ -87,4 +88,13 @@ From the log module, more parameters will be generated during the simulation, wh
 2. How to interpret?   
 ### Map Result (TODO?)
 ### Page Styles
-1. Bootstrap installed to polish the page
+1. <strong>DONE</strong> Bootstrap installed to polish the page
+
+#### This is the view for current dashboard.
+![](assets/db1.png)
+![](assets/db2.png)
+
+
+## TODO for V4
+1. add button and links to main page: https://dash-bootstrap-components.opensource.faculty.ai/docs/components/tooltip/
+2. TBD
