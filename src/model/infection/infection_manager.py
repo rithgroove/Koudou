@@ -279,4 +279,5 @@ def road_infection(step_size, kd_map: Map, infected_ag, ags_by_location, disease
         chance = apply_time_scale(step_size, scale, prob)
         if rng.uniform(0.0,1.0,1)[0] < chance :  # infect agent
             ag.set_attribute(disease.name, disease.starting_state)
-            log("on_the_road",disease, infected_ag,ag,logger,ts)   
+            log("on_the_road",disease, infected_ag,ag,logger,ts)
+
