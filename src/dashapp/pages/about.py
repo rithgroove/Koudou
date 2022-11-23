@@ -1,20 +1,33 @@
 import dash
-from dash import html
+from dash import html, dcc, callback, Input, Output
+import base64
 
 style_title = {
-    'textAlign': 'center',
-    'marginLeft': '100px',
-    'marginRight': '100px',
+    'textAlign': 'center'
 }
 
-style_dropdown = {
-    'width': '250px'
+style_markdown = {
+    'margin-left': '250px'
 }
 
-dash.register_page(__name__)
+style_img = {
+    'width': '60%',
+    'marginLeft': '20%',
+    'marginRight': '20%'
+}
 
-layout = html.Div(style=style_title,
+dash.register_page(__name__, path='/about')
+
+layout = html.Div(
     children=[
-        html.H5("This is about page")
+        html.Div(
+            children=[
+                html.H3("   "),
+                html.Img(src=dash.get_asset_url('mi1.png'), style=style_img),
+                html.Img(src=dash.get_asset_url('mi2.png'), style=style_img),
+                html.Img(src=dash.get_asset_url('mi3.png'), style=style_img),
+            ]
+        ),
+
     ]
 )

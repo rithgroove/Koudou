@@ -84,7 +84,7 @@ df_demo2 = pd.read_csv(r'data/infection_summary_demo2.csv')
 df_disease_transition = pd.read_csv(r'data/disease_transition.csv')
 df_activity_history = pd.read_csv(r'data/activity_history.csv')
 df_new_infection = pd.read_csv(r'data/new_infection.csv')
-markdown_text = open('data/home/markdown_files/markdown_text_demo', encoding='utf-8').read()
+markdown_text = open('data/home/markdown_files/introduction.txt', encoding='utf-8').read()
 
 def generate_table(dataframe, max_rows=10):
     return html.Table([
