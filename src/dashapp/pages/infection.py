@@ -1,6 +1,4 @@
 import datetime
-import sys
-sys.path.append('../..')
 import dash
 from dash import dcc, html, Input, Output, callback
 import plotly.express as px
