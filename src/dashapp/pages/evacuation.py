@@ -1,13 +1,8 @@
 import dash
 from dash import html, dcc, callback, Input, Output
+from .public.css import *
 
 dash.register_page(__name__)
-
-style_title = {
-    'textAlign': 'center',
-    'marginLeft': '100px',
-    'marginRight': '100px'
-}
 
 layout = html.Div(style=style_title,
     children=[

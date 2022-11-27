@@ -1,15 +1,6 @@
 import dash
 from dash import html
-
-style_title = {
-    'textAlign': 'center',
-    'marginLeft': '100px',
-    'marginRight': '100px',
-}
-
-style_dropdown = {
-    'width': '250px'
-}
+from .public.css import *
 
 dash.register_page(__name__)
 

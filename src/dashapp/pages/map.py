@@ -4,55 +4,31 @@ import pandas as pd
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import os
-
-style_title = {
-    'textAlign': 'center',
-}
-
-style_business_map = {
-    'margin-left': "10%",
-    'margin-right': "10%",
-}
-
-style_map_figure = {
-    'display': 'center',
-    'width': '30%',
-    'margin-left': '1.51515%',
-    'margin-right': '1.51515%',
-    'margin-bottom': '2.5%',
-    # 'padding': '5%'
-}
+from .public.css import *
 
 dash.register_page(__name__)
 
 business_map = pd.read_csv(os.getcwd()+'../../../config/map/business.csv')
 tsukuba_map = pd.read_csv(os.getcwd()+'../../../config/map/tsukuba-tu-building-data.csv')
-evacuation_map = pd.read_json(os.getcwd()+'../../../config/map/evacuation_center.json',
-                              encoding='utf-8',
-                              orient="records")
+evacuation_map = pd.read_json(os.getcwd()+'../../../config/map/evacuation_center.json', encoding='utf-8', orient="records")
 
 layout = html.Div(
     children=[
-        html.H3("Map Data", style=style_title, id='choice'),
+        html.Span('Map Data', className="badge bg-dark", style=style_badge, id='choice'),
         html.Div(
            children=[
-               html.Br(),
                html.Img(src=dash.get_asset_url('full_map.png'), style=style_map_figure),
                html.Img(src=dash.get_asset_url('map_no_zoom.png'), style=style_map_figure),
                html.Img(src=dash.get_asset_url('map_zoom_out.png'), style=style_map_figure),
            ]
         ),
-        html.H3("Business Characteristic", style=style_title),
+        html.Span('Business Characteristic', className="badge bg-dark", style=style_badge),
         dcc.Graph(style=style_business_map, id='business-map-show'),
-        html.Br(),
-        html.H3("Business and Location", style=style_title),
+        html.Span('Business and Location', className="badge bg-dark", style=style_badge),
         dcc.Graph(style=style_business_map, id='tsukuba-tu-building-map-show'),
-        html.Br(),
-        html.H3("Evacuation Center", style=style_title),
+        html.Span('Evacuation Center', className="badge bg-dark", style=style_badge),
         dcc.Graph(style=style_business_map, id='evacuation-center-map-show'),
-        html.Br(),
-        html.H3("Query Commercial Institution", style=style_title),
-        html.Br(),
+        html.Span('Query Institution', className="badge bg-dark", style=style_badge),
     ]
 )
 
@@ -83,7 +59,6 @@ def update_graph(choice):
                    fill_color='lightcyan',
                    align='left'))
     ])
-
     fig.update_layout(
         width=1000,
         height=400,

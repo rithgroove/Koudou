@@ -1,31 +1,13 @@
 import datetime
 import dash
-from dash import dcc, html, Input, Output, callback
+from dash import dcc, Input, Output, callback
 import plotly.express as px
-import pandas as pd
+import os
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-
-
-# CSS Style
-style_title = {
-    'textAlign': 'center',
-    'marginLeft': '100px',
-    'marginRight': '100px'
-}
-
-style_title2 = {
-    'background': '#f2f2f2',
-    'textAlign': 'center',
-    'marginLeft': '100px',
-    'marginRight': '100px'
-}
-
-style_h4 = {
-    'textAlign': 'center',
-    # 'marginLeft': '100px',
-    # 'marginRight': '100px'
-}
+from .public.css import *
+from .public.data import *
+from .public.utils import *
 
 style_checkList = {
     'textAlign': 'center'
@@ -35,25 +17,20 @@ style_div_left = {
     'float': 'left',
     'width': '48%',
     'marginLeft': '1%',
-    # 'border': '1px solid #F00',
 }
 
 style_div_right= {
     'float': 'right',
     'width': '48%',
     'marginRight': '1%',
-    # 'border': '1px solid #F00',
 }
 
-style_interactive_button={
-    # # 'flex': 1,
-    # 'float': 'left',
+style_interactive_button = {
     'width': '48%',
     'marginLeft': '1%',
 }
 
 style_interactive_table={
-    # 'float': 'left',
     'margin-left': '-50px'
 }
 
@@ -61,67 +38,22 @@ style_form={
     'float': 'right'
 }
 
-style_radio={
+style_radio = {
     'margin-left': '10px'
 }
 
-style_download_button={
+style_download_button = {
     'margin': '30px'
 }
 
-external_stylesheets = [
-    'https://codepen.io/chriddyp/pen/bWLwgP.css',
-    'https://codepen.io/chriddyp/pen/brPBPO.css']
-
-
 dash.register_page(__name__)
 
-# Data loading
-df_demo1 = pd.read_csv(r'data/infection_summary_demo1.csv')
-df_demo2 = pd.read_csv(r'data/infection_summary_demo2.csv')
-df_disease_transition = pd.read_csv(r'data/disease_transition.csv')
-df_activity_history = pd.read_csv(r'data/activity_history.csv')
-df_new_infection = pd.read_csv(r'data/new_infection.csv')
-markdown_text = open('data/home/markdown_files/introduction.txt', encoding='utf-8').read()
+df_demo1 = pd.read_csv(os.getcwd() + './data/infection_summary_demo1.csv')
+df_demo2 = pd.read_csv(os.getcwd() + './data/infection_summary_demo2.csv')
+df_disease_transition = pd.read_csv(os.getcwd() + './data/disease_transition.csv')
+df_activity_history = pd.read_csv(os.getcwd() + './data/activity_history.csv')
+df_new_infection = pd.read_csv(os.getcwd() + './data/new_infection.csv')
 
-def generate_table(dataframe, max_rows=10):
-    return html.Table([
-        html.Thead(
-            html.Tr([html.Th(col) for col in dataframe.columns])
-        ),
-        html.Tbody([
-            html.Tr([
-                html.Td(dataframe.iloc[i][col]) for col in dataframe.columns
-            ]) for i in range(min(len(dataframe), max_rows))
-        ])
-    ])
-
-def join_search_profession(profession, file_name):
-    if file_name == 'New Infection':
-        if profession == 'University Student':
-            result_df = df_new_infection[df_new_infection['agent_profession']=='university_student']
-        elif profession == 'All':
-            result_df = df_new_infection
-        else:
-            result_df = df_new_infection[df_new_infection['agent_profession']=='student']
-    elif file_name == 'Activity History':
-        if profession == 'University Student':
-            result_df = df_activity_history[df_activity_history['profession']=='university_student']
-        elif profession == 'All':
-            result_df = df_activity_history
-        else:
-            result_df = df_activity_history[df_activity_history['profession']=='student']
-    else:
-        if profession == 'University Student':
-            result_df = df_disease_transition[df_disease_transition['agent_profession']=='university_student']
-        elif profession == 'All':
-            result_df = df_disease_transition
-        else:
-            result_df = df_disease_transition[df_disease_transition['agent_profession']=='student']
-    return result_df
-
-
-# HTML Part
 layout = html.Div(children=[
     html.Div([
 
@@ -141,7 +73,7 @@ layout = html.Div(children=[
             # html.Img(src='https://askabiologist.asu.edu/sites/default/files/headers/covidsim-header_0.png', alt="Model Introduction Picture"),
             # dcc.Markdown(children=markdown_text),
 
-            html.H4(style=style_h4, children="Joint Search with Result Set"),
+            html.H4(style=style_title, children="Joint Search with Result Set"),
             html.Div(style=style_interactive_button, children=[
                 html.Label('Profession'),
                 dcc.Dropdown(
@@ -162,9 +94,9 @@ layout = html.Div(children=[
 
 
         html.Div(style=style_div_right, children=[
-            html.H4(style=style_h4, children="Infection Situation by Time"),
-            dcc.Graph(style=style_h4, id="time-series-chart"),
-            html.P(style=style_h4, children="Select a Case"),
+            html.H4(style=style_title, children="Infection Situation by Time"),
+            dcc.Graph(style=style_title, id="time-series-chart"),
+            html.P(style=style_title, children="Select a Case"),
             dcc.Checklist(
                 style=style_checkList,
                 id="ticker",
@@ -174,7 +106,7 @@ layout = html.Div(children=[
             ),
             html.Button("Download Source File", id="btn_image", style=style_download_button),
             dcc.Download(id="download-image"),
-            html.H4(style=style_h4, children='Show Result in Form'),
+            html.H4(style=style_title, children='Show Result in Form'),
             generate_table(df_demo2),
             html.Br(),
 
@@ -217,7 +149,7 @@ def display_time_series(ticker):
     Input('profession', 'value'),
     Input('file_name', 'value'))
 def update_graph(profession, file_name):
-    join_df = join_search_profession(profession, file_name)
+    join_df = join_search_profession(profession, file_name, df_new_infection, df_activity_history, df_disease_transition)
     if file_name == 'New Infection':
         column_name_values = ['time', 'type', 'disease', 'id', 'profession', 'source']
         column_name_list = ['time_stamp', 'type', 'disease_name', 'agent_id', 'agent_profession', 'source_id']

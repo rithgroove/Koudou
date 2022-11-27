@@ -1,29 +1,11 @@
 import dash
 from dash import html, dcc
 import dash_bootstrap_components as dbc
+from .public.css import *
+import os
 
-style_title = {
-    'textAlign': 'center'
-}
-
-style_markdown = {
-    'margin-left': '250px'
-}
-
-style_img = {
-    'width': '60%',
-    'marginLeft': '20%',
-    'marginRight': '20%'
-}
-
-style_button = {
-    'width': '80%',
-    'marginLeft': '20%',
-    'marginRight': '10%'
-}
-
-markdown_text = open('data/home/markdown_files/introduction.txt', encoding='utf-8').read()
-readme_text = open('data/home/markdown_files/readme.txt', encoding='utf-8').read()
+markdown_text = open(os.getcwd() + './data/home/markdown_files/introduction.txt', encoding='utf-8').read()
+readme_text = open(os.getcwd() + './data/home/markdown_files/readme.txt', encoding='utf-8').read()
 
 dash.register_page(__name__, path='/')
 
@@ -43,8 +25,7 @@ layout = html.Div(
                 dcc.Markdown(style=style_img, children=markdown_text),
                 html.Br(),
                 html.H3("All Available Links for Pages Above", style=style_title),
-                html.Div(style=style_button, children=
-                [
+                html.Div(style=style_button, children=[
                     dbc.Button("About", color="primary", className="me-1", href="/about"),
                     dbc.Button("Configuration", color="dark", className="me-1", href="/configuration"),
                     dbc.Button("Map", color="dark", className="me-1", href="/map"),
@@ -53,10 +34,8 @@ layout = html.Div(
                     dbc.Button("Evacuation", color="info", className="me-1", href="/evacuation"),
                     dbc.Button("Geographical", color="info", className="me-1", href="/geographical"),
                 ]
-                         ),
-                # dcc.Markdown(style=style_img, children=readme_text)
+                         )
             ]
-        ),
-
+        )
     ]
 )
