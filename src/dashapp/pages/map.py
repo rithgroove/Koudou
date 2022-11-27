@@ -27,7 +27,9 @@ dash.register_page(__name__)
 
 business_map = pd.read_csv(os.getcwd()+'../../../config/map/business.csv')
 tsukuba_map = pd.read_csv(os.getcwd()+'../../../config/map/tsukuba-tu-building-data.csv')
-evacuation_map = pd.read_json(os.getcwd()+'../../../config/map/evacuation_center.json')
+evacuation_map = pd.read_json(os.getcwd()+'../../../config/map/evacuation_center.json',
+                              encoding='utf-8',
+                              orient="records")
 
 layout = html.Div(
     children=[
@@ -42,10 +44,53 @@ layout = html.Div(
         ),
         html.H3("Business Characteristic", style=style_title),
         dcc.Graph(style=style_business_map, id='business-map-show'),
+        html.Br(),
         html.H3("Business and Location", style=style_title),
         dcc.Graph(style=style_business_map, id='tsukuba-tu-building-map-show'),
+        html.Br(),
+        html.H3("Evacuation Center", style=style_title),
+        dcc.Graph(style=style_business_map, id='evacuation-center-map-show'),
+        html.Br(),
+        html.H3("Query Commercial Institution", style=style_title),
+        html.Br(),
     ]
 )
+
+@callback(Output('evacuation-center-map-show', 'figure'),
+          Input('choice', 'value'))
+def update_graph(choice):
+    value_list = []
+    for i in range(len(evacuation_map)):
+        single_list = []
+        single_list.append(i+1)
+        single_list.append(evacuation_map.iloc[i][0]["selection"])
+        single_list.append(evacuation_map.iloc[i][0]["rules"]["place_id"])
+        single_list.append(evacuation_map.iloc[i][0]["attributes"]["name"])
+        single_list.append(evacuation_map.iloc[i][0]["attributes"]["capacity"])
+        single_list.append(evacuation_map.iloc[i][0]["attributes"]["contains_food"])
+        single_list.append(evacuation_map.iloc[i][0]["attributes"]["contains_medicine"])
+        value_list.append(single_list)
+
+    value_list = [[row[col] for row in value_list] for col in range(len(value_list[0]))]
+    fig = go.Figure(data=[go.Table(
+        header=dict(values=["Center No. \ Values", "Selection", "Place ID", "Name",
+                            "Capacity", "Contains Food", "Contains Medicine"],
+                    line_color='darkslategray',
+                    fill_color='lightskyblue',
+                    align='left'),
+        cells=dict(values=value_list,  # 2nd column
+                   line_color='darkslategray',
+                   fill_color='lightcyan',
+                   align='left'))
+    ])
+
+    fig.update_layout(
+        width=1000,
+        height=400,
+        showlegend=False,
+        margin=go.layout.Margin(l=5, r=5, b=5, t=5, pad=0),  # pad参数是刻度与标签的距离
+        )
+    return fig
 
 @callback(Output('tsukuba-tu-building-map-show', 'figure'),
           Input('choice', 'value'))
@@ -74,7 +119,7 @@ def update_graph(choice):
     fig.update_layout(
         plot_bgcolor='#E6E6FA',  # 图的背景颜色
         paper_bgcolor='#F8F8FF',  # 图像的背景颜色
-        height=300,
+        height=500,
         width=1000,
         showlegend=False,
         margin=go.layout.Margin(l=5, r=5, b=5, t=5, pad=0),  # pad参数是刻度与标签的距离
