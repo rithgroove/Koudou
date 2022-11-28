@@ -29,6 +29,7 @@ layout = html.Div(
         html.Span('Evacuation Center', className="badge bg-dark", style=style_badge),
         dcc.Graph(style=style_business_map, id='evacuation-center-map-show'),
         html.Span('Query Institution', className="badge bg-dark", style=style_badge),
+        html.Div(style={}, )
     ]
 )
 

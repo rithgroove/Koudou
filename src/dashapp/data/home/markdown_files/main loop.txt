@@ -1,4 +1,6 @@
 The simulation is ran by repeating the following actions certain number of steps. During each step, these are the operations that are executed:
+
+
 1. Update agents attributes
     * Updates updatable attributes like hunger, energy, etc
 2. Check for agent activities

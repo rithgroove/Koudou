@@ -1,4 +1,6 @@
 When Koudou is executed, the flow of the program is as follows (words inside quotes are options in the parameter file):
+
+
 1. Loads the Map
     * First, it tries to find and load the cached map if exists, this cache is specified in the the option "MAP_CACHE"
     * If the cache does not exists, it will create a map from a .osm file defined in "MAP". This process happens in the following order

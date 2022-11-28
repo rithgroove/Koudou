@@ -3,10 +3,6 @@ import plotly.graph_objects as go
 import pandas as pd
 
 # ---------------- config ------------------
-def config_tables_show():
-
-    pass
-
 def table_generator(target_dataframe):
     column_list = []
     for item in target_dataframe.columns:
@@ -23,6 +19,11 @@ def table_generator(target_dataframe):
         )]
     )
     return fig
+
+def toggle_modal(n1, is_open):
+    if n1:
+        return not is_open
+    return is_open
 
 
 # ---------------- infection ------------------
