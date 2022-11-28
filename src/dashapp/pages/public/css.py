@@ -23,6 +23,13 @@ style_aligns = {
     'margin-right': '5px'
 }
 
+style_data_table = {
+    'width': '80%',
+    'margin-left': '10%',
+    'margin-right': '10%'
+}
+
+
 # ---------------- App ------------------
 style_footer = {
     'margin-top': '10px',
@@ -74,12 +81,6 @@ style_wiki = {
 
 
 # ---------------- Config ------------------
-style_data_table = {
-    'width': '80%',
-    'margin-left': '10%',
-    'margin-right': '10%'
-}
-
 style_files_show_div = {
     'width': '80%',
     'margin-left': '10%',
@@ -109,6 +110,13 @@ style_badge_table = {
 }
 
 # ---------------- Map ------------------
+style_dropdown_menu = {
+    'margin-left': '20%',
+    'margin-right': '20%',
+    'width': '60%',
+    'margin-top': '10px'
+}
+
 style_business_map = {
     'margin-left': "10%",
     'margin-right': "10%",
@@ -120,4 +128,45 @@ style_map_figure = {
     'margin-left': '1.51515%',
     'margin-right': '1.51515%',
     'margin-bottom': '5px',
+}
+
+style_alert_instruction = {
+    'width': "20%",
+    # 'height': '10px'
+}
+
+style_alert_content = {
+    'width': '60%',
+    # 'height': '10px'
+}
+
+style_alert_align = {
+    'margin-left': '20%',
+    'margin-right': '20%',
+    'width': '60%',
+    'display': 'flex',
+    'flex-direction': 'row',
+    'flex-wrap': 'nowrap',
+    'align-items': 'center',
+}
+
+style_checklist_figure = {
+    'width': '75%',
+    'margin-left': '25%',
+}
+
+style_checklist_align = {
+    'display': 'flex',
+    'flex-direction': 'column',
+}
+
+style_checklist_form = {
+    'margin-left': '10%',
+    'margin-right': '10%',
+    'width': '80%',
+    'margin-top': '10px',
+    'display': 'flex',
+    'flex-direction': 'row',
+    'flex-wrap': 'nowrap',
+    # 'align-items': 'center',
 }

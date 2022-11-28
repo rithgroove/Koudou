@@ -66,13 +66,13 @@ layout = html.Div(
                 ]),
                 html.Span('All Available Links', className="badge bg-dark", style=style_badge),
                 html.Div(style=style_button, children=[
-                    dbc.Button("About", color="primary", className="me-1", href="/about"),
-                    dbc.Button("Configuration", color="dark", className="me-1", href="/configuration"),
-                    dbc.Button("Map", color="dark", className="me-1", href="/map"),
-                    dbc.Button("Log Result", color="info", className="me-1", href="/result"),
-                    dbc.Button("Infection", color="info", className="me-1", href="/infection"),
-                    dbc.Button("Evacuation", color="info", className="me-1", href="/evacuation"),
-                    dbc.Button("Geographical", color="info", className="me-1", href="/geographical"),
+                    dbc.Button("About", color="primary", className="me-1", outline=True, href="/about"),
+                    dbc.Button("Configuration", color="dark", className="me-1", outline=True, href="/configuration"),
+                    dbc.Button("Map", color="dark", className="me-1", outline=True, href="/map"),
+                    dbc.Button("Log Result", color="info", className="me-1", outline=True, href="/result"),
+                    dbc.Button("Infection", color="info", className="me-1", outline=True, href="/infection"),
+                    dbc.Button("Evacuation", color="info", className="me-1", outline=True, href="/evacuation"),
+                    dbc.Button("Geographical", color="info", className="me-1", outline=True, href="/geographical"),
                 ]),
             ]
         )

@@ -47,7 +47,7 @@ layout = html.Div(children=[
             ]),
             html.Div(
                 [
-                    dbc.Button("Tips", id="open-lg", className="me-1", n_clicks=0),
+                    dbc.Button("Tips", id="open-lg", className="me-1", outline=True, color='info', n_clicks=0),
                     dbc.Modal(
                         [
                             dbc.ModalHeader(dbc.ModalTitle("Tip")),

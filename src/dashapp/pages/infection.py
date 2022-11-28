@@ -92,7 +92,6 @@ layout = html.Div(children=[
             dcc.Graph(style=style_interactive_table, id='indicator-graphic'),
         ]),
 
-
         html.Div(style=style_div_right, children=[
             html.H4(style=style_title, children="Infection Situation by Time"),
             dcc.Graph(style=style_title, id="time-series-chart"),
