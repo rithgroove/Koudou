@@ -15,7 +15,8 @@ Deployment resource for Simulator Dashboard: [Dash Plotly](https://plotly.com/da
 ``pip install plotly`` <br>
 ``pip install dash``<br>
 ``pip install jupyter -dash``<br>
-``pip install dash-bootstrap-components``
+``pip install dash-bootstrap-components``<br>
+``pip install plotly_express``
 ### File Deployment (Rough Version)
 1. Directly modify markdown files content from `./dashapp/data/home/markdown_files/*`.
 2. Move all csv files from `Koudou/results/test_config_file/*/*` to `./dashapp/data/test_result` directory.

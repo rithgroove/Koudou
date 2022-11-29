@@ -1,6 +1,5 @@
 import dash
 from dash import html, dcc, callback, Input, Output
-import base64
 
 style_title = {
     'textAlign': 'center'
