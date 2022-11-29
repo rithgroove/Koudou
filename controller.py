@@ -31,7 +31,7 @@ class Controller():
 
         self.thread_finished = True
         self.rng = np.random.default_rng(seed=self.d_param["SEED"])
-        # self.step_length = self.d_param["STEP_LENGTH"]
+        self.step_length = self.d_param["STEP_LENGTH"]
 
         self.init_logger()
         self.logger.write_log("List of Parameters")
@@ -161,40 +161,44 @@ class Controller():
         self.logger = Logger(exp_name=self.d_param["EXP_NAME"], level=self.d_param["LOG_LEVEL"])
 
         # health
-        header = ["time_stamp","susceptible","exposed",
+        header = ["time", "time_stamp","susceptible","exposed",
                   "asymptomatic","symptomatic","severe","recovered"]
         self.logger.add_csv_file("infection_summary.csv", header)
 
         # position
-        header = ["time_stamp","location","count"]
+        header = ["time", "time_stamp","home","road","restaurant","hospital","retail","workplace","business",
+        "school","university","train_station", "office","barbershop", "laboratory"]
         self.logger.add_csv_file("agent_position_summary.csv", header)
 
         # activity
-        header = ["time_stamp","agent_id","profession","location",
+        header = ["time", "time_stamp","agent_id","profession","location",
                   "current_node_id","household_id","home_node_id","activy_name"]
         self.logger.add_csv_file("activity_history.csv", header)
 
         # new infections
-        header = ["time_stamp","type","disease_name","agent_id",
+        header = ["time", "time_stamp","type","disease_name","agent_id",
                   "agent_profession","agent_location","agent_node_id",
                   "source_id","source_profession","source_location","source_node_id"]
         self.logger.add_csv_file("new_infection.csv", header)
 
         # infection transition
-        header = ["time_stamp","disease_name","agent_id","agent_profession",
+        header = ["time", "time_stamp","disease_name","agent_id","agent_profession",
                   "agent_location","agent_node_id","current_state","next_state"]
         self.logger.add_csv_file("disease_transition.csv", header)
 
         # evacuation
-        header = ["time_stamp","evacuated","unevacuated_ERI","unevacuated_no_ERI"]
+        header = ["time", "time_stamp","evacuated","unevacuated_ERI","unevacuated_no_ERI"]
         self.logger.add_csv_file("evacuation.csv", header)
 
         # time stamp?
-        header = ["time_stamp","","",""]
+        header = ["time", "time_stamp","","",""]
         self.logger.add_csv_file("infection_transition.csv", header)
 
         # logs
         self.logger.add_file("log.txt")
+
+        # logs
+        self.logger.add_file("time.txt")
 
     ## SIM
     def step(self):
@@ -213,7 +217,6 @@ class Controller():
         ########################### LOGGING ###########################################
         temp = self.sim.summarized_attribute("covid")
         temp2 = {}
-        temp2["time_stamp"] = self.sim.ts.step_count
         health_header = ["time_stamp","susceptible","exposed",
                   "asymptomatic","symptomatic","severe","recovered"]
         for x in health_header:
@@ -221,23 +224,27 @@ class Controller():
                 temp2[x] = temp[x]
             else:
                 temp2[x] = 0
-
+        temp2["time"] = self.sim.ts.get_hour_min_str()
+        temp2["time_stamp"] = self.sim.ts.step_count
         self.logger.write_csv_data("infection_summary.csv", temp2)
 
         # agent position
         temp = self.sim.summarized_attribute("location")
-        for x in temp.keys():
-            temp2 = {}
-            temp2["time_stamp"] = self.sim.ts.step_count
-            temp2["location"]   = x
-            temp2["count"]      = temp[x]
-
+        location_header = ["time", "time_stamp","home","road","restaurant","hospital","retail","workplace","business",
+        "school","university","train_station", "office","barbershop", "laboratory"]
+        for x in location_header:
+            if x in temp.keys():
+                temp2[x] = temp[x]
+            else:
+                temp2[x] = 0
+        temp2["time"] = self.sim.ts.get_hour_min_str()
+        temp2["time_stamp"] = self.sim.ts.step_count
         self.logger.write_csv_data("agent_position_summary.csv", temp2)
 
 
         ###########################################################################
         # STEP
-        self.sim.step(step_length = self.d_param["STEP_LENGTH"],
+        self.sim.step(step_length = self.step_length,
                       logger      = self.logger)
 
         # self.update_view() #todo: create an update loop, where we add move methods
@@ -250,15 +257,18 @@ class Controller():
 
 
     def run_simulation(self):
-        steps_in_a_hour =  (60*60)
-        for d in range(0, self.d_param["MAX_STEPS"]):
+        steps_in_min =  (60)
+        for d in range(0, self.d_param["MAX_STEPS"], self.step_length):
             self.run_step()
-            if d%steps_in_a_hour == 0:
-                hours =  d//steps_in_a_hour
-                self.print_msg(f"Running simulation... {hours}/{self.d_param['MAX_STEPS']/steps_in_a_hour} hours")
-
-        self.print_msg(f"{d+1}/{self.d_param['MAX_STEPS']} hours done")
+            if d%steps_in_min == 0:
+                hours =  d//steps_in_min
+                self.print_msg(f"Running simulation... {hours}/{self.d_param['MAX_STEPS']/steps_in_min} minutes")
+        d += self.step_length
+        self.print_msg(f"{(d)/3600}/{self.d_param['MAX_STEPS']/3600} hours done")
         self.print_msg("")
+        time_log = f"{(d)} steps, {(d)/60} minutes"
+        self.logger.write_log(data=time_log, filename="time.txt")
+        
 
     def run_auto(self):
         self.thread_finished = False
@@ -270,6 +280,8 @@ class Controller():
         self.view.btn_start_change_method(text="Pause", method=self.cmd_pause)
         self.thread = threading.Thread(target=self.run_auto, args=())
         self.thread_ask_stop = False
+        
+        
         self.thread.start()
 
     def cmd_pause(self):

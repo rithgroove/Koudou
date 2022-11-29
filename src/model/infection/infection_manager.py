@@ -71,6 +71,7 @@ def infected_next_stage(step_size, ag: Agent, disease: Disease, rng, logger,ts):
             if rand_value < previous_chances + chance:
                 next_state = compartiment
                 data = {}
+                data["time"] = ts.get_hour_min_str()
                 data["time_stamp"] = ts.step_count
                 data["disease_name"] = disease.name
                 data["agent_id"] = ag.agent_id
@@ -101,6 +102,7 @@ def apply_time_scale(step_size, time_scale, chance):
 
 def log(infection_type,disease,infector,infectee,logger,ts):
     data = {}
+    data["time"] = ts.get_hour_min_str()
     data["time_stamp"] = ts.step_count
     data["type"] = infection_type
     data["disease_name"] = disease.name
