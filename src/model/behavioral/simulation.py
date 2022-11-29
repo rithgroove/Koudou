@@ -136,10 +136,8 @@ class Simulation:
 			x.generate_vector(self.kd_map, results[temp])
 
 	def summarized_attribute(self,attribute_name):
-		temp = {}
+		summary = {}
 		for agent in self.agents:
 			key = agent.get_attribute(attribute_name)
-			if key not in temp.keys():
-				temp[key] = 0
-			temp[key] += 1
-		return temp
+			summary[key] = summary[key] + 1 if key in summary else 0
+		return summary

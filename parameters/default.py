@@ -6,7 +6,7 @@ parameters = {
 
 
     "SEED":            101512, # Seed used for reproducing experiments
-    "N_AGENTS":        750, # Number of agents in the simulation, the more agents, the longer it will take to execute
+    "N_AGENTS":        5000, # Number of agents in the simulation, the more agents, the longer it will take to execute
     "THREADS":         8, # How many CPUs should be used for pathfinding
 
     "BUILDING_TAGS":  "config/map/tsukuba-tu-building-data.csv", # Path to the file that describes the tags to be created for untagged buildings
@@ -14,7 +14,7 @@ parameters = {
     "GRID_SIZE":      20, # Grid size used when calculating the centroid for buildings, NOT recommended to change
     "EVAC_CENTER" :   "config/map/evacuation_center.json", # Path for the file that describes where the evac centers should be
     "STEP_LENGTH" :   5, #Each step is one second,
-    "MAX_STEPS"    :   5*60, # This is simulating for 7 weeks (49 daysm 24 hours, 60 minutes, 60 seconds), 
+    "MAX_STEPS"    :   60*60*24*10, # This is simulating for 7 weeks (49 daysm 24 hours, 60 minutes, 60 seconds), 
     "LOG_LEVEL"     : "debug",
 
     "DISEASES": ["config/infection/covid.json"], # Path to the diseases that will be simualted, it will use this path and the config/infection/covid-infection.json
