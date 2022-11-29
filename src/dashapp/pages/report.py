@@ -3,10 +3,8 @@ from dash import html
 import os
 from .public.css import *
 
-# log_data = open(os.getcwd()+'/data/log_result/log.txt')
-# log_data_lines = log_data.readlines()
-
-log_data_lines = []
+log_data = open(os.getcwd()+'/data/log_result/log.txt')
+log_data_lines = log_data.readlines()
 
 dash.register_page(__name__)
 

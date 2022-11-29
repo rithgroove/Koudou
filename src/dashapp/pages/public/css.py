@@ -200,3 +200,22 @@ style_checklist_form = {
     'flex-wrap': 'nowrap',
     # 'align-items': 'center',
 }
+
+
+# ---------------- Upload ------------------
+style_upload_csv_show = {
+    'width': '90%',
+    'margin-left': '5%'
+}
+
+style_upload_bottom = {
+    'width': '60%',
+    'height': '60px',
+    'lineHeight': '60px',
+    'borderWidth': '1px',
+    'borderStyle': 'dashed',
+    'borderRadius': '5px',
+    'textAlign': 'center',
+    'margin-left': '20%',
+    'margin-top': '10px'
+}

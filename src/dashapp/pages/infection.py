@@ -7,6 +7,7 @@ from plotly.subplots import make_subplots
 from .public.css import *
 from .public.utils import *
 import dash_bootstrap_components as dbc
+from .public.File_Factory import Files
 
 
 style_radio = {
@@ -19,7 +20,10 @@ style_download_button = {
 
 dash.register_page(__name__)
 
-df_demo1 = pd.read_csv(os.getcwd() + './data/infection_summary_demo1.csv')
+file_object = Files()
+
+# df_demo1 = pd.read_csv(os.getcwd() + './data/infection_summary_demo1.csv')
+df_demo1 = pd.NA
 df_demo2 = pd.read_csv(os.getcwd() + './data/infection_summary_demo2.csv')
 df_infection_summary = pd.read_csv(os.getcwd() + './data/simulation_result/infection_summary.csv')
 df_disease_transition = pd.read_csv(os.getcwd() + './data/simulation_result/disease_transition.csv')
@@ -180,6 +184,8 @@ def live_datetime(n):
     Output("time-series-chart", "figure"),
     Input("ticker", "value"))
 def display_time_series(ticker):
+    f = Files()
+    df_demo1 = f.count
     fig = px.line(df_demo1, x='time_stamp', y=ticker)
     fig.update_layout(
         plot_bgcolor='#E6E6FA',  # 图的背景颜色
