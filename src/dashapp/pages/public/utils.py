@@ -41,6 +41,12 @@ def build_map_data_table():
     pass
 
 # ---------------- infection ------------------
+def build_infection_agent_list(new_infection):
+    return new_infection['agent_id'].unique().tolist()
+
+def track_infection_state_new_infection(new_infection, agent_id):
+    return new_infection.loc[new_infection['agent_id'] == agent_id]
+
 def preprocess_linear_data():
     pass
 

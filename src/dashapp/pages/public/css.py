@@ -29,6 +29,10 @@ style_data_table = {
     'margin-right': '10%'
 }
 
+style_background = {
+    'background-color': '#D8D8D8'
+}
+
 
 # ---------------- App ------------------
 style_footer = {
@@ -75,6 +79,32 @@ style_wiki = {
 }
 
 # ---------------- infection ------------------
+style_div_left = {
+    'float': 'left',
+    'width': '48%',
+    'marginLeft': '1%',
+}
+
+style_div_right= {
+    'float': 'right',
+    'width': '48%',
+    'marginRight': '1%',
+}
+
+style_interactive_button = {
+    'width': '48%',
+    'marginLeft': '1%',
+}
+
+style_infection_table = {
+    'margin-left': '1%'
+}
+
+style_random_bottom = {
+    'width': '60%',
+    'marginLeft': '20%',
+    'marginRight': '20%'
+}
 
 
 # ---------------- evacuation ------------------

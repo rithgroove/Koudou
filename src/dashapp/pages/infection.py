@@ -3,40 +3,11 @@ import dash
 from dash import dcc, Input, Output, callback
 import plotly.express as px
 import os
-import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from .public.css import *
-from .public.data import *
 from .public.utils import *
+import dash_bootstrap_components as dbc
 
-style_checkList = {
-    'textAlign': 'center'
-}
-
-style_div_left = {
-    'float': 'left',
-    'width': '48%',
-    'marginLeft': '1%',
-}
-
-style_div_right= {
-    'float': 'right',
-    'width': '48%',
-    'marginRight': '1%',
-}
-
-style_interactive_button = {
-    'width': '48%',
-    'marginLeft': '1%',
-}
-
-style_interactive_table={
-    'margin-left': '-50px'
-}
-
-style_form={
-    'float': 'right'
-}
 
 style_radio = {
     'margin-left': '10px'
@@ -50,16 +21,18 @@ dash.register_page(__name__)
 
 df_demo1 = pd.read_csv(os.getcwd() + './data/infection_summary_demo1.csv')
 df_demo2 = pd.read_csv(os.getcwd() + './data/infection_summary_demo2.csv')
-df_disease_transition = pd.read_csv(os.getcwd() + './data/disease_transition.csv')
-df_activity_history = pd.read_csv(os.getcwd() + './data/activity_history.csv')
-df_new_infection = pd.read_csv(os.getcwd() + './data/new_infection.csv')
+df_infection_summary = pd.read_csv(os.getcwd() + './data/simulation_result/infection_summary.csv')
+df_disease_transition = pd.read_csv(os.getcwd() + './data/simulation_result/disease_transition.csv')
+df_activity_history = pd.read_csv(os.getcwd() + './data/simulation_result/activity_history.csv')
+df_new_infection = pd.read_csv(os.getcwd() + './data/simulation_result/new_infection.csv')
+
+infection_agent_id_list = build_infection_agent_list(df_new_infection)
 
 layout = html.Div(children=[
     html.Div([
-
         html.Div(
             children=[
-                html.H2(style=style_title, children="Infection Analytics"),
+                html.Span('Infection Analysis', className="badge bg-dark", style=style_badge),
                 html.H3(style=style_title, id='datetime-text'),
                 dcc.Interval(
                     id='datetime',
@@ -70,9 +43,6 @@ layout = html.Div(children=[
         ),
 
         html.Div(style=style_div_left, children=[
-            # html.Img(src='https://askabiologist.asu.edu/sites/default/files/headers/covidsim-header_0.png', alt="Model Introduction Picture"),
-            # dcc.Markdown(children=markdown_text),
-
             html.H4(style=style_title, children="Joint Search with Result Set"),
             html.Div(style=style_interactive_button, children=[
                 html.Label('Profession'),
@@ -89,7 +59,7 @@ layout = html.Div(children=[
                                    id='file_name'),
                 ]
             ),
-            dcc.Graph(style=style_interactive_table, id='indicator-graphic'),
+            dcc.Graph(style=style_infection_table, id='indicator-graphic'),
         ]),
 
         html.Div(style=style_div_right, children=[
@@ -97,19 +67,20 @@ layout = html.Div(children=[
             dcc.Graph(style=style_title, id="time-series-chart"),
             html.P(style=style_title, children="Select a Case"),
             dcc.Checklist(
-                style=style_checkList,
+                style=style_title,
                 id="ticker",
                 options=["susceptible", "exposed", "asymptomatic", "symptomatic", "severe", "recovered"],
                 value=["susceptible", "exposed", "asymptomatic", "symptomatic", "severe", "recovered"],
                 inline=True
             ),
-            html.Button("Download Source File", id="btn_image", style=style_download_button),
-            dcc.Download(id="download-image"),
+            # html.Button("Download Source File", id="btn_image", style=style_download_button),
+            # dcc.Download(id="download-image"),
+            html.Br(),
             html.H4(style=style_title, children='Show Result in Form'),
             generate_table(df_demo2),
             html.Br(),
 
-            dcc.Graph(style=style_interactive_table, id='pie-chart'),
+            dcc.Graph(style=style_infection_table, id='pie-chart'),
             html.Label('Slide for time change'),
             dcc.Slider(
                 min=df_demo2['list'].min(),
@@ -121,9 +92,79 @@ layout = html.Div(children=[
             ),
         ])
     ]),
+    html.Span('Infection for Agent', className="badge bg-dark", style=style_badge),
+    html.Div(style=style_data_table, children=[
+        dbc.InputGroup(
+            [
+                dbc.Button("Random Agent ID for Infection Tracking", id="input-random-agent-button", n_clicks=0),
+                dbc.Input(id="input-random-agent-id", placeholder="Agent ID"),
+            ], style=style_random_bottom
+        ),
+
+        dcc.Graph(style=style_data_table, id='random-agent-figure'),
+    ]),
 
 ])
 
+@callback(
+    Output("random-agent-figure", "figure"),
+    [Input("input-random-agent-button", "n_clicks")]
+)
+def agent_report_figure(n_clicks):
+    if n_clicks:
+        id_list = infection_agent_id_list
+        which = n_clicks % len(id_list)
+        random_id = id_list[which]
+    print(random_id)
+    agent_pd = track_infection_state_new_infection(df_new_infection, random_id)
+    print(agent_pd)
+
+    column_name_values = ['time', 'Type', 'Disease', 'Profession',
+                          'Location', 'Node ID', 'Source ID', 'Source Profession',
+                          'Source Location', 'Source Node ID']
+    column_name_list = ['time_stamp', 'type', 'disease_name', 'agent_profession',
+                        'agent_location', 'agent_node_id', 'source_id', 'source_profession',
+                        'source_location', 'source_node_id']
+
+    fig = make_subplots(
+        rows=1, cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.03,
+        specs=[[{"type": "table"}]]
+    )
+    fig.add_trace(
+        go.Table(
+            header=dict(
+                values=column_name_values,
+                font=dict(size=12),
+                align="left"
+            ),
+            cells=dict(
+                values=[agent_pd[k].tolist() for k in column_name_list],
+                align="left")
+        ),
+        row=1, col=1
+    )
+    fig.update_layout(
+        height=1200,
+        width=1000,
+        showlegend=False,
+        margin=go.layout.Margin(l=5, r=5, b=5, t=5, pad=0),  # pad参数是刻度与标签的距离
+    )
+    return fig
+
+
+@callback(
+    Output("input-random-agent-id", "value"),
+    [Input("input-random-agent-button", "n_clicks")],
+)
+def random_agent_infection(n_clicks):
+    if n_clicks:
+        id_list = infection_agent_id_list
+        which = n_clicks % len(id_list)
+        return id_list[which]
+    else:
+        return ""
 
 @callback(
     Output("datetime-text", "children"),
@@ -140,6 +181,14 @@ def live_datetime(n):
     Input("ticker", "value"))
 def display_time_series(ticker):
     fig = px.line(df_demo1, x='time_stamp', y=ticker)
+    fig.update_layout(
+        plot_bgcolor='#E6E6FA',  # 图的背景颜色
+        # paper_bgcolor='#F8F8FF',  # 图像的背景颜色
+        height=400,
+        width=600,
+        showlegend=False,
+        margin=go.layout.Margin(l=5, r=5, b=5, t=5, pad=0),  # pad参数是刻度与标签的距离
+    )
     return fig
 
 
@@ -179,9 +228,10 @@ def update_graph(profession, file_name):
         row=1, col=1
     )
     fig.update_layout(
-        height=1300,
-        width=700,
+        height=1200,
+        width=600,
         showlegend=False,
+        margin=go.layout.Margin(l=5, r=5, b=5, t=5, pad=0),  # pad参数是刻度与标签的距离
     )
     return fig
 
@@ -196,13 +246,16 @@ def generate_chart(time_tracker):
     trace = [go.Pie(labels=labels, values=values)]
     layout=go.Layout(title='Proportion of Infection')
     fig = go.Figure(data=trace, layout=layout)
+    fig.update_layout(
+        margin=go.layout.Margin(l=5, r=5, b=5, t=5, pad=0),  # pad参数是刻度与标签的距离
+    )
     return fig
 
-@callback(
-    Output("download-image", "data"),
-    Input("btn_image", "n_clicks"),
-    prevent_initial_call=True,
-)
-def func(n_clicks):
-    return dcc.send_data_frame(df_demo1.to_csv, "infection_demo_download.csv")
+# @callback(
+#     Output("download-agent-analysis", "data"),
+#     Input("btn_image", "n_clicks"),
+#     prevent_initial_call=True,
+# )
+# def func(n_clicks):
+#     return dcc.send_data_frame(df_demo1.to_csv, "infection_demo_download.csv")
 

@@ -7,7 +7,7 @@ dash.register_page(__name__)
 
 layout = html.Div(style=style_title,
     children=[
-        html.H2(children="Evacuation Analytics"),
+        html.H2(children="Evacuation Analysis"),
         html.Div([
             html.Div(style=style_title, children=[
                 html.Label('Agent ID  '),

@@ -2,6 +2,7 @@ from dash import Dash, html
 import dash
 import dash_bootstrap_components as dbc
 from pages.public.data import *
+from pages.public.css import *
 
 markdown_text = open('data/home/markdown_files/introduction.txt', encoding='utf-8').read()
 
@@ -40,8 +41,8 @@ navIncluded = html.Div(
 
 app.layout = html.Div([
     navIncluded, dash.page_container,
-    # html.Footer("TTT", style=style_footer)
-])
+    ]
+)
 
 
 if __name__ == '__main__':
