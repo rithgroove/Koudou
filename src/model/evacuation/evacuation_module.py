@@ -57,7 +57,6 @@ class EvacuationModule(Module):
         for evac_center_id in kd_map.d_evacuation_centers:
             evac_center =  kd_map.d_evacuation_centers[evac_center_id]
             capacity = int(evac_center.evacuation_attr["capacity"])
-            count = 0
             evacuated = 0 
             unevacuated = []
             if (evac_center.centroid in kd_sim.d_agents_by_location.keys()): #check if there are some agents in the evacuation point
@@ -79,6 +78,7 @@ class EvacuationModule(Module):
                     if (evacuated < capacity):        
                         agent.set_attribute("evacuated",True)
                         agent.set_attribute("location","Evacuation_Point")
+                        print(f"Agent {agent.agent_id} evacuated on {evac_center.centroid}")
                         evacuated += 1
                     else:
                         target = kd_map.get_closest_evacuation_center(agent.coordinate,agent.get_attribute("explored_evac"))
@@ -89,6 +89,7 @@ class EvacuationModule(Module):
     def step(self,kd_sim,kd_map,ts,step_length,rng,logger):
         if (kd_sim.get_attribute("evacuation")):
             if not self.triggered:
+                print("Evacuation started!")
                 #reset agent activities
                 self.reset_agents_actions(kd_sim)
             self.share_info(kd_sim,kd_map,ts,step_length,rng,logger)

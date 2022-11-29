@@ -6,7 +6,7 @@ parameters = {
 
 
     "SEED":            101512, # Seed used for reproducing experiments
-    "N_AGENTS":        5000, # Number of agents in the simulation, the more agents, the longer it will take to execute
+    "N_AGENTS":        1000, # Number of agents in the simulation, the more agents, the longer it will take to execute
     "THREADS":         8, # How many CPUs should be used for pathfinding
 
     "BUILDING_TAGS":  "config/map/tsukuba-tu-building-data.csv", # Path to the file that describes the tags to be created for untagged buildings
@@ -26,7 +26,7 @@ parameters = {
                        "config/evacuation/condition_evac.csv",
                        "config/infection/condition_infection.csv"],
 
-        "default_behavior" : "normal",
+        "start_behavior" : "normal",
 
         "attributes" : {
             "basic"      : ["config/behavioral/attributes/attribute_basic.csv",
@@ -40,6 +40,7 @@ parameters = {
         "behaviors" :{
             "normal"         : "config/behavioral/behavior/behavior_normal.csv",
             "evacuate"       : "config/evacuation/behavior/behavior_evacuate.csv",
+            "evacuated"       : "config/evacuation/behavior/behavior_evacuated.csv",
             "self_isolation" : "config/infection/behavior/behavior_symptomatic.csv",
             "severe"         : "config/infection/behavior/behavior_severe.csv"
         }
