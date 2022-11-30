@@ -219,3 +219,9 @@ style_upload_bottom = {
     'margin-left': '20%',
     'margin-top': '10px'
 }
+
+style_offcanvas = {
+    'text-align': 'center',
+    'margin-top': '10px',
+    'margin-bottom': '10px'
+}

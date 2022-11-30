@@ -1,23 +1,32 @@
 import dash
-from dash import dcc, html, dash_table, callback
-import os
+from dash import dcc, html, callback, State, Input, Output
 from .public.css import *
-import base64
-import datetime
-import pandas as pd
-import io
 from dash.dependencies import Input, Output, State
-from .public.File_Factory import Files
+from .public.utils import *
+import dash_bootstrap_components as dbc
 
 dash.register_page(__name__)
 
 layout = html.Div([
+    html.Div(style=style_offcanvas, children=[
+        dbc.Button("Instructions", id="open-offcanvas", n_clicks=0),
+        dbc.Offcanvas(
+            html.P(
+                "In this module, you can upload you own result files that from the simulation result"
+                " with file names as follows: "
+                "activity_history, agent_position_summary, disease_transition, evacuation, infection_summary, "
+                "infection_transition, new_infection. The analysis content will be updated automatically based on "
+                "the uploaded files. "
+            ),
+            id="offcanvas",
+            title="How Upload Works",
+            is_open=False,
+        ),
+    ]),
+    # html.Div("Upload infection_summary.csv", style=style_title),
     dcc.Upload(
         id='upload-data',
-        children=html.Div([
-            'Drag and Drop or ',
-            html.A('Select Files')
-        ]),
+        children=html.Div(['Drag and Drop or ', html.A('Select Files')]),
         style=style_upload_bottom,
         # Allow multiple files to be uploaded
         multiple=True
@@ -25,51 +34,15 @@ layout = html.Div([
     html.Div(style=style_upload_csv_show, id='output-data-upload'),
 ])
 
-
-def parse_contents(contents, filename, date):
-    content_type, content_string = contents.split(',')
-
-    decoded = base64.b64decode(content_string)
-    try:
-        if 'csv' in filename:
-            # Assume that the user uploaded a CSV file
-            df = pd.read_csv(
-                io.StringIO(decoded.decode('utf-8')))
-            print(df)
-            if 'demo1' in filename:
-                f = Files()
-                f.count = df
-        elif 'xls' in filename:
-            # Assume that the user uploaded an excel file
-            df = pd.read_excel(io.BytesIO(decoded))
-        elif 'txt' in filename:
-            df = open(io.BytesIO(decoded))
-            df = df.readlines()
-
-    except Exception as e:
-        print(e)
-        return html.Div([
-            'There was an error processing this file.'
-        ])
-
-    return html.Div([
-        html.H5(filename),
-        html.H6(datetime.datetime.fromtimestamp(date)),
-
-        dash_table.DataTable(
-            df.to_dict('records'),
-            [{'name': i, 'id': i} for i in df.columns]
-        ),
-
-        html.Hr(),  # horizontal line
-
-        # For debugging, display the raw contents provided by the web browser
-        html.Div('Raw Content'),
-        html.Pre(contents[0:200] + '...', style={
-            'whiteSpace': 'pre-wrap',
-            'wordBreak': 'break-all'
-        })
-    ])
+@callback(
+    Output("offcanvas", "is_open"),
+    Input("open-offcanvas", "n_clicks"),
+    [State("offcanvas", "is_open")],
+)
+def toggle_offcanvas(n1, is_open):
+    if n1:
+        return not is_open
+    return is_open
 
 @callback(Output('output-data-upload', 'children'),
               Input('upload-data', 'contents'),

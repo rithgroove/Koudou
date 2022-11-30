@@ -23,7 +23,7 @@ dash.register_page(__name__)
 file_object = Files()
 
 # df_demo1 = pd.read_csv(os.getcwd() + './data/infection_summary_demo1.csv')
-df_demo1 = pd.NA
+# df_demo1 = pd.NA
 df_demo2 = pd.read_csv(os.getcwd() + './data/infection_summary_demo2.csv')
 df_infection_summary = pd.read_csv(os.getcwd() + './data/simulation_result/infection_summary.csv')
 df_disease_transition = pd.read_csv(os.getcwd() + './data/simulation_result/disease_transition.csv')
@@ -185,8 +185,8 @@ def live_datetime(n):
     Input("ticker", "value"))
 def display_time_series(ticker):
     f = Files()
-    df_demo1 = f.count
-    fig = px.line(df_demo1, x='time_stamp', y=ticker)
+    print('f.count from infection.py', f.infection_summary)
+    fig = px.line(f.infection_summary, x='time_stamp', y=ticker)
     fig.update_layout(
         plot_bgcolor='#E6E6FA',  # 图的背景颜色
         # paper_bgcolor='#F8F8FF',  # 图像的背景颜色
