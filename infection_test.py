@@ -1,4 +1,4 @@
-from src.utils.parser import load_parameters
+from src.util.parser import load_parameters
 from src.model.behavioral.simulation import Simulation
 from src.model.infection.infection_manager import initialize_infection, infection_step
 from src.model.map.a_star import a_star_search

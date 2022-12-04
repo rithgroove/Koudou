@@ -63,15 +63,18 @@ class Map():
         return self.d_residences[key]
 
     def get_random_business(self, business_type, qtd, rng, time_stamp=None, only_open=False, only_closed=False):
-        arr = [b for b in self.d_businesses.values()]
+        
+        condition = lambda b: b.type == business_type
         if only_open:
-            arr = [b for b in arr if b.is_open(time_stamp)]
+            condition = lambda b: b.type == business_type and b.is_open(time_stamp)
         elif only_closed:
-            arr = [b for b in arr if not b.is_open(time_stamp)]
+            condition = lambda b: b.type == business_type and not b.is_open(time_stamp)
 
-        arr = [b for b in arr if b.type == business_type]
+        arr = [b for b in self.d_businesses.values() if condition(b)]
+
         if (len(arr) <= qtd):
             return arr
+
         results = rng.choice(arr, qtd, replace=False)
         return results
 
