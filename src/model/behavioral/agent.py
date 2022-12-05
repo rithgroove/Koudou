@@ -40,9 +40,8 @@ class Agent:
 
 	def force_reset(self):
 		if len(self.actions) > 0 and isinstance(self.actions[0],ActionMove):
-			temp = self.actions[0]
-			temp.force_reset()
-			self.actions = [temp]
+			self.actions[0].force_reset()
+			self.actions = self.actions[:1]
 		else:
 			self.actions = []
 
