@@ -3,8 +3,11 @@ import parameters.default as defaultParam
 import pandas as pd
 
 # ---------------- App ------------------
-BS = 'https://bootswatch.com/5/lumen/bootstrap.min.css'
-
+# BS = 'https://bootswatch.com/5/lumen/bootstrap.min.css'
+# BS = 'https://bootswatch.com/5/sketchy/bootstrap.min.css'
+# BS = 'https://bootswatch.com/5/flatly/bootstrap.min.css'
+BS = 'https://bootswatch.com/5/united/bootstrap.min.css'
+# BS = ''
 
 # ---------------- config ------------------
 data_default_config = OrderedDict(

@@ -29,6 +29,24 @@ style_data_table = {
     'margin-right': '10%'
 }
 
+style_data_align_1 = {
+    'width': '70%',
+    'margin-left': '15%',
+    'margin-right': '15%'
+}
+
+style_data_align_2 = {
+    'width': '60%',
+    'margin-left': '20%',
+    'margin-right': '20%'
+}
+
+style_data_align_3 = {
+    'width': '50%',
+    'margin-left': '25%',
+    'margin-right': '25%'
+}
+
 style_background = {
     'background-color': '#D8D8D8'
 }
@@ -132,9 +150,9 @@ style_configs_div = {
 }
 
 style_badge_table = {
-    'margin-left': '30%',
-    'margin-right': '30%',
-    'width': '40%',
+    'margin-left': '15%',
+    'margin-right': '15%',
+    'width': '70%',
     'font-size': '20px',
     'margin-top': '10px',
 }
@@ -150,6 +168,7 @@ style_dropdown_menu = {
 style_business_map = {
     'margin-left': "10%",
     'margin-right': "10%",
+    'width': '80%'
 }
 
 style_map_figure = {
@@ -162,7 +181,7 @@ style_map_figure = {
 
 style_alert_instruction = {
     'width': "20%",
-    # 'height': '10px'
+    'margin-left': '10%',
 }
 
 style_alert_content = {
@@ -191,9 +210,9 @@ style_checklist_align = {
 }
 
 style_checklist_form = {
-    'margin-left': '10%',
-    'margin-right': '10%',
-    'width': '80%',
+    'margin-left': '15%',
+    'margin-right': '15%',
+    'width': '70%',
     'margin-top': '10px',
     'display': 'flex',
     'flex-direction': 'row',
