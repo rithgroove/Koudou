@@ -63,3 +63,4 @@ class Files(object):
     @new_infection.setter
     def new_infection(self, file_df):
         Files._new_infection = file_df
+

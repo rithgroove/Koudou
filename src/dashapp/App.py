@@ -25,7 +25,7 @@ navbar = dbc.NavbarSimple(
                 dbc.DropdownMenuItem("Simulation Log", href="/result"),
                 dbc.DropdownMenuItem("Infection", href="/infection"),
                 dbc.DropdownMenuItem("Evacuation", href="/evacuation"),
-                dbc.DropdownMenuItem("Geographical", href="/geographical"),
+                dbc.DropdownMenuItem("Location", href="/geographical"),
             ],
             nav=True,
             in_navbar=True,

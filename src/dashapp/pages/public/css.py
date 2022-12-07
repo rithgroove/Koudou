@@ -29,6 +29,13 @@ style_data_table = {
     'margin-right': '10%'
 }
 
+style_data_align_0 = {
+    'width': '90%',
+    'margin-left': '5%',
+    'margin-right': '5%',
+
+}
+
 style_data_align_1 = {
     'width': '70%',
     'margin-left': '15%',

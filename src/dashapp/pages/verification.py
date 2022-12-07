@@ -18,12 +18,12 @@ layout = html.Div([
             title="How Verification Works",
             is_open=False,
         ),
-        html.Iframe(
-            src="https://docs.google.com/document/d/1-KLSoAioMcr8l6PtJ-SPw5bsJPBIb0IOZrZKSM_Lo3A/edit",
-            title="iframe Example 1",
-            width="400",
-            height="300",
-    )
+        # html.Iframe(
+        #     src="https://docs.google.com/document/d/1-KLSoAioMcr8l6PtJ-SPw5bsJPBIb0IOZrZKSM_Lo3A/edit",
+        #     title="iframe Example 1",
+        #     width="400",
+        #     height="300",
+        # )
     ]),
 ])
 

@@ -1,4 +1,3 @@
-import datetime
 import dash
 from dash import dcc, Input, Output, callback
 import plotly.express as px
