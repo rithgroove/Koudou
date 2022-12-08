@@ -12,6 +12,11 @@ style_title = {
     'text-align': 'center',
 }
 
+style_select_case = {
+    'text-align': 'center',
+    'padding': '5px'
+}
+
 style_dropdown = {
     'width': '250px',
     'margin-left': '5px',
@@ -58,6 +63,9 @@ style_background = {
     'background-color': '#D8D8D8'
 }
 
+style_fontSize = {
+    'font-size': '30px'
+}
 
 # ---------------- App ------------------
 style_footer = {

@@ -6,6 +6,7 @@ import pandas as pd
 from dash import html, dash_table
 from .File_Factory import Files
 
+
 # ---------------- config ------------------
 def table_generator(target_dataframe):
     column_list = []
@@ -24,6 +25,7 @@ def table_generator(target_dataframe):
     )
     return fig
 
+
 def toggle_modal(n1, is_open):
     if n1:
         return not is_open
@@ -34,6 +36,7 @@ def toggle_modal(n1, is_open):
 def build_option_list(tsukuba_map):
     return tsukuba_map['type'].unique().tolist()
 
+
 def count_business_number(filter_list, filer_df):
     dict_result = {}
     for item in filter_list:
@@ -41,18 +44,23 @@ def count_business_number(filter_list, filer_df):
         dict_result[item] = target_len
     return dict_result
 
+
 def build_map_data_table():
     pass
+
 
 # ---------------- infection ------------------
 def build_infection_agent_list(new_infection):
     return new_infection['agent_id'].unique().tolist()
 
+
 def track_infection_state_new_infection(new_infection, agent_id):
     return new_infection.loc[new_infection['agent_id'] == agent_id]
 
+
 def preprocess_linear_data():
     pass
+
 
 def generate_table(dataframe, max_rows=10):
     return html.Table([
@@ -66,28 +74,29 @@ def generate_table(dataframe, max_rows=10):
         ])
     ])
 
+
 def join_search_profession(profession, file_name, df_new_infection, df_activity_history, df_disease_transition):
     if file_name == 'New Infection':
         if profession == 'University Student':
-            result_df = df_new_infection[df_new_infection['agent_profession']=='university_student']
+            result_df = df_new_infection[df_new_infection['agent_profession'] == 'university_student']
         elif profession == 'All':
             result_df = df_new_infection
         else:
-            result_df = df_new_infection[df_new_infection['agent_profession']=='student']
+            result_df = df_new_infection[df_new_infection['agent_profession'] == 'student']
     elif file_name == 'Activity History':
         if profession == 'University Student':
-            result_df = df_activity_history[df_activity_history['profession']=='university_student']
+            result_df = df_activity_history[df_activity_history['profession'] == 'university_student']
         elif profession == 'All':
             result_df = df_activity_history
         else:
-            result_df = df_activity_history[df_activity_history['profession']=='student']
+            result_df = df_activity_history[df_activity_history['profession'] == 'student']
     else:
         if profession == 'University Student':
-            result_df = df_disease_transition[df_disease_transition['agent_profession']=='university_student']
+            result_df = df_disease_transition[df_disease_transition['agent_profession'] == 'university_student']
         elif profession == 'All':
             result_df = df_disease_transition
         else:
-            result_df = df_disease_transition[df_disease_transition['agent_profession']=='student']
+            result_df = df_disease_transition[df_disease_transition['agent_profession'] == 'student']
     return result_df
 
 
@@ -97,8 +106,26 @@ def find_single_agent_path():
 
 
 # ---------------- location ------------------
-def location_divider():
-    pass
+def location_divider(df_agent_position_summary):
+    list_locations = []
+    unique_location_list = df_agent_position_summary['location'].unique()
+
+    for location in unique_location_list:
+        this_location_list = df_agent_position_summary.loc[df_agent_position_summary['location'] == location]
+        list_locations.append(this_location_list)
+
+    df_comp = location_df_processor(list_locations)
+    return df_comp
+
+
+def location_df_processor(position_list):
+    init_df = position_list[0]
+    init_df.drop(['location'], axis=1)
+    init_df.rename(columns={'count': 'home'})
+    for df in position_list:
+
+        pass
+    return position_list
 
 
 # ---------------- upload ------------------
@@ -161,4 +188,3 @@ def parse_contents(contents, filename, date):
             'wordBreak': 'break-all'
         })
     ])
-
