@@ -7,6 +7,13 @@ from dash import html, dash_table
 from .File_Factory import Files
 
 
+# ---------------- global ------------------
+def timestamp_converter(timestamp):
+    time = ''
+
+    return time
+
+
 # ---------------- config ------------------
 def table_generator(target_dataframe):
     column_list = []
@@ -54,8 +61,8 @@ def build_infection_agent_list(new_infection):
     return new_infection['agent_id'].unique().tolist()
 
 
-def track_infection_state_new_infection(new_infection, agent_id):
-    return new_infection.loc[new_infection['agent_id'] == agent_id]
+def agent_id_filter(data_df, agent_id):
+    return data_df.loc[data_df['agent_id'] == agent_id]
 
 
 def preprocess_linear_data():
@@ -100,6 +107,15 @@ def join_search_profession(profession, file_name, df_new_infection, df_activity_
     return result_df
 
 
+def text_color():
+    pass
+
+
+def get_data_by_interval(start, end, df):
+    df = df.loc[(df['time_stamp'] >= start) & (df['time_stamp'] <= end)]
+    return df
+
+
 # ---------------- evacuation ------------------
 def find_single_agent_path():
     pass
@@ -123,7 +139,6 @@ def location_df_processor(position_list):
     init_df.drop(['location'], axis=1)
     init_df.rename(columns={'count': 'home'})
     for df in position_list:
-
         pass
     return position_list
 

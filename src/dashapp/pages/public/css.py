@@ -8,6 +8,15 @@ style_badge = {
     'margin-top': '10px',
 }
 
+style_badge1 = {
+    'margin-left': '30%',
+    'margin-right': '30%',
+    'width': '40%',
+    'font-size': '20px',
+    'margin-bottom': '10px',
+    'margin-top': '10px',
+}
+
 style_title = {
     'text-align': 'center',
 }
@@ -38,7 +47,6 @@ style_data_align_0 = {
     'width': '90%',
     'margin-left': '5%',
     'margin-right': '5%',
-
 }
 
 style_data_align_1 = {
@@ -57,6 +65,10 @@ style_data_align_3 = {
     'width': '50%',
     'margin-left': '25%',
     'margin-right': '25%'
+}
+
+style_data_align_4 = {
+    'width': '100%'
 }
 
 style_background = {
@@ -136,7 +148,8 @@ style_infection_table = {
 style_random_bottom = {
     'width': '60%',
     'marginLeft': '20%',
-    'marginRight': '20%'
+    'marginRight': '20%',
+    'marginBottom': "8px"
 }
 
 
