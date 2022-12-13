@@ -17,6 +17,15 @@ style_badge1 = {
     'margin-top': '10px',
 }
 
+style_badge2 = {
+    'margin-left': '35%',
+    'margin-right': '35%',
+    'width': '30%',
+    'font-size': '20px',
+    'margin-bottom': '10px',
+    'margin-top': '10px',
+}
+
 style_title = {
     'text-align': 'center',
 }

@@ -1,6 +1,7 @@
 import math
 
 import dash
+import pandas as pd
 from dash import dcc, Input, Output, callback
 import plotly.express as px
 import os
@@ -31,6 +32,8 @@ df_disease_transition = pd.read_csv(os.getcwd() + './data/simulation_result/dise
 df_activity_history = pd.read_csv(os.getcwd() + './data/simulation_result/activity_history.csv')
 df_new_infection = pd.read_csv(os.getcwd() + './data/simulation_result/new_infection.csv')
 infection_agent_id_list = build_infection_agent_list(df_new_infection)
+df_attribute_schedule = pd.read_csv(os.getcwd() + '../../../config/behavioral/attributes/attribute_schedule.csv')
+
 
 p1, p2, p3, p4, p5, p6, p7, p8, total_agents, p9, l9, l10, l11 = calculate_facts(df_new_infection, df_disease_transition)
 
@@ -197,6 +200,17 @@ layout = html.Div(children=[
         dbc.Button("Link to Evacuation", outline=True, color="success",
                    className="me-1", style=style_data_align_5,
                    href='/evacuation'),
+        html.H5([
+            dbc.Badge("Evacuation Settings", className="ms-1"),
+        ]),
+        html.H5('Start Day: ' + str(df_attribute_schedule.loc[0, 'start_day']) + "th day " +
+                str(df_attribute_schedule.loc[0, 'start_hour']) + ':' +
+                str(df_attribute_schedule.loc[0, 'start_minute']) + ':' +
+                str(df_attribute_schedule.loc[0, 'start_second'])),
+        html.H5('End Day: ' + str(df_attribute_schedule.loc[0, 'end_day']) + "th day " +
+                str(df_attribute_schedule.loc[0, 'end_hour']) + ':' +
+                str(df_attribute_schedule.loc[0, 'end_minute']) + ':' +
+                str(df_attribute_schedule.loc[0, 'end_second'])),
         dcc.Graph(style=style_infection_table, id='ba-evacuation-figure'),
     ])
 ])

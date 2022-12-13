@@ -1,4 +1,5 @@
 import dash
+import numpy as np
 from dash import html, dcc, Input, Output, callback
 from .public.css import *
 from .public.utils import *
@@ -17,6 +18,10 @@ counts_pd = pd.DataFrame({
     'location': counts_dict.keys(),
     'counts': counts_dict.values()
 })
+proportion_list = []
+counts_sum = np.sum(list(counts_dict.values()))
+for value in list(counts_dict.values()):
+    proportion_list.append(str(round(value / counts_sum, 5)*100)+'%')
 
 layout = html.Div(style=style_title,
     children=[
@@ -51,7 +56,7 @@ def table_return(value):
                     align='center'),
         cells=dict(values=[list(counts_dict.keys()),
                            list(counts_dict.values()),
-                           []],
+                           proportion_list],
                    line_color='darkslategray',
                    fill_color='lightcyan',
                    align='center'))
