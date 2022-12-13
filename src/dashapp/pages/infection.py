@@ -1,3 +1,5 @@
+import math
+
 import dash
 from dash import dcc, Input, Output, callback
 import plotly.express as px
@@ -29,6 +31,8 @@ df_disease_transition = pd.read_csv(os.getcwd() + './data/simulation_result/dise
 df_activity_history = pd.read_csv(os.getcwd() + './data/simulation_result/activity_history.csv')
 df_new_infection = pd.read_csv(os.getcwd() + './data/simulation_result/new_infection.csv')
 infection_agent_id_list = build_infection_agent_list(df_new_infection)
+
+p1, p2, p3, p4, p5, p6, p7, p8, total_agents, p9, l9, l10, l11 = calculate_facts(df_new_infection, df_disease_transition)
 
 layout = html.Div(children=[
     html.Div([
@@ -95,7 +99,7 @@ layout = html.Div(children=[
     html.Div(children=[
         html.Span('Infection for Agent', className="badge bg-dark", style=style_badge),
     ]),
-    html.Div(style=style_data_table, children=[
+    html.Div(style=style_data_align_0, children=[
         dbc.InputGroup(
             [
                 dbc.Button("Random Agent ID for Infection Tracking", id="input-random-agent-button", n_clicks=0),
@@ -104,7 +108,7 @@ layout = html.Div(children=[
         ),
 
         html.H5([dbc.Badge("new_infection.csv:", className="ms-1"),
-                 ' The information when the agent first get infected.'], style=style_title),
+                 ' The information when the agent first get exposed.'], style=style_title),
         dcc.Graph(style=style_data_align_4, id='random-new-infection-figure'),
         html.H5([dbc.Badge("disease_transition.csv:", className="ms-1"),
                  ' The infection information of the agent in its life time.'],
@@ -124,6 +128,76 @@ layout = html.Div(children=[
             " Tracking and analyzing the agent's activity and location after it gets infected."
         ]),
         html.Div(id='tracking-by-agent-id-list-group')
+    ]),
+    html.Br(),
+    html.Div(style=style_data_table, children=[
+        dbc.Badge("Some Facts", text_color="dark", color="light",
+                  className="me-1", style=style_badge),
+        html.H5([
+            dbc.Badge("Parameter 1", className="ms-1"),
+            " Average time when the agent first get exposed: " + timestamp_converter(math.floor(p1))
+        ]),
+        html.H5([
+            dbc.Badge("Parameter 2", className="ms-1"),
+            " Average time from exposed to asymptomatic: " + timestamp_converter(math.floor(p2))
+        ]),
+        html.H5([
+            dbc.Badge("Parameter 3", className="ms-1"),
+            " Average time from asymptomatic to symptomatic: " + timestamp_converter(math.floor(p3))
+        ]),
+        html.H5([
+            dbc.Badge("Parameter 4", className="ms-1"),
+            " Average time from asymptomatic to recovered: " + timestamp_converter(math.floor(p4))
+        ]),
+        html.H5([
+            dbc.Badge("Parameter 5", className="ms-1"),
+            " Average time from symptomatic to recovered: " + timestamp_converter(math.floor(p5))
+        ]),
+        html.H5([
+            dbc.Badge("Parameter 6", className="ms-1"),
+            " Average time from symptomatic to severe: " + timestamp_converter(math.floor(p6))
+        ]),
+        html.H5([
+            dbc.Badge("Parameter 7", className="ms-1"),
+            " Average time from severe to recovered: " + timestamp_converter(math.floor(p7))
+        ]),
+        html.H5([
+            dbc.Badge("Parameter 8", className="ms-1"),
+            " Percentage of agents (" + str(total_agents)
+            + " agents in total) never get infected in this life cycle: " + str(p8) + "%"
+        ]),
+        html.H5([
+            dbc.Badge("Parameter 9", className="ms-1"),
+            " List and number of agent that get infected multiples times: "
+        ]),
+        html.H5(str(p9) + ' agent(s) got infected multiples times, and they are ' + str(l9), style=style_title),
+        html.H5([
+            dbc.Badge("Parameter 10", className="ms-1"),
+            " Most frequent locations that make agents transfer from exposed to asymptomatic: "
+        ]),
+        html.H5("The locations are lists by their frequency from high to low: ", style=style_title),
+        html.H5(str(l10), style=style_title),
+        html.H5([
+            dbc.Badge("Parameter 11", className="ms-1"),
+            " Most frequent locations that make agents transfer from asymptomatic to symptomatic: "
+        ]),
+        html.H5("The locations are lists by their frequency from high to low: ", style=style_title),
+        html.H5(str(l11), style=style_title),
+        html.A("Link to view details of agent location", href='/geographical')
+    ]),
+    html.Div(style=style_data_table, children=[
+        dbc.Badge("Before and after evacuation", text_color="dark", color="light",
+                  className="me-1", style=style_badge1),
+        html.H5([
+            dbc.Badge("Instruction", color="success", className="ms-1"),
+            " Review the difference of infection state like rates and proportions "
+            "before and after the evacuation happened. For more detailed evacuation information, "
+            "click the link to evacuation analysis page."
+        ]),
+        dbc.Button("Link to Evacuation", outline=True, color="success",
+                   className="me-1", style=style_data_align_5,
+                   href='/evacuation'),
+        dcc.Graph(style=style_infection_table, id='ba-evacuation-figure'),
     ])
 ])
 
@@ -138,12 +212,12 @@ def return_random_activity_history_table(random_id):
             [
                 html.Div(
                     [
-                        html.H5("[Time Stamp]: [Disease Name] Infection State", className="mb-1"),
+                        html.H5("Sample List [Time Stamp]: [Disease Name] Infection State", className="mb-1"),
                         html.Small("Infection Transition: [Current State] -> [Next State]", className="text-success"),
                     ],
                     className="d-flex w-100 justify-content-between",
                 ),
-                html.P("Agent Location at [Time Stamp]: [Location]", className="mb-1"),
+                html.P("Agent Location at [Location]", className="mb-1"),
                 html.Div(
                     [
                         html.Small("At [Time Stamp], the agent [Agent ID] [Activity] at [Location].",
@@ -172,12 +246,11 @@ def return_random_activity_history_table(random_id):
     for i in range(len(time_stamp_list) - 1):
         table = get_data_by_interval(time_stamp_list[i], time_stamp_list[i + 1], activity_history_pd)
 
-        print(table)
-
         agent_activity_html_list = []
         for j in range(len(table)):
-            behavioral_sentence = "At "+str(table.iloc[j, 0])+", the agent "+\
-                                  str(table.iloc[j, 1])+" "+str(table.iloc[j, 7])+'.'
+            behavioral_sentence = "At " + timestamp_converter(table.iloc[j, 0]) + ", the agent " + \
+                                  str(table.iloc[j, 1]) + " " + str(table.iloc[j, 7]) + ', the location is ' \
+                                  + table.iloc[j, 3] + '.'
 
             agent_activity_html_list.append(
                 html.Small(behavioral_sentence, className="text-muted"),
@@ -187,7 +260,7 @@ def return_random_activity_history_table(random_id):
             )
 
         agent_activity_html_list.append(
-                html.Small("Finish activities at this infection state period.", className="text-muted")
+            html.Small("Finish activities at this infection state period.", className="text-muted")
         )
 
         component_list.append(
@@ -195,18 +268,57 @@ def return_random_activity_history_table(random_id):
                 [
                     html.Div(
                         [
-                            html.H5(str(time_stamp_list[i])+": "+disease_list[i]+" Infection State", className="mb-1"),
-                            html.Small("Infection Transition: "+current_state_list[i]+" -> "+next_state_list[i],
+                            html.H5(
+                                timestamp_converter(time_stamp_list[i]) + ": " + disease_list[i] + " Infection State",
+                                className="mb-1"),
+                            html.Small("Infection Transition: " + current_state_list[i] + " -> " + next_state_list[i],
                                        className="text-success"),
                         ],
                         className="d-flex w-100 justify-content-between",
                     ),
-                    html.P("Agent Location when infection state changes is "+location_list[i], className="mb-1"),
+                    html.P("Agent Location when infection state changes is " + location_list[i], className="mb-1"),
                     html.Div(children=agent_activity_html_list)
                 ]
             ),
         )
-        pass
+
+    # Add tracking information for the last state.
+    table = activity_history_pd.loc[(activity_history_pd['time_stamp'] >= time_stamp_list[len(time_stamp_list) - 1])]
+    agent_activity_html_list = []
+    for j in range(len(table)):
+        behavioral_sentence = "At " + timestamp_converter(table.iloc[j, 0]) + ", the agent " + \
+                              str(table.iloc[j, 1]) + " " + str(table.iloc[j, 7]) + ', the location is ' \
+                              + table.iloc[j, 3] + '.'
+
+        agent_activity_html_list.append(
+            html.Small(behavioral_sentence, className="text-muted"),
+        )
+        agent_activity_html_list.append(
+            html.Br(),
+        )
+
+    agent_activity_html_list.append(
+        html.Small("Finish activities at this infection state period.", className="text-muted")
+    )
+
+    component_list.append(
+        dbc.ListGroupItem(
+            [
+                html.Div(
+                    [
+                        html.H5(timestamp_converter(time_stamp_list[len(time_stamp_list) - 1]) + ": " +
+                                disease_list[len(time_stamp_list) - 1] + " Infection State", className="mb-1"),
+                        html.Small("Infection Transition: " + current_state_list[len(time_stamp_list) - 1] + " -> "
+                                   + next_state_list[len(time_stamp_list) - 1], className="text-success"),
+                    ],
+                    className="d-flex w-100 justify-content-between",
+                ),
+                html.P("Agent Location when infection state changes is " + location_list[len(time_stamp_list) - 1],
+                       className="mb-1"),
+                html.Div(children=agent_activity_html_list)
+            ]
+        ),
+    )
 
     return dbc.ListGroup(component_list)
 
@@ -221,11 +333,12 @@ def return_random_activity_history_table(random_id):
     else:
         agent_pd = agent_id_filter(df_activity_history, random_id)
 
+    agent_pd = df_timestamp_converter(agent_pd)
     column_name_values = [
-        'Agent ID', 'Time Stamp', 'Profession', 'Location', 'Household ID', 'Activity Name'
+        'Time Stamp', 'Profession', 'Location', 'Household ID', 'Activity Name'
     ]
     column_name_list = [
-        'agent_id', 'time_stamp', 'profession', 'location', 'household_id', 'activy_name'
+        'time_stamp', 'profession', 'location', 'household_id', 'activy_name'
     ]
 
     fig = make_subplots(
@@ -266,9 +379,10 @@ def return_random_disease_transition_table(random_id):
     else:
         agent_pd = agent_id_filter(df_disease_transition, random_id)
 
-    column_name_values = ['Agent ID', 'Time Stamp', 'Disease', 'Profession', 'Location',
+    agent_pd = df_timestamp_converter(agent_pd)
+    column_name_values = ['Time Stamp', 'Disease', 'Profession', 'Location',
                           'Current State', 'Next State']
-    column_name_list = ['agent_id', 'time_stamp', 'disease_name', 'agent_profession', 'agent_location',
+    column_name_list = ['time_stamp', 'disease_name', 'agent_profession', 'agent_location',
                         'current_state', 'next_state']
 
     fig = make_subplots(
@@ -296,7 +410,6 @@ def return_random_disease_transition_table(random_id):
         showlegend=False,
         margin=go.layout.Margin(l=0, r=0, b=0, t=5, pad=0),  # pad参数是刻度与标签的距离
     )
-    # print(random_id)
     return fig
 
 
@@ -314,6 +427,7 @@ def return_random_new_infection_figure(n_clicks):
 
     agent_pd = agent_id_filter(df_new_infection, random_id)
 
+    agent_pd = df_timestamp_converter(agent_pd)
     column_name_values = ['Agent ID', 'Time Stamp', 'Type', 'Disease', 'Profession',
                           'Location', 'Source Profession', 'Source Location']
     column_name_list = ['agent_id', 'time_stamp', 'type', 'disease_name', 'agent_profession',

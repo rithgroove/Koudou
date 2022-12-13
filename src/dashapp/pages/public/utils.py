@@ -4,14 +4,26 @@ import base64
 import datetime
 import pandas as pd
 from dash import html, dash_table
+import numpy as np
+import parameters.default as defaultParam
+from src.util.time_stamp import TimeStamp
 from .File_Factory import Files
+from collections import Counter
 
 
 # ---------------- global ------------------
 def timestamp_converter(timestamp):
-    time = ''
-
+    ts = TimeStamp(timestamp)
+    time = '[' + str(ts.get_week()) + ' week ' + str(ts.get_day_of_week()) + ' days ' + str(ts.get_hour_min_str()) \
+           + ':' + str(ts.get_second()) + ']'
     return time
+
+
+def df_timestamp_converter(df):
+    df.index = range(len(df))
+    for i in range(len(df)):
+        df.loc[i, 'time_stamp'] = timestamp_converter(df.loc[i, 'time_stamp'])
+    return df
 
 
 # ---------------- config ------------------
@@ -57,6 +69,79 @@ def build_map_data_table():
 
 
 # ---------------- infection ------------------
+def single_fact_calculator(df_disease_transition, current_state, next_state):
+    list = []
+    for i in range(len(df_disease_transition)):
+        if df_disease_transition.loc[i, 'current_state'] == current_state and df_disease_transition.loc[
+            i, 'next_state'] == next_state:
+            ts_end = df_disease_transition.loc[i, 'time_stamp']
+            agent_id = df_disease_transition.loc[i, 'agent_id']
+            ts_temp = 0
+            for j in range(i + 1):
+                if df_disease_transition.loc[i - j, 'agent_id'] == agent_id and df_disease_transition.loc[
+                    i - j, 'next_state'] == current_state:
+                    ts_temp = df_disease_transition.loc[i - j, 'time_stamp']
+                    break
+            if ts_temp == 0:
+                pass
+            else:
+                ts_start = ts_temp
+                ts_diff = ts_end - ts_start
+                list.append(ts_diff)
+    p = np.mean(list)
+    return p
+
+
+def calculate_facts(df_new_infection, df_disease_transition):
+    p1 = np.mean(df_new_infection['time_stamp'])
+
+    list_p2 = []
+    for i in range(len(df_disease_transition)):
+        if df_disease_transition.loc[i, 'current_state'] == 'exposed' and df_disease_transition.loc[
+            i, 'next_state'] == 'asymptomatic':
+            ts_end = df_disease_transition.loc[i, 'time_stamp']
+            agent_id = df_disease_transition.loc[i, 'agent_id']
+            ts_start = df_new_infection.loc[df_new_infection['agent_id'] == agent_id].iloc[0, 0]
+            ts_diff = ts_end - ts_start
+            list_p2.append(ts_diff)
+    p2 = np.mean(list_p2)
+
+    p3 = single_fact_calculator(df_disease_transition, 'asymptomatic', 'symptomatic')
+    p4 = single_fact_calculator(df_disease_transition, 'asymptomatic', 'recovered')
+    p5 = single_fact_calculator(df_disease_transition, 'symptomatic', 'recovered')
+    p6 = single_fact_calculator(df_disease_transition, 'symptomatic', 'severe')
+    p7 = single_fact_calculator(df_disease_transition, 'severe', 'recovered')
+
+    p8_1 = list(set(df_disease_transition['agent_id']))
+    p8_2 = list(set(df_new_infection['agent_id']))
+    p8_3 = p8_1 + p8_2
+    p8_len = len(list(set(p8_3)))
+    total_agents = defaultParam.parameters.get("N_AGENTS")
+    p8 = (total_agents-p8_len) / total_agents * 100
+
+    p9 = 0
+    l9 = []
+    for i in range(len(df_disease_transition)):
+        if df_disease_transition.loc[i, 'current_state'] == 'recovered':
+            p9 = p9 + 1
+            agent_id = df_disease_transition.loc[i, 'agent_id']
+            l9.append(agent_id)
+
+    list_location = []
+    for i in range(len(df_disease_transition)):
+        if df_disease_transition.loc[i, 'current_state'] == 'exposed' and df_disease_transition.loc[i, 'next_state'] == 'asymptomatic':
+            list_location.append(df_disease_transition.loc[i, 'agent_location'])
+    result_counter1 = Counter(list_location)
+
+    list_location = []
+    for i in range(len(df_disease_transition)):
+        if df_disease_transition.loc[i, 'current_state'] == 'asymptomatic' and df_disease_transition.loc[i, 'next_state'] == 'symptomatic':
+            list_location.append(df_disease_transition.loc[i, 'agent_location'])
+    result_counter2 = Counter(list_location)
+
+    return p1, p2, p3, p4, p5, p6, p7, p8, total_agents, p9, l9, result_counter1, result_counter2
+
+
 def build_infection_agent_list(new_infection):
     return new_infection['agent_id'].unique().tolist()
 
@@ -141,6 +226,17 @@ def location_df_processor(position_list):
     for df in position_list:
         pass
     return position_list
+
+def proportion_calculation(df):
+    result_dict = {}
+    timestamp_length = (df.loc[len(df) - 1, 'time_stamp']) / 5
+    unique_location_list = df['location'].unique()
+    for location in unique_location_list:
+        single_location_df = df.loc[df['location']==location]
+        mean_count = np.sum(single_location_df['count']) / timestamp_length
+        result_dict[location] = round(mean_count, 2)
+
+    return result_dict
 
 
 # ---------------- upload ------------------

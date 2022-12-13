@@ -71,6 +71,12 @@ style_data_align_4 = {
     'width': '100%'
 }
 
+style_data_align_5 = {
+    'width': '30%',
+    'margin-left': '35%',
+    'margin-right': '35%'
+}
+
 style_background = {
     'background-color': '#D8D8D8'
 }
