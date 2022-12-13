@@ -54,6 +54,7 @@ class EvacuationModule(Module):
 
     # mark agents that arrived at evacuation point as evacuated
     def evacuate(self,kd_sim,kd_map,ts,step_length,rng,logger):
+        total_evac = 0
         for evac_center_id in kd_map.d_evacuation_centers:
             evac_center =  kd_map.d_evacuation_centers[evac_center_id]
             capacity = int(evac_center.evacuation_attr["capacity"])
@@ -83,7 +84,14 @@ class EvacuationModule(Module):
                     else:
                         target = kd_map.get_closest_evacuation_center(agent.coordinate,agent.get_attribute("explored_evac"))
                         agent.set_attribute("target_evac",target.centroid)
-
+            total_evac += evacuated
+        data = {
+            "time_stamp": ts.step_count,
+            "evacuated": total_evac,
+            "unevacuated_ERI": 0,
+            "unevacuated_no_ERI": 0
+        }
+        logger.write_csv_data("evacuation.csv", data)
 
     # triggered once when the evacuation begin
     def step(self,kd_sim,kd_map,ts,step_length,rng,logger):

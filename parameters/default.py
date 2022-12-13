@@ -14,12 +14,12 @@ parameters = {
     "GRID_SIZE":      20, # Grid size used when calculating the centroid for buildings, NOT recommended to change
     "EVAC_CENTER" :   "config/map/evacuation_center.json", # Path for the file that describes where the evac centers should be
     "STEP_LENGTH" :   5, #Each step is one second,
-    "MAX_STEPS"    :   60*60*24*10, # This is simulating for 7 weeks (49 daysm 24 hours, 60 minutes, 60 seconds), 
+    "MAX_STEPS"    :   60*65, # This is simulating for 7 weeks (49 daysm 24 hours, 60 minutes, 60 seconds), 
     "LOG_LEVEL"     : "debug",
 
     "DISEASES": ["config/infection/covid.json"], # Path to the diseases that will be simualted, it will use this path and the config/infection/covid-infection.json
 
-    "EVACUATION": {"DISTANCE":10, "SHARE_INFO_CHANCE": 0.8}, # Agents have 80% cahnce of sharing infor if thgey have a distance less than 10
+    "EVACUATION": {"DISTANCE":10, "SHARE_INFO_CHANCE": 0.8}, # Agents have 80% cahnce of sharing infor if they have a distance less than 10
 
     "SIM_CONFIG":{
         "condition" : ["config/behavioral/condition.csv",
@@ -33,7 +33,7 @@ parameters = {
                             "config/evacuation/attributes/attribute_basic_evac.csv"],
             "option"     : ["config/behavioral/attributes/attribute_option.csv",
                             "config/evacuation/attributes/attribute_option_evac.csv"],
-            "updateable" : ["config/behavioral/attributes/attribute_updateable.csv"],
+            "updateable" : ["config/evacuation/attributes/attribute_updateable.csv"],
             "schedule"   : ["config/behavioral/attributes/attribute_schedule.csv"],
             "profession" : ["config/behavioral/profession.csv"]
         },
