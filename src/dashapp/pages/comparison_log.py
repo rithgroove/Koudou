@@ -6,11 +6,20 @@ from .public.css import *
 dash.register_page(__name__, path='/comparison_log')
 
 
+log_data_lines = []
+html_list1 = []
+for i in range(len(log_data_lines)):
+    html_list1.append(html.H5(log_data_lines[i]))
+
 tab1_content = dbc.Card(
     dbc.CardBody(
         [
-            html.P("This is tab 1!", className="card-text"),
-            dbc.Button("Click here", color="success"),
+            html.Div(
+                children=[
+                    html.Span('Simulation Log for Model 1', className="badge bg-dark", style=style_badge1),
+                    html.Div(style=style_log, children=html_list1)
+                ]
+            ),
         ]
     ),
     className="mt-3",
@@ -19,8 +28,12 @@ tab1_content = dbc.Card(
 tab2_content = dbc.Card(
     dbc.CardBody(
         [
-            html.P("This is tab 2!", className="card-text"),
-            dbc.Button("Don't click here", color="danger"),
+            html.Div(
+                children=[
+                    html.Span('Simulation Log for Model 2', className="badge bg-dark", style=style_badge1),
+                    html.Div(style=style_log, children=html_list1)
+                ]
+            ),
         ]
     ),
     className="mt-3",
@@ -29,8 +42,12 @@ tab2_content = dbc.Card(
 tab3_content = dbc.Card(
     dbc.CardBody(
         [
-            html.P("This is tab 3!", className="card-text"),
-            dbc.Button("Don't click here", color="danger"),
+            html.Div(
+                children=[
+                    html.Span('Simulation Log for Model 3', className="badge bg-dark", style=style_badge1),
+                    html.Div(style=style_log, children=html_list1)
+                ]
+            ),
         ]
     ),
     className="mt-3",

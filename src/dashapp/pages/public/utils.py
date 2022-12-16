@@ -229,7 +229,7 @@ def location_df_processor(position_list):
 
 def proportion_calculation(df):
     result_dict = {}
-    timestamp_length = (df.loc[len(df) - 1, 'time_stamp']) / 5
+    timestamp_length = int(df.loc[len(df) - 1, 'time_stamp']) / 5
     unique_location_list = df['location'].unique()
     for location in unique_location_list:
         single_location_df = df.loc[df['location']==location]

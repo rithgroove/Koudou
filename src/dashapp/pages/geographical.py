@@ -10,7 +10,7 @@ import plotly.express as px
 
 dash.register_page(__name__)
 
-df_agent_position_summary = pd.read_csv(os.getcwd() + './data/simulation_result/agent_position_summary.csv')
+df_agent_position_summary = pd.read_csv(os.getcwd() + './data/simulation_result/agent_position_summary.csv',low_memory=False)
 unique_location_list = df_agent_position_summary['location'].unique()
 list_locations = location_divider(df_agent_position_summary)
 counts_dict = proportion_calculation(df_agent_position_summary)

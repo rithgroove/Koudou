@@ -16,6 +16,6 @@ layout = html.Div(
     children=[
         html.Span('Simulation Log', className="badge bg-dark", style=style_badge),
         html.Div(style=style_log, children=html_list)
-    ], style=style_background
+    ]
 )
 
