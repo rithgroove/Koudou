@@ -7,8 +7,10 @@ from dash import html, dash_table
 import numpy as np
 import parameters.default as defaultParam
 from src.util.time_stamp import TimeStamp
-from .File_Factory import Files
+from .File_Factory import ModelOne, ModelTwo, ModelThree
 from collections import Counter
+from .css import *
+import time
 
 
 # ---------------- global ------------------
@@ -117,7 +119,7 @@ def calculate_facts(df_new_infection, df_disease_transition):
     p8_3 = p8_1 + p8_2
     p8_len = len(list(set(p8_3)))
     total_agents = defaultParam.parameters.get("N_AGENTS")
-    p8 = (total_agents-p8_len) / total_agents * 100
+    p8 = (total_agents - p8_len) / total_agents * 100
 
     p9 = 0
     l9 = []
@@ -129,13 +131,15 @@ def calculate_facts(df_new_infection, df_disease_transition):
 
     list_location = []
     for i in range(len(df_disease_transition)):
-        if df_disease_transition.loc[i, 'current_state'] == 'exposed' and df_disease_transition.loc[i, 'next_state'] == 'asymptomatic':
+        if df_disease_transition.loc[i, 'current_state'] == 'exposed' and df_disease_transition.loc[
+            i, 'next_state'] == 'asymptomatic':
             list_location.append(df_disease_transition.loc[i, 'agent_location'])
     result_counter1 = Counter(list_location)
 
     list_location = []
     for i in range(len(df_disease_transition)):
-        if df_disease_transition.loc[i, 'current_state'] == 'asymptomatic' and df_disease_transition.loc[i, 'next_state'] == 'symptomatic':
+        if df_disease_transition.loc[i, 'current_state'] == 'asymptomatic' and df_disease_transition.loc[
+            i, 'next_state'] == 'symptomatic':
             list_location.append(df_disease_transition.loc[i, 'agent_location'])
     result_counter2 = Counter(list_location)
 
@@ -227,12 +231,13 @@ def location_df_processor(position_list):
         pass
     return position_list
 
+
 def proportion_calculation(df):
     result_dict = {}
     timestamp_length = int(df.loc[len(df) - 1, 'time_stamp']) / 5
     unique_location_list = df['location'].unique()
     for location in unique_location_list:
-        single_location_df = df.loc[df['location']==location]
+        single_location_df = df.loc[df['location'] == location]
         mean_count = np.sum(single_location_df['count']) / timestamp_length
         result_dict[location] = round(mean_count, 2)
 
@@ -240,17 +245,14 @@ def proportion_calculation(df):
 
 
 # ---------------- upload ------------------
-def parse_contents(contents, filename, date):
+def parse_contents(contents, filename, date, f):
     content_type, content_string = contents.split(',')
-
     decoded = base64.b64decode(content_string)
     try:
         if 'csv' in filename:
             # Assume that the user uploaded a CSV file
             df = pd.read_csv(
                 io.StringIO(decoded.decode('utf-8')))
-            # print(df)
-            f = Files()
             if 'activity_history.' in filename:
                 f.activity_history = df
             elif 'agent_position_summary.' in filename:
@@ -267,35 +269,20 @@ def parse_contents(contents, filename, date):
                 f.new_infection = df
             else:
                 return html.Div(['CSV file is not found .'])
-        elif 'xls' in filename:
-            # Assume that the user uploaded an excel file
-            df = pd.read_excel(io.BytesIO(decoded))
         elif 'txt' in filename:
-            df = open(io.BytesIO(decoded))
-            df = df.readlines()
-
+            # Assume that the user uploaded an excel file
+            log_data_lines = str(decoded).split('\\n')
+            html_list = []
+            for i in range(len(log_data_lines)):
+                html_list.append(html.H5(log_data_lines[i]))
+            f.log = html_list
+            # return html.Div(style=style_log, children=html_list)
     except Exception as e:
-        print(e)
+        print('[Error Log]: ', e)
         return html.Div([
-            'There was an error processing this file.'
+            'There was an error processing this file, please refer to terminal.'
         ])
-
     return html.Div([
-        html.H5("Upload Successfully!"),
-        html.H5(filename),
-        html.H6(datetime.datetime.fromtimestamp(date)),
-
-        dash_table.DataTable(
-            df.to_dict('records'),
-            [{'name': i, 'id': i} for i in df.columns]
-        ),
-
-        html.Hr(),  # horizontal line
-
-        # For debugging, display the raw contents provided by the web browser
-        html.Div('Raw Content'),
-        html.Pre(contents[0:200] + '...', style={
-            'whiteSpace': 'pre-wrap',
-            'wordBreak': 'break-all'
-        })
+        html.H5('[File Processing ' + time.ctime() + ']: ' + filename + ' is uploaded successfully!',
+                style=style_title)
     ])

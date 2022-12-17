@@ -1,7 +1,5 @@
 import math
-
 import dash
-import pandas as pd
 from dash import dcc, Input, Output, callback
 import plotly.express as px
 import os
@@ -9,7 +7,7 @@ from plotly.subplots import make_subplots
 from .public.css import *
 from .public.utils import *
 import dash_bootstrap_components as dbc
-from .public.File_Factory import Files
+from .public.File_Factory import ModelOne
 
 style_radio = {
     'margin-left': '10px'
@@ -21,7 +19,7 @@ style_download_button = {
 
 dash.register_page(__name__)
 
-file_object = Files()
+file_object = ModelOne()
 
 # df_demo1 = pd.read_csv(os.getcwd() + './data/infection_summary_demo1.csv')
 # df_demo1 = pd.NA
@@ -34,8 +32,8 @@ df_new_infection = pd.read_csv(os.getcwd() + './data/simulation_result/new_infec
 infection_agent_id_list = build_infection_agent_list(df_new_infection)
 df_attribute_schedule = pd.read_csv(os.getcwd() + '../../../config/behavioral/attributes/attribute_schedule.csv')
 
-
-p1, p2, p3, p4, p5, p6, p7, p8, total_agents, p9, l9, l10, l11 = calculate_facts(df_new_infection, df_disease_transition)
+p1, p2, p3, p4, p5, p6, p7, p8, total_agents, p9, l9, l10, l11 = calculate_facts(df_new_infection,
+                                                                                 df_disease_transition)
 
 layout = html.Div(children=[
     html.Div([
@@ -502,7 +500,7 @@ def live_datetime(n):
     Output("time-series-chart", "figure"),
     Input("ticker", "value"))
 def display_time_series(ticker):
-    f = Files()
+    f = ModelOne()
     # print('f.count from infection.py', f.infection_summary)
     fig = px.line(f.infection_summary, x='time_stamp', y=ticker)
     fig.update_layout(

@@ -94,6 +94,10 @@ style_fontSize = {
     'font-size': '30px'
 }
 
+style_fontSize20 = {
+    'font-size': '20px'
+}
+
 # ---------------- App ------------------
 style_footer = {
     'margin-top': '10px',

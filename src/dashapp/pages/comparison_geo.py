@@ -20,9 +20,11 @@ tab1_content = dbc.Card(
                         color="white",
                         text_color="secondary",
                         className="border me-1",
+                        style=style_fontSize20
                     ),
                 ]
             ),
+
             html.Hr(),
             html.Div(
                 style=style_data_align_4,
@@ -32,9 +34,11 @@ tab1_content = dbc.Card(
                         color="white",
                         text_color="secondary",
                         className="border me-1",
+                        style=style_fontSize20
                     ),
                 ]
-            )
+            ),
+
         ]
     ),
     className="mt-3",

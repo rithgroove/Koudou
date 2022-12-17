@@ -2,22 +2,18 @@ import dash
 from dash import html, dcc, callback, Input, Output
 import dash_bootstrap_components as dbc
 from .public.css import *
+from .public.File_Factory import ModelOne, ModelTwo, ModelThree
 
 dash.register_page(__name__, path='/comparison_log')
-
-
-log_data_lines = []
-html_list1 = []
-for i in range(len(log_data_lines)):
-    html_list1.append(html.H5(log_data_lines[i]))
 
 tab1_content = dbc.Card(
     dbc.CardBody(
         [
             html.Div(
                 children=[
-                    html.Span('Simulation Log for Model 1', className="badge bg-dark", style=style_badge1),
-                    html.Div(style=style_log, children=html_list1)
+                    html.Span('Simulation Log for Model 1', className="badge bg-dark",
+                              style=style_badge1, id='input_log1'),
+                    html.Div(style=style_data_align_1, id='log-model1')
                 ]
             ),
         ]
@@ -30,8 +26,9 @@ tab2_content = dbc.Card(
         [
             html.Div(
                 children=[
-                    html.Span('Simulation Log for Model 2', className="badge bg-dark", style=style_badge1),
-                    html.Div(style=style_log, children=html_list1)
+                    html.Span('Simulation Log for Model 2', className="badge bg-dark",
+                              style=style_badge1, id='input_log2'),
+                    html.Div(style=style_data_align_1, id='log-model2')
                 ]
             ),
         ]
@@ -44,8 +41,9 @@ tab3_content = dbc.Card(
         [
             html.Div(
                 children=[
-                    html.Span('Simulation Log for Model 3', className="badge bg-dark", style=style_badge1),
-                    html.Div(style=style_log, children=html_list1)
+                    html.Span('Simulation Log for Model 3', className="badge bg-dark",
+                              style=style_badge1, id='input_log3'),
+                    html.Div(style=style_data_align_1, id='log-model3')
                 ]
             ),
         ]
@@ -62,12 +60,37 @@ tabs = dbc.Tabs(
 )
 
 layout = html.Div(style=style_data_align_0, children=[
-        html.Div(
-            children=[
-                html.H3("Model Comparison for Logging Part", style=style_select_case),
-                tabs
-            ]
-        ),
+    html.Div(
+        children=[
+            html.H3("Model Comparison for Logging Part", style=style_select_case),
+            tabs
+        ]
+    ),
+])
 
-    ]
+
+@callback(
+    Output('log-model1', 'children'),
+    Input('input_log1', 'value')
 )
+def display_log_model1(i):
+    f = ModelOne()
+    return html.Div(children=f.log)
+
+
+@callback(
+    Output('log-model2', 'children'),
+    Input('input_log2', 'value')
+)
+def display_log_model1(i):
+    f = ModelTwo()
+    return html.Div(children=f.log)
+
+
+@callback(
+    Output('log-model3', 'children'),
+    Input('input_log3', 'value')
+)
+def display_log_model1(i):
+    f = ModelThree()
+    return html.Div(children=f.log)
