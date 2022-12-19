@@ -1,5 +1,5 @@
 import pandas as pd
-
+from .utils import preprocess_linear_data
 
 class ModelOne(object):
     #  activity_history.csv
@@ -55,6 +55,7 @@ class ModelOne(object):
 
     @infection_summary.setter
     def infection_summary(self, file_df):
+        file_df = preprocess_linear_data(file_df)
         ModelOne._infection_summary = file_df
 
     # infection_transition.csv
@@ -145,6 +146,7 @@ class ModelTwo(object):
 
     @infection_summary.setter
     def infection_summary(self, file_df):
+        file_df = preprocess_linear_data(file_df)
         ModelTwo._infection_summary = file_df
 
     # infection_transition.csv
@@ -235,6 +237,7 @@ class ModelThree(object):
 
     @infection_summary.setter
     def infection_summary(self, file_df):
+        file_df = preprocess_linear_data(file_df)
         ModelThree._infection_summary = file_df
 
     # infection_transition.csv

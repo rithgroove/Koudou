@@ -5,6 +5,7 @@ from .public.css import *
 from dash.dependencies import Input, Output, State
 from .public.utils import *
 import dash_bootstrap_components as dbc
+from .public.File_Factory import *
 
 dash.register_page(__name__)
 
@@ -24,7 +25,6 @@ layout = html.Div([
         ),
     ]),
     html.Br(),
-    html.Hr(style=style_data_align_3),
     html.Div("Upload Model One", style=style_title),
     dcc.Upload(
         id='upload-data',

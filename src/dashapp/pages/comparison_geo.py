@@ -6,6 +6,7 @@ import dash_bootstrap_components as dbc
 from .public.css import *
 import plotly.express as px
 from .public.utils import *
+from .public.File_Factory import *
 
 dash.register_page(__name__, path='/comparison_geo')
 
@@ -77,7 +78,6 @@ tab1_content = dbc.Card(
                             html.Div(className='col-sm-4', children=[
                                 html.H5("Model Two", id="random-input-model-two"),
                                 html.Div(id='count-proportion-table-model-two'),
-
                             ]),
                             html.Div(className='col-sm-4', children=[
                                 html.H5("Model Three", id="random-input-model-three"),
