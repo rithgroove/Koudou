@@ -24,6 +24,7 @@ layout = html.Div([
         ),
     ]),
     html.Br(),
+    html.Hr(style=style_data_align_3),
     html.Div("Upload Model One", style=style_title),
     dcc.Upload(
         id='upload-data',
@@ -36,8 +37,7 @@ layout = html.Div([
         multiple=True
     ),
     html.Div(id='output-data-upload'),
-
-    html.Br(),
+    html.Hr(style=style_data_align_3),
     html.Div("Upload Model Two", style=style_title),
     dcc.Upload(
         id='upload-data-model-two',
@@ -50,8 +50,7 @@ layout = html.Div([
         multiple=True
     ),
     html.Div(id='output-data-upload-model-two'),
-
-    html.Br(),
+    html.Hr(style=style_data_align_3),
     html.Div("Upload Model Three", style=style_title),
     dcc.Upload(
         id='upload-data-model-three',
@@ -103,7 +102,6 @@ def update_output_model_three(list_of_contents, list_of_names, list_of_dates):
             parse_contents(c, n, d, f) for c, n, d in
             zip(list_of_contents, list_of_names, list_of_dates)]
         return children
-
 
 
 @callback(

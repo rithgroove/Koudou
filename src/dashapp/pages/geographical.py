@@ -25,11 +25,11 @@ for value in list(counts_dict.values()):
 
 layout = html.Div(style=style_title,
     children=[
-        html.Span('Agent Location Analysis', className="badge bg-dark", style=style_badge),
-        html.Div(style=style_data_align_0, children=[
-            html.H5("All locations are listed: ", id='random-input'),
-            html.H5(unique_location_list + ' ')
-        ]),
+        html.Span('Agent Location Analysis', className="badge bg-dark", style=style_badge, id='random-input'),
+        # html.Div(style=style_data_align_0, children=[
+        #     html.H5("All locations are listed: ", id='random-input'),
+        #     html.H5(unique_location_list + ' ')
+        # ]),
         html.Span(style=style_fontSize, children=[
             dbc.Badge(
                 "Agent Position Summary",

@@ -9,6 +9,7 @@ import parameters.default as defaultParam
 from src.util.time_stamp import TimeStamp
 from .File_Factory import ModelOne, ModelTwo, ModelThree
 from collections import Counter
+import plotly.express as px
 from .css import *
 import time
 
@@ -276,7 +277,6 @@ def parse_contents(contents, filename, date, f):
             for i in range(len(log_data_lines)):
                 html_list.append(html.H5(log_data_lines[i]))
             f.log = html_list
-            # return html.Div(style=style_log, children=html_list)
     except Exception as e:
         print('[Error Log]: ', e)
         return html.Div([
@@ -286,3 +286,53 @@ def parse_contents(contents, filename, date, f):
         html.H5('[File Processing ' + time.ctime() + ']: ' + filename + ' is uploaded successfully!',
                 style=style_title)
     ])
+
+
+# ---------------- comparison location ------------------
+def table_return_html(counts_dict):
+    proportion_list = []
+    counts_sum = np.sum(list(counts_dict.values()))
+    for value in list(counts_dict.values()):
+        proportion_list.append(str(format((value / counts_sum * 100), '.3f')) + '%')
+    fig = go.Figure(data=[go.Table(
+        header=dict(values=['Location', 'Average Count', 'Proportion'],
+                    line_color='darkslategray',
+                    fill_color='lightskyblue',
+                    align='center'),
+        cells=dict(values=[list(counts_dict.keys()),
+                           list(counts_dict.values()),
+                           proportion_list],
+                   line_color='darkslategray',
+                   fill_color='lightcyan',
+                   align='center'))
+    ])
+    fig.update_layout(
+        height=300,
+        showlegend=True,
+        margin=go.layout.Margin(l=0, r=0, b=0, t=0, pad=0),
+    )
+    return fig
+
+def pie_return_html(counts_dict):
+    counts_pd = pd.DataFrame({
+        'location': counts_dict.keys(),
+        'counts': counts_dict.values()
+    })
+    fig = px.pie(counts_pd, names="location", values="counts",
+                 # 不同颜色：RdBu、Peach
+                 color_discrete_sequence=px.colors.sequential.Peach  # 只需要改变最后的RdBu即可
+                 )
+    colors = ['gold', 'mediumturquoise', 'darkorange', 'lightgreen', 'cyan']
+    fig.update_traces(
+        hoverinfo='label+percent',
+        textinfo='value',
+        textfont_size=10,
+        marker=dict(colors=colors,
+                    line=dict(color='#000000', width=2)))
+    fig.update_layout(
+        height=300,
+        # width=80,
+        showlegend=True,
+        margin=go.layout.Margin(l=0, r=0, b=0, t=0, pad=0),  # pad参数是刻度与标签的距离
+    )
+    return fig
