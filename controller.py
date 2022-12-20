@@ -185,6 +185,11 @@ class Controller():
                   "agent_location","agent_node_id","current_state","next_state"]
         self.logger.add_csv_file("disease_transition.csv", header)
 
+        # infection transition
+        header = ["time_stamp","disease_name","agent_id","agent_profession",
+                  "agent_location","agent_node_id","symptom", "state"]
+        self.logger.add_csv_file("symptom.csv", header)
+
         # evacuation
         header = ["time_stamp","evacuated","unevacuated_ERI","unevacuated_no_ERI"]
         self.logger.add_csv_file("evacuation.csv", header)
@@ -245,14 +250,14 @@ class Controller():
 
 
     def run_simulation(self):
-        steps_in_a_hour =  (60*60)
-        for d in range(0, self.d_param["MAX_STEPS"]):
+        steps_in_a_min =  (60)
+        for d in range(0, self.d_param["MAX_STEPS"], self.d_param["STEP_LENGTH"]):
             self.run_step()
-            if d%steps_in_a_hour == 0:
-                hours =  d//steps_in_a_hour
-                self.print_msg(f"Running simulation... {hours}/{self.d_param['MAX_STEPS']/steps_in_a_hour} hours")
-
-        self.print_msg(f"{d+1}/{self.d_param['MAX_STEPS']} hours done")
+            if d%steps_in_a_min == 0:
+                hours =  d//steps_in_a_min
+                self.print_msg(f"Running simulation... {hours}/{self.d_param['MAX_STEPS']/steps_in_a_min} minutes")
+        d += self.d_param["STEP_LENGTH"]
+        self.print_msg(f"{(d)/3600}/{self.d_param['MAX_STEPS']/3600} hours done")
         self.print_msg("")
 
     def run_auto(self):
