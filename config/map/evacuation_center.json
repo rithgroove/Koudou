@@ -7,7 +7,7 @@
             },
             "attributes": {
                 "name" : "Kasuga Gakuen Obligatory Education School",
-                "capacity": 1500,
+                "capacity": 200,
                 "contains_food": true,
                 "contains_medicine": false
             }
@@ -19,7 +19,7 @@
             },
             "attributes": {
                 "name" : "Azuma Elementary School",
-                "capacity": 1500,
+                "capacity": 200,
                 "contains_food": true,
                 "contains_medicine": false
             }
@@ -31,7 +31,7 @@
             },
             "attributes": {
                 "name" : "Kasuga Exchange Center",
-                "capacity": 1500,
+                "capacity": 200,
                 "contains_food": true,
                 "contains_medicine": false
             }
@@ -43,7 +43,7 @@
             },
             "attributes": {
                 "name" : "Tsukuba Capio",
-                "capacity": 1500,
+                "capacity": 200,
                 "contains_food": true,
                 "contains_medicine": false
             }
@@ -55,7 +55,7 @@
             },
             "attributes": {
                 "name" : "Tsukuba Innovation Plaza",
-                "capacity": 1500,
+                "capacity": 200,
                 "contains_food": true,
                 "contains_medicine": false
             }
@@ -67,7 +67,7 @@
             },
             "attributes": {
                 "name" : "Joyo Bank Azuma",
-                "capacity": 1500,
+                "capacity": 200,
                 "contains_food": true,
                 "contains_medicine": false
             }
@@ -79,7 +79,7 @@
             },
             "attributes": {
                 "name" : "Tsukuba Bank Headquarters",
-                "capacity": 1500,
+                "capacity": 200,
                 "contains_food": true,
                 "contains_medicine": false
             }
@@ -91,7 +91,7 @@
             },
             "attributes": {
                 "name" : "Azuma Exchange Center",
-                "capacity": 1500,
+                "capacity": 200,
                 "contains_food": true,
                 "contains_medicine": false
             }

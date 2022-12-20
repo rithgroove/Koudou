@@ -141,19 +141,24 @@ class Controller():
             # todo: we shouldnt pass thw whole simulator, just the necessary things
             # i guess just agents, but Im not changing this to avoid bugs
             self.logger.write_log("--------------------Loading Disease Module--------------------")
-            self.sim.modules.append(
-                InfectionModule(parameters = self.d_param["DISEASES"],
-                                kd_sim     = self.sim,
-                                rng        = self.rng,
-                                logger     = self.logger))
+            infec_model = InfectionModule(
+                parameters = self.d_param["DISEASES"],
+                kd_sim     = self.sim,
+                rng        = self.rng,
+                logger     = self.logger
+            )
+            self.sim.modules.append(infec_model)
             self.logger.write_log("--------------------Finished Loading Disease Module--------------------")
                                 
 
         if self.d_param["EVACUATION"]:
             self.logger.write_log("--------------------Loading Evacuation Module--------------------")
-            self.sim.modules.append(
-                EvacuationModule(distance = self.d_param["EVACUATION"]["DISTANCE"],
-                                 share_information_chance = self.d_param["EVACUATION"]["SHARE_INFO_CHANCE"]))
+            evac_module = EvacuationModule(
+                distance=self.d_param["EVACUATION"]["DISTANCE"],
+                share_information_chance=self.d_param["EVACUATION"]["SHARE_INFO_CHANCE"], 
+                logger = self.logger,
+            )
+            self.sim.modules.append(evac_module)
             self.logger.write_log("--------------------Finished Loading Disease Module--------------------")
 
     ## LOGGER
@@ -185,9 +190,6 @@ class Controller():
                   "agent_location","agent_node_id","current_state","next_state"]
         self.logger.add_csv_file("disease_transition.csv", header)
 
-        # evacuation
-        header = ["time_stamp","evacuated","unevacuated_ERI","unevacuated_no_ERI"]
-        self.logger.add_csv_file("evacuation.csv", header)
 
         # time stamp?
         header = ["time_stamp","","",""]

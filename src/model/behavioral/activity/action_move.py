@@ -82,8 +82,8 @@ class ActionMove(Action):
                 if self.target_type is not None:
                     self.agent.set_attribute("location",self.target_type)
             self.reseted = False
-            if (self.destination_string == "!evac"):
-                print(f"agent {self.agent.agent_id}'s' Evac Finished")
+            # if (self.destination_string == "!evac"):
+            #     print(f"agent {self.agent.agent_id}'s' Evac Finished")
         return leftover
 
     @property
