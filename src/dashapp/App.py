@@ -1,29 +1,8 @@
-from dash import Dash, html, dcc
+from dash import Dash, html
 import dash
 import dash_bootstrap_components as dbc
-
-BS = 'https://bootswatch.com/5/lumen/bootstrap.min.css'
-
-style_title = {
-    'textAlign': 'center',
-    'marginLeft': '100px',
-    'marginRight': '100px'
-}
-
-style_navLink={
-    'textAlign': 'center',
-}
-
-style_title = {
-    'textAlign': 'center',
-    'marginLeft': '100px',
-    'marginRight': '100px'
-}
-
-style_markdown = {
-    'margin-left': '250px'
-}
-
+from pages.public.data import *
+from pages.public.css import *
 
 markdown_text = open('data/home/markdown_files/introduction.txt', encoding='utf-8').read()
 
@@ -60,11 +39,11 @@ navIncluded = html.Div(
     ]
 )
 
-
 app.layout = html.Div([
-    navIncluded,
-	dash.page_container,
-])
+    navIncluded, dash.page_container,
+    ]
+)
+
 
 if __name__ == '__main__':
 	app.run_server(debug=True)

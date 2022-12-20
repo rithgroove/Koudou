@@ -221,7 +221,7 @@ class Controller():
         health_header = ["time_stamp","susceptible","exposed",
                   "asymptomatic","symptomatic","severe","recovered"]
         for h in health_header:
-            log_data[h] = summarized_attr[h] if h in summarized_attr.keys() else 0
+            log_data[h] = summarized_attr[h] if h in summarized_attr else 0
 
         log_data["time_stamp"] = self.sim.ts.step_count
         self.logger.write_csv_data("infection_summary.csv", log_data)
@@ -250,14 +250,14 @@ class Controller():
 
 
     def run_simulation(self):
-        steps_in_a_min =  (60)
+        steps_in_a_minute =  (60)
         for d in range(0, self.d_param["MAX_STEPS"], self.d_param["STEP_LENGTH"]):
             self.run_step()
-            if d%steps_in_a_min == 0:
-                hours =  d//steps_in_a_min
-                self.print_msg(f"Running simulation... {hours}/{self.d_param['MAX_STEPS']/steps_in_a_min} minutes")
-        d += self.d_param["STEP_LENGTH"]
-        self.print_msg(f"{(d)/3600}/{self.d_param['MAX_STEPS']/3600} hours done")
+            if d%steps_in_a_minute == 0:
+                minutes =  d//steps_in_a_minute
+                self.print_msg(f"Running simulation... {minutes}/{self.d_param['MAX_STEPS']/steps_in_a_minute} minutes")
+
+        self.print_msg(f"{d+self.d_param['STEP_LENGTH']}/{self.d_param['MAX_STEPS']} steps done")
         self.print_msg("")
 
     def run_auto(self):

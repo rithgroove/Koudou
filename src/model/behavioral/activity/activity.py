@@ -9,6 +9,7 @@ class Activity:
 		self.condition = []
 		self.rewards = []
 		self.actions = []
+		self.actions_arr = []
 		self.command = command.lower()
 
 	def add_condition(self,condition):
@@ -18,31 +19,40 @@ class Activity:
 		self.rewards.append(reward)
 
 	def add_action(self,action):
+
+		action_arr = action.replace(" ", "").split(":")
+		action_arr[0] = action_arr[0].lower()
+		if action_arr[0] =="move" and "id)" not in action_arr[1] and "!" not in action_arr[1]:
+			action_arr[1] = action_arr[1].replace("(building_type)", "")
+			action_arr[1] = action_arr[1].replace("(type)", "")
+
 		self.actions.append(action)
+		self.actions_arr.append(action_arr)
 
 	def check_conditions(self,agent,kd_sim, kd_map, ts,rng):
 		result = True
-		for x in self.condition:
-			if (self.command.lower() == "and" or self.command.lower() == "none" ):
-				result = result and x.check_value(agent,kd_sim)
+		command = self.command.lower()
+
+		if (command == "and" or command == "none" ):
+			for cond in self.condition:
+				result = result and cond.check_value(agent, kd_sim)
 				if not result:
 					break
-			elif (self.command.lower() == "or"):
-				result = result or x.check_value(agent,kd_sim)
+		elif (command == "or"):
+			for cond in self.condition:
+				result = result or cond.check_value(agent, kd_sim)
 				if result:
 					break
-		if result:
-			for x in self.actions:
-				temp = x.split(":")
-				temp[0] = temp[0].replace(" ","")
-				if temp[0].lower()=="move" and "id)" not in temp[1] and "!" not in temp[1]:
-					temp[1] = temp[1].replace("(building_type)","")
-					temp[1] = temp[1].replace("(type)","")
-					temp[1] = temp[1].replace(" ","")
-					destination = kd_map.get_random_business(temp[1], 1, rng ,time_stamp = ts, only_open = True)
-					if len(destination) == 0:
-						result = False
-		return result
+
+		if not result:
+			return False
+
+		for action in self.actions_arr:
+			if action[0]=="move" and "id)" not in action[1] and "!" not in action[1]:
+				destination = kd_map.get_random_business(action[1], 1, rng ,time_stamp = ts, only_open = True)
+				if len(destination) == 0:
+					return False
+		return True
 
 	def generate_actions(self,agent,kd_map,ts,rng):
 		actions = []
