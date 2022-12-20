@@ -215,32 +215,26 @@ class Controller():
         # LOGGING
         # infection summary
         ########################### LOGGING ###########################################
-        temp = self.sim.summarized_attribute("covid")
-        temp2 = {}
+        summarized_attr = self.sim.summarized_attribute("covid")
+        log_data = {}
         health_header = ["time_stamp","susceptible","exposed",
                   "asymptomatic","symptomatic","severe","recovered"]
-        for x in health_header:
-            if x in temp.keys():
-                temp2[x] = temp[x]
-            else:
-                temp2[x] = 0
-        temp2["time"] = self.sim.ts.get_hour_min_str()
-        temp2["time_stamp"] = self.sim.ts.step_count
-        self.logger.write_csv_data("infection_summary.csv", temp2)
+        for h in health_header:
+            log_data[h] = summarized_attr[h] if h in summarized_attr else 0
+        
+        log_data["time"] = self.sim.ts.get_hour_min_str()
+        log_data["time_stamp"] = self.sim.ts.step_count
+        self.logger.write_csv_data("infection_summary.csv", log_data)
 
         # agent position
-        temp = self.sim.summarized_attribute("location")
-        location_header = ["time", "time_stamp","home","road","restaurant","hospital","retail","workplace","business",
-        "school","university","train_station", "office","barbershop", "laboratory"]
-        for x in location_header:
-            if x in temp.keys():
-                temp2[x] = temp[x]
-            else:
-                temp2[x] = 0
-        temp2["time"] = self.sim.ts.get_hour_min_str()
-        temp2["time_stamp"] = self.sim.ts.step_count
-        self.logger.write_csv_data("agent_position_summary.csv", temp2)
-
+        summarized_attr = self.sim.summarized_attribute("location")
+        for k in summarized_attr.keys():
+            log_data = {}
+            log_data["time"] = self.sim.ts.get_hour_min_str()
+            log_data["time_stamp"] = self.sim.ts.step_count
+            log_data["location"]   = k
+            log_data["count"]      = summarized_attr[k]
+            self.logger.write_csv_data("agent_position_summary.csv", log_data)
 
         ###########################################################################
         # STEP
@@ -257,14 +251,14 @@ class Controller():
 
 
     def run_simulation(self):
-        steps_in_min =  (60)
-        for d in range(0, self.d_param["MAX_STEPS"], self.step_length):
+        steps_in_a_minute =  (60)
+        for d in range(0, self.d_param["MAX_STEPS"], self.d_param["STEP_LENGTH"]):
             self.run_step()
-            if d%steps_in_min == 0:
-                hours =  d//steps_in_min
-                self.print_msg(f"Running simulation... {hours}/{self.d_param['MAX_STEPS']/steps_in_min} minutes")
-        d += self.step_length
-        self.print_msg(f"{(d)/3600}/{self.d_param['MAX_STEPS']/3600} hours done")
+            if d%steps_in_a_minute == 0:
+                minutes =  d//steps_in_a_minute
+                self.print_msg(f"Running simulation... {minutes}/{self.d_param['MAX_STEPS']/steps_in_a_minute} minutes")
+
+        self.print_msg(f"{d+self.d_param['STEP_LENGTH']}/{self.d_param['MAX_STEPS']} steps done")
         self.print_msg("")
         time_log = f"{(d)} steps, {(d)/60} minutes"
         self.logger.write_log(data=time_log, filename="time.txt")
