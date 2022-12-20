@@ -13,8 +13,17 @@ class Simulation:
 		logger.write_log("--------------------Finished loading Attribute Genereator--------------------")
 
 		logger.write_log("--------------------Generating Attributes for Agents--------------------")
-		self.agents = agent_manager.generate_agents(kd_map,attribute_generator,agents_count, logger)
+		self.agents = agent_manager.generate_agents(kd_map,attribute_generator,agents_count, rng, logger)
 		logger.write_log("--------------------Finished Generating Attributes for Agents--------------------")
+
+		logger.write_log("--------------------Agent Profession Summary--------------------")
+		for profession in attribute_generator.professions:
+			count = 0
+			for ag in self.agents:
+				if ag.get_attribute("profession") == profession["name"]:
+					count += 1
+			logger.write_log(str(count) + " " + profession["name"] + " agents added to simulation")
+		logger.write_log("--------------------Agent Profession Summary--------------------")
 
 		logger.write_log("--------------------Adding Conditions--------------------")
 		self.conditions = agent_manager.load_conditions(config["condition"],rng, self.logger)
