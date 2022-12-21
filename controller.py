@@ -186,6 +186,11 @@ class Controller():
                   "agent_location","agent_node_id","current_state","next_state"]
         self.logger.add_csv_file("disease_transition.csv", header)
 
+        # infection transition
+        header = ["time_stamp","disease_name","agent_id","agent_profession",
+                  "agent_location","agent_node_id","symptom", "state"]
+        self.logger.add_csv_file("symptom.csv", header)
+
         # evacuation
         header = ["time", "time_stamp","evacuated","unevacuated_ERI","unevacuated_no_ERI"]
         self.logger.add_csv_file("evacuation.csv", header)

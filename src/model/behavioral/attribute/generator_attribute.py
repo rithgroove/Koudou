@@ -291,10 +291,11 @@ class GeneratorAttribute:
 			else:
 				counter -= prof["weight"]
 		self.counter+=1
+		'''
 		if logging:
 			for prof in self.professions:
 				logger.write_log("Added " + str(prof["weight"]) + " agents with profession " + prof["name"])
-		
+		'''
 		#calculate start time, end time, etc
 		start_time = self.rng.integers(temp["min_start_hour"],temp["max_start_hour"]+1,1)[0]
 		workhour = self.rng.integers(temp["min_workhour"],temp["max_workhour"]+1,1)[0]
