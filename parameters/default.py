@@ -6,7 +6,7 @@ parameters = {
 
 
     "SEED":            101512, # Seed used for reproducing experiments
-    "N_AGENTS":        5000, # Number of agents in the simulation, the more agents, the longer it will take to execute
+    "N_AGENTS":        4000, # Number of agents in the simulation, the more agents, the longer it will take to execute
     "THREADS":         8, # How many CPUs should be used for pathfinding
 
     "BUILDING_TAGS":  "config/map/tsukuba-tu-building-data.csv", # Path to the file that describes the tags to be created for untagged buildings
@@ -19,27 +19,28 @@ parameters = {
 
     "DISEASES": ["config/infection/covid.json"], # Path to the diseases that will be simualted, it will use this path and the config/infection/covid-infection.json
 
-    "EVACUATION": {"DISTANCE":10, "SHARE_INFO_CHANCE": 0.8}, # Agents have 80% cahnce of sharing infor if thgey have a distance less than 10
+    "EVACUATION": {"DISTANCE":10, "SHARE_INFO_CHANCE": 0.8}, # Agents have 80% cahnce of sharing infor if they have a distance less than 10
 
     "SIM_CONFIG":{
         "condition" : ["config/behavioral/condition.csv",
                        "config/evacuation/condition_evac.csv",
                        "config/infection/condition_infection.csv"],
 
-        "default_behavior" : "normal",
+        "start_behavior" : "normal",
 
         "attributes" : {
             "basic"      : ["config/behavioral/attributes/attribute_basic.csv",
                             "config/evacuation/attributes/attribute_basic_evac.csv"],
             "option"     : ["config/behavioral/attributes/attribute_option.csv",
                             "config/evacuation/attributes/attribute_option_evac.csv"],
-            "updateable" : ["config/behavioral/attributes/attribute_updateable.csv"],
+            "updateable" : ["config/evacuation/attributes/attribute_updateable.csv"],
             "schedule"   : ["config/behavioral/attributes/attribute_schedule.csv"],
             "profession" : ["config/behavioral/profession.csv"]
         },
         "behaviors" :{
             "normal"         : "config/behavioral/behavior/behavior_normal.csv",
             "evacuate"       : "config/evacuation/behavior/behavior_evacuate.csv",
+            "evacuated"       : "config/evacuation/behavior/behavior_evacuated.csv",
             "self_isolation" : "config/infection/behavior/behavior_symptomatic.csv",
             "severe"         : "config/infection/behavior/behavior_severe.csv"
         }

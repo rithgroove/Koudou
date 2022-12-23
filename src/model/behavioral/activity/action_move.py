@@ -27,7 +27,6 @@ class ActionMove(Action):
         self.agent = agent
         self.finished = False
         self.origin = agent.get_attribute("current_node_id")
-        self.vectors = []
         self.target = None
         self.typing = ""
         self.target_type = None
@@ -64,9 +63,8 @@ class ActionMove(Action):
         self.reseted = False
 
     def force_reset(self):
-        if (len(self.vectors) > 0):
-           self.vectors = [self.vectors[0]]
-           self.reseted = True
+        self.sequence = self.sequence[:1]
+        self.reseted = True
 
     def step(self,kd_sim,kd_map,ts,step_length,rng):
         # if have action do it
@@ -83,8 +81,9 @@ class ActionMove(Action):
             if (not self.reseted):
                 if self.target_type is not None:
                     self.agent.set_attribute("location",self.target_type)
+            self.reseted = False
             # if (self.destination_string == "!evac"):
-                # print(f"agent {self.agent.agent_id}'s' Evac Finished")
+            #     print(f"agent {self.agent.agent_id}'s' Evac Finished")
         return leftover
 
     @property
