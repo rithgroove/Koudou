@@ -14,7 +14,7 @@ parameters = {
     "GRID_SIZE":      20, # Grid size used when calculating the centroid for buildings, NOT recommended to change
     "EVAC_CENTER" :   "config/map/evacuation_center.json", # Path for the file that describes where the evac centers should be
     "STEP_LENGTH" :   5, #Each step is one second,
-    "MAX_STEPS"    :   60*60*24, # This is simulating for 7 weeks (49 daysm 24 hours, 60 minutes, 60 seconds), 
+    "MAX_STEPS"    :   60*60*24*10, # This is simulating for 7 weeks (49 daysm 24 hours, 60 minutes, 60 seconds),
     "LOG_LEVEL"     : "debug",
 
     "DISEASES": ["config/infection/covid.json"], # Path to the diseases that will be simualted, it will use this path and the config/infection/covid-infection.json

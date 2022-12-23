@@ -1,0 +1,339 @@
+[debug] : List of Parameters
+[debug] : --------------------START--------------------
+[debug] : EXP_NAME
+[debug] : SEED
+[debug] : MAX_STEPS
+[debug] : MAP
+[debug] : MAP_CACHE
+[debug] : PATHFIND_CACHE
+[debug] : BUILDING_TAGS
+[debug] : BUSINESS
+[debug] : GRID_SIZE
+[debug] : USE_VIEW
+[debug] : ZOOM_IN
+[debug] : ZOOM_OUT
+[debug] : SIM_CONFIG
+[debug] : DISEASES
+[debug] : EVACUATION
+[debug] : OS
+[debug] : N_AGENTS
+[debug] : THREADS
+[debug] : EVAC_CENTER
+[debug] : STEP_LENGTH
+[debug] : LOG_LEVEL
+[debug] : --------------------END---------------------
+[debug] : Found Map Cache
+[debug] : --------------------Loading Simulation--------------------
+[debug] : --------------------Loading Attribute Generator--------------------
+[debug] : walking_speed added to generator_attribute.basic
+[debug] : eat_out_preference added to generator_attribute.basic
+[debug] : household_food_stock added to generator_attribute.basic_household
+[debug] : taken_necessity added to generator_attribute.basic
+[debug] : target_evac added to generator_attribute.basic
+[debug] : explored_evac added to generator_attribute.basic
+[debug] : evacuated added to generator_attribute.basic
+[debug] : gender : Male added to generator_attribute.option
+[debug] : gender : Female added to generator_attribute.option
+[debug] : symptoms : Asymptomatic added to generator_attribute.option
+[debug] : symptoms : Symptomatic added to generator_attribute.option
+[debug] : symptoms : Severe added to generator_attribute.option
+[debug] : risk : Low added to generator_attribute.option
+[debug] : risk : Medium added to generator_attribute.option
+[debug] : risk : High added to generator_attribute.option
+[debug] : health : Susceptible added to generator_attribute.option
+[debug] : health : Exposed added to generator_attribute.option
+[debug] : health : Infectious added to generator_attribute.option
+[debug] : health : Recovered added to generator_attribute.option
+[debug] : health : Dead added to generator_attribute.option
+[debug] : quarantine : Not quaratined added to generator_attribute.option
+[debug] : quarantine : Quaratined added to generator_attribute.option
+[debug] : Hospitalized : Not hospitalized added to generator_attribute.option
+[debug] : Hospitalized : Hospitalized added to generator_attribute.option
+[debug] : know_evac : TRUE added to generator_attribute.option
+[debug] : know_evac : FALSE added to generator_attribute.option
+[debug] : hunger added to generator_attribute.updateable
+[debug] : energy added to generator_attribute.updateable
+[debug] : student schedule (weekday) added to generator_attribute.profession[schedule]
+[debug] : university_student schedule (weekday) added to generator_attribute.profession[schedule]
+[debug] : medical_doctor schedule (everyday) added to generator_attribute.profession[schedule]
+[debug] : teacher schedule (weekday) added to generator_attribute.profession[schedule]
+[debug] : university_professor  schedule (weekday) added to generator_attribute.profession[schedule]
+[debug] : salaryman_outside_city schedule (weekday) added to generator_attribute.profession[schedule]
+[debug] : retailer schedule (everyday) added to generator_attribute.profession[schedule]
+[debug] : salaryman schedule (weekday) added to generator_attribute.profession[schedule]
+[debug] : barber schedule (everyday) added to generator_attribute.profession[schedule]
+[debug] : restaurant_worker schedule (everyday) added to generator_attribute.profession[schedule]
+[debug] : scientist schedule (weekday) added to generator_attribute.profession[schedule]
+[debug] : evacuation with start time 5:0:0:0 and end time 8:0:0:0 added to generator_attribute.schedules_sim
+[debug] : --------------------Finished loading Attribute Genereator--------------------
+[debug] : --------------------Generating Attributes for Agents--------------------
+[debug] : Added walking_speed to agents
+[debug] : Added eat_out_preference to agents
+[debug] : Added taken_necessity to agents
+[debug] : Added target_evac to agents
+[debug] : Added explored_evac to agents
+[debug] : Added evacuated to agents
+[debug] : Added hunger to agents
+[debug] : Added energy to agents
+[debug] : Added gender to agents
+[debug] : Added symptoms to agents
+[debug] : Added risk to agents
+[debug] : Added health to agents
+[debug] : Added quarantine to agents
+[debug] : Added Hospitalized to agents
+[debug] : Added know_evac to agents
+[debug] : Added 450 agents with profession student
+[debug] : Added 1600 agents with profession university_student
+[debug] : Added 100 agents with profession medical_doctor
+[debug] : Added 100 agents with profession teacher
+[debug] : Added 200 agents with profession university_professor 
+[debug] : Added 800 agents with profession salaryman_outside_city
+[debug] : Added 450 agents with profession retailer
+[debug] : Added 1000 agents with profession salaryman
+[debug] : Added 10 agents with profession barber
+[debug] : Added 140 agents with profession restaurant_worker
+[debug] : Added 150 agents with profession scientist
+[debug] : Added the following profession related attributes to agents
+[debug] : workplace type, start time, end time, workhour, workday, schedule, off_map, workplace_id, workplace_node_id
+[debug] : Added profession to agents
+[debug] : --------------------Generating Household Attributes--------------------
+[debug] : Added 2477 households
+[debug] : Added household_food_stock to agents
+[debug] : --------------------Finished Generating Household Attributes--------------------
+[debug] : --------------------Finished Generating Attributes for Agents--------------------
+[debug] : --------------------Adding Conditions--------------------
+[debug] : is_working added to simulation.conditions
+[debug] : not_at_home added to simulation.conditions
+[debug] : at_home added to simulation.conditions
+[debug] : hungry added to simulation.conditions
+[debug] : symptomatic added to simulation.conditions
+[debug] : not_at_hospital added to simulation.conditions
+[debug] : severe added to simulation.conditions
+[debug] : sleepy added to simulation.conditions
+[debug] : at_hospital added to simulation.conditions
+[debug] : not_at_evac_point added to simulation.conditions
+[debug] : at_evac_point added to simulation.conditions
+[debug] : asymptomatic added to simulation.conditions
+[debug] : is_evac added to simulation.conditions
+[debug] : is_not_evac added to simulation.conditions
+[debug] : eat_out added to simulation.conditions
+[debug] : not_at_work added to simulation.conditions
+[debug] : start_to_have_symptoms added to simulation.conditions
+[debug] : fridge_empty added to simulation.conditions
+[debug] : not_evacuated added to simulation.conditions
+[debug] : evacuated added to simulation.conditions
+[debug] : have_target added to simulation.conditions
+[debug] : know_evac added to simulation.conditions
+[debug] : no_necessity added to simulation.conditions
+[debug] : is_susceptible added to simulation.conditions
+[debug] : is_recovered added to simulation.conditions
+[debug] : is_asymptomatic added to simulation.conditions
+[debug] : is_symptomatic added to simulation.conditions
+[debug] : is_severe added to simulation.conditions
+[debug] : --------------------Finished Adding Conditions--------------------
+[debug] : --------------------Adding Behaviors and Activities--------------------
+[debug] : Added switch_to_hospitalization to simulaiton.behaviors.activities
+[debug] : Added switch_to_evacuation to simulaiton.behaviors.activities
+[debug] : Added switch_to_self_isolate to simulaiton.behaviors.activities
+[debug] : Added go_to_work to simulaiton.behaviors.activities
+[debug] : Added eat_at_restaurant to simulaiton.behaviors.activities
+[debug] : Added eat_at_home to simulaiton.behaviors.activities
+[debug] : Added go_home_and_eat to simulaiton.behaviors.activities
+[debug] : Added do_groceries to simulaiton.behaviors.activities
+[debug] : Added go_home to simulaiton.behaviors.activities
+[debug] : Added sleep to simulaiton.behaviors.activities
+[debug] : Added normal to simulaiton.behaviors
+[debug] : Added switch_to_normal_from_evac to simulaiton.behaviors.activities
+[debug] : Added switch_to_hospitalization to simulaiton.behaviors.activities
+[debug] : Added switch_to_evacuated to simulaiton.behaviors.activities
+[debug] : Added go_home_to_take_necessity to simulaiton.behaviors.activities
+[debug] : Added take_necessity to simulaiton.behaviors.activities
+[debug] : Added move_to_evac_and_have_target to simulaiton.behaviors.activities
+[debug] : Added move_to_evac to simulaiton.behaviors.activities
+[debug] : Added move_randomly to simulaiton.behaviors.activities
+[debug] : Added evacuate to simulaiton.behaviors
+[debug] : Added switch_to_hospitalization to simulaiton.behaviors.activities
+[debug] : Added switch_to_evacuation to simulaiton.behaviors.activities
+[debug] : Added switch_to_normal to simulaiton.behaviors.activities
+[debug] : Added switch_to_normal_recovered to simulaiton.behaviors.activities
+[debug] : Added switch_to_normal_asymptomatic to simulaiton.behaviors.activities
+[debug] : Added go_home to simulaiton.behaviors.activities
+[debug] : Added eat_at_home to simulaiton.behaviors.activities
+[debug] : Added sleep to simulaiton.behaviors.activities
+[debug] : Added self_isolation to simulaiton.behaviors
+[debug] : Added switch_to_normal to simulaiton.behaviors.activities
+[debug] : Added switch_to_normal_recovered to simulaiton.behaviors.activities
+[debug] : Added switch_to_normal_asymptomatic to simulaiton.behaviors.activities
+[debug] : Added go_to_hospital to simulaiton.behaviors.activities
+[debug] : Added eat_at_hospital to simulaiton.behaviors.activities
+[debug] : Added sleep to simulaiton.behaviors.activities
+[debug] : Added severe to simulaiton.behaviors
+[debug] : --------------------Finished Adding Behaviors and Activities--------------------
+[debug] : simulation.behaviors added to simulation.agents
+[debug] : --------------------Adding Simulation Attributes--------------------
+[debug] : evacuation added to simulation.attributes
+[debug] : --------------------Finished Adding Simulation Attributes--------------------
+[debug] : --------------------Printing generator_attribute.py--------------------
+[debug] : [Attribute Generator]
+
+-----------------------------------------------
+| Agent's attributes                          |
+-----------------------------------------------
+ Basic attributes = 6
+   + walking_speed : 1.46(float)
+   + eat_out_preference : random(0.1-0.9)(float)
+   + taken_necessity : FALSE(bool)
+   + target_evac : none(string)
+   + explored_evac : none(string)
+   + evacuated : FALSE(bool)
+
+ Option based attributes = 7
+   + gender (string):
+     - Male : 0.5
+     - Female : 0.5
+   + symptoms (string):
+     - Asymptomatic : 1.0
+     - Symptomatic : 0.0
+     - Severe : 0.0
+   + risk (string):
+     - Low : 0.4
+     - Medium : 0.3
+     - High : 0.3
+   + health (string):
+     - Susceptible : 1.0
+     - Exposed : 0.0
+     - Infectious : 0.0
+     - Recovered : 0.0
+     - Dead : 0.0
+   + quarantine (string):
+     - Not quaratined : 1.0
+     - Quaratined : 0.0
+   + Hospitalized (string):
+     - Not hospitalized : 1.0
+     - Hospitalized : 0.0
+   + know_evac (bool):
+     - True : 0.3
+     - False : 0.7
+
+ Updateable attributes = 2
+   + hunger (float): 
+     - range            : 0.0 - 1.0 
+     - initialization   : 0.5 - 0.9
+     - update (seconds) : -1.15e-05
+   + energy (float): 
+     - range            : 0.0 - 1440.0 
+     - initialization   : 1000.0 - 1440.0
+     - update (seconds) : -0.017
+
+ Scheduled attributes = 0
+
+ Professions = 11
+   + student :
+     - place         : school
+     - working days  : 5 - 5 days
+     - duration      : 9 - 9 hours
+     - starting hour : 8 - 9 o'clock
+     - weight        : 450
+     - off_map        : False
+     - schedule      : Thu,Tue,Fri,Wed,Mon
+   + university_student :
+     - place         : university
+     - working days  : 3 - 5 days
+     - duration      : 4 - 9 hours
+     - starting hour : 8 - 14 o'clock
+     - weight        : 1600
+     - off_map        : False
+     - schedule      : Thu,Mon,Wed,Fri,Tue
+   + medical_doctor :
+     - place         : hospital
+     - working days  : 5 - 7 days
+     - duration      : 8 - 24 hours
+     - starting hour : 0 - 23 o'clock
+     - weight        : 100
+     - off_map        : False
+     - schedule      : Fri,Tue,Thu,Wed,Mon,Sun,Sat
+   + teacher :
+     - place         : school
+     - working days  : 5 - 5 days
+     - duration      : 9 - 9 hours
+     - starting hour : 8 - 9 o'clock
+     - weight        : 100
+     - off_map        : False
+     - schedule      : Tue,Wed,Mon,Fri,Thu
+   + university_professor  :
+     - place         : university
+     - working days  : 3 - 5 days
+     - duration      : 5 - 9 hours
+     - starting hour : 8 - 9 o'clock
+     - weight        : 200
+     - off_map        : False
+     - schedule      : Mon,Thu,Wed,Fri,Tue
+   + salaryman_outside_city :
+     - place         : train_station
+     - working days  : 5 - 5 days
+     - duration      : 9 - 9 hours
+     - starting hour : 8 - 9 o'clock
+     - weight        : 800
+     - off_map        : True
+     - schedule      : Wed,Tue,Thu,Mon,Fri
+   + retailer :
+     - place         : retail
+     - working days  : 3 - 5 days
+     - duration      : 8 - 8 hours
+     - starting hour : 0 - 23 o'clock
+     - weight        : 450
+     - off_map        : False
+     - schedule      : Sun,Fri,Tue,Sat,Wed,Thu,Mon
+   + salaryman :
+     - place         : office
+     - working days  : 5 - 5 days
+     - duration      : 4 - 5 hours
+     - starting hour : 8 - 10 o'clock
+     - weight        : 1000
+     - off_map        : False
+     - schedule      : Fri,Wed,Thu,Tue,Mon
+   + barber :
+     - place         : barbershop
+     - working days  : 5 - 6 days
+     - duration      : 7 - 8 hours
+     - starting hour : 8 - 12 o'clock
+     - weight        : 10
+     - off_map        : False
+     - schedule      : Wed,Sun,Thu,Mon,Sat,Tue,Fri
+   + restaurant_worker :
+     - place         : restaurant
+     - working days  : 5 - 7 days
+     - duration      : 8 - 10 hours
+     - starting hour : 0 - 18 o'clock
+     - weight        : 140
+     - off_map        : False
+     - schedule      : Sun,Mon,Wed,Tue,Sat,Fri,Thu
+   + scientist :
+     - place         : laboratory
+     - working days  : 3 - 5 days
+     - duration      : 5 - 9 hours
+     - starting hour : 8 - 9 o'clock
+     - weight        : 150
+     - off_map        : False
+     - schedule      : Mon,Tue,Fri,Thu,Wed
+-----------------------------------------------
+| simulator's attributes                      |
+-----------------------------------------------
+ Basic attributes = 0
+
+ Option based attributes = 0
+
+ Updateable attributes = 0
+ Scheduled attributes = 1
+   + evacuation: 
+     - start          : 432000
+     - end            : 691200
+
+
+[debug] : --------------------Finished Printing generator_attribute.py--------------------
+[debug] : --------------------Loading Disease Module--------------------
+[debug] : 10 agents infected to covid
+[debug] : --------------------Finished Loading Disease Module--------------------
+[debug] : --------------------Loading Evacuation Module--------------------
+[debug] : --------------------Finished Loading Disease Module--------------------
+[debug] : --------------------Finished Loading Simulation--------------------
