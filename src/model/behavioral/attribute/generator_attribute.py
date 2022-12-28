@@ -252,7 +252,7 @@ class GeneratorAttribute:
 					logger.write_log("Added " + shared_attr.name + " to agents")
 			logging = 0
 
-	def generate_attribute(self,agent,kd_map, logger, logging):
+	def generate_attribute(self,agent,kd_map, rng, logger, logging):
 		# add basic attribute
 		for attr in self.basic:
 			if (self.basic[attr]["value"] == "!random"):
@@ -282,18 +282,14 @@ class GeneratorAttribute:
 					logger.write_log("Added " + key + " to agents")
 
 		# get profession for this agent (not random but iteratively)
-		counter = self.counter % self.max_weight
 		temp = None
+		rnd = rng.integers(self.max_weight)
+		cumulative = 0
 		for prof in self.professions:
-			if prof["weight"] > counter:
+			cumulative += prof["weight"]
+			if rnd < cumulative:
 				temp = prof
 				break
-			else:
-				counter -= prof["weight"]
-		self.counter+=1
-		if logging:
-			for prof in self.professions:
-				logger.write_log("Added " + str(prof["weight"]) + " agents with profession " + prof["name"])
 		
 		#calculate start time, end time, etc
 		start_time = self.rng.integers(temp["min_start_hour"],temp["max_start_hour"]+1,1)[0]

@@ -22,11 +22,12 @@ def load_conditions(condition_files,rng, logger):
 			logger.write_log(x["name"] + " added to simulation.conditions")
 	return conditions
 	
-def generate_agents(kd_map,attribute_generator,n_agents, logger):
+def generate_agents(kd_map,attribute_generator,n_agents,rng,logger):
 	agents = []
+	logger.write_log("Generating " + str(n_agents) + " agents")
 	for ag_id in range(n_agents):
 		agent = Agent(ag_id)
-		attribute_generator.generate_attribute(agent, kd_map, logger, ag_id == (n_agents - 1))
+		attribute_generator.generate_attribute(agent, kd_map, rng, logger, ag_id == (n_agents - 1))
 		agents.append(agent)
 	logger.write_log("--------------------Generating Household Attributes--------------------")
 	attribute_generator.generate_household_attribute(agents, kd_map, logger)
