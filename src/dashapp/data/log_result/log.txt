@@ -64,7 +64,7 @@
 [debug] : barber schedule (everyday) added to generator_attribute.profession[schedule]
 [debug] : restaurant_worker schedule (everyday) added to generator_attribute.profession[schedule]
 [debug] : scientist schedule (weekday) added to generator_attribute.profession[schedule]
-[debug] : evacuation with start time 400:11:0:0 and end time 1121:14:0:0 added to generator_attribute.schedules_sim
+[debug] : evacuation with start time 5:0:0:0 and end time 8:0:0:0 added to generator_attribute.schedules_sim
 [debug] : --------------------Finished loading Attribute Genereator--------------------
 [debug] : --------------------Generating Attributes for Agents--------------------
 [debug] : Added walking_speed to agents
@@ -326,8 +326,8 @@
  Updateable attributes = 0
  Scheduled attributes = 1
    + evacuation: 
-     - start          : 34599600
-     - end            : 96904800
+     - start          : 432000
+     - end            : 691200
 
 
 [debug] : --------------------Finished Printing generator_attribute.py--------------------

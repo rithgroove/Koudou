@@ -37,7 +37,7 @@ class Simulation:
 
 		for x in self.agents:
 			x.behaviors = self.behaviors
-			x.default_behavior = self.behaviors[config["default_behavior"]]
+			x.current_behavior = self.behaviors[config["start_behavior"]]
 		self.logger.write_log("simulation.behaviors added to simulation.agents")
 
 		logger.write_log("--------------------Adding Simulation Attributes--------------------")

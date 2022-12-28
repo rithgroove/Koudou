@@ -1,8 +1,6 @@
-from dash import Dash, html
+from dash import Dash
 import dash
-import dash_bootstrap_components as dbc
 from pages.public.data import *
-from pages.public.css import *
 
 markdown_text = open('data/home/markdown_files/introduction.txt', encoding='utf-8').read()
 
@@ -11,18 +9,39 @@ app = Dash(__name__, use_pages=True, external_stylesheets=[BS])
 navbar = dbc.NavbarSimple(
     children=[
         dbc.NavItem(dbc.NavLink("About", href="/about")),
-        dbc.NavItem(dbc.NavLink("Configuration", href="/config")),
-        dbc.NavItem(dbc.NavLink("Map", href="/map")),
-        dbc.NavItem(dbc.NavLink("Simulation Result", href="/result")),
         dbc.DropdownMenu(
             children=[
+                dbc.DropdownMenuItem("General", href="/config"),
+                dbc.DropdownMenuItem("Map", href="/map"),
+            ],
+            nav=True,
+            in_navbar=True,
+            label="Configuration",
+        ),
+        dbc.DropdownMenu(
+            children=[
+                dbc.DropdownMenuItem("Simulation Log", href="/result"),
                 dbc.DropdownMenuItem("Infection", href="/infection"),
                 dbc.DropdownMenuItem("Evacuation", href="/evacuation"),
-                dbc.DropdownMenuItem("Geographical", href="/geographical"),
+                dbc.DropdownMenuItem("Location", href="/geographical"),
             ],
             nav=True,
             in_navbar=True,
             label="Simulation Analysis",
+        ),
+        dbc.NavItem(dbc.NavLink("Model Verification", href="/verification")),
+        dbc.NavItem(dbc.NavLink("Upload", href="/upload")),
+        dbc.DropdownMenu(
+            children=[
+                dbc.DropdownMenuItem("Introduction", href="/comparison_intro"),
+                dbc.DropdownMenuItem("Infection", href="/comparison_infection"),
+                dbc.DropdownMenuItem("Evacuation", href="/comparison_evacuation"),
+                dbc.DropdownMenuItem("Location", href="/comparison_geo"),
+                dbc.DropdownMenuItem("Log", href="/comparison_log"),
+            ],
+            nav=True,
+            in_navbar=True,
+            label="Comparison",
         ),
     ],
     brand="Simulator Dashboard",

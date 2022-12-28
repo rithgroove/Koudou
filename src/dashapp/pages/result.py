@@ -3,7 +3,7 @@ from dash import html
 import os
 from .public.css import *
 
-log_data = open(os.getcwd()+'/data/log_result/log.txt')
+log_data = open(os.getcwd() + "./data/log_result/log.txt", "r")
 log_data_lines = log_data.readlines()
 
 dash.register_page(__name__)
@@ -16,6 +16,6 @@ layout = html.Div(
     children=[
         html.Span('Simulation Log', className="badge bg-dark", style=style_badge),
         html.Div(style=style_log, children=html_list)
-    ], style=style_background
+    ]
 )
 

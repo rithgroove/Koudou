@@ -51,7 +51,7 @@ layout = html.Div(
                 ),
             ], style=style_alert_align
         ),
-        html.Div(id='count-number', style=style_data_table),
+        html.Div(id='count-number', style=style_data_align_3),
         html.Div(style=style_checklist_form, children=[
             dcc.Checklist(
                 style=style_checklist_align,
@@ -61,7 +61,7 @@ layout = html.Div(
                 inline=True,
                 inputClassName='form-check-input',
             ),
-            dcc.Graph(style={'margin-left': '30px'}, id="business_figure"),
+            dcc.Graph(style={'margin-left': '30px', 'width':'70%'}, id="business_figure"),
         ]),
     ]
 )
@@ -105,8 +105,8 @@ def business_filter(business_type):
     fig.update_layout(
         plot_bgcolor='#E6E6FA',  # 图的背景颜色
         paper_bgcolor='#F8F8FF',  # 图像的背景颜色
-        height=800,
-        width=900,
+        height=600,
+        # width=900,
         showlegend=False,
         margin=go.layout.Margin(l=5, r=5, b=5, t=5, pad=0),  # pad参数是刻度与标签的距离
     )
@@ -150,7 +150,7 @@ def update_graph(choice):
                    align='left'))
     ])
     fig.update_layout(
-        width=1000,
+        # width=1000,
         height=400,
         showlegend=False,
         margin=go.layout.Margin(l=5, r=5, b=5, t=5, pad=0),  # pad参数是刻度与标签的距离
@@ -185,7 +185,7 @@ def update_graph(choice):
         plot_bgcolor='#E6E6FA',  # 图的背景颜色
         paper_bgcolor='#F8F8FF',  # 图像的背景颜色
         height=500,
-        width=1000,
+        # width=1000,
         showlegend=False,
         margin=go.layout.Margin(l=5, r=5, b=5, t=5, pad=0),  # pad参数是刻度与标签的距离
     )
@@ -221,7 +221,7 @@ def update_graph(choice):
         plot_bgcolor='#E6E6FA',  # 图的背景颜色
         paper_bgcolor='#F8F8FF',  # 图像的背景颜色
         height=200,
-        width=1000,
+        # width=1000,
         showlegend=False,
         margin=go.layout.Margin(l=5, r=5, b=5, t=5, pad=0),  # pad参数是刻度与标签的距离
     )
