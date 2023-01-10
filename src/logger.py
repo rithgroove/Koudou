@@ -6,7 +6,9 @@ import datetime
 class Logger():
     def __init__(self, exp_name, level):
         self.exp_name = exp_name
-        self.path     = os.path.join("results", exp_name, time.asctime())
+        folder_name = time.asctime().split(" ")
+        folder_name = "_".join(folder_name[1:])
+        self.path     = os.path.join("results", exp_name, time.asctime().replace(" ", "_"))
         self.files    = {}
         self.headers = {}
         os.makedirs(self.path, exist_ok=True)

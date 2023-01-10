@@ -1,10 +1,13 @@
 from collections import OrderedDict
 import parameters.default as defaultParam
-import pandas as pd
+from .utils import *
 
 # ---------------- App ------------------
-BS = 'https://bootswatch.com/5/lumen/bootstrap.min.css'
-
+# BS = 'https://bootswatch.com/5/lumen/bootstrap.min.css'
+# BS = 'https://bootswatch.com/5/sketchy/bootstrap.min.css'
+# BS = 'https://bootswatch.com/5/flatly/bootstrap.min.css'
+BS = 'https://bootswatch.com/5/united/bootstrap.min.css'
+# BS = ''
 
 # ---------------- config ------------------
 data_default_config = OrderedDict(
@@ -28,7 +31,7 @@ data_default_config = OrderedDict(
              str(defaultParam.parameters.get("THREADS")),
              str(defaultParam.parameters.get("GRID_SIZE")),
              str(defaultParam.parameters.get("STEP_LENGTH")),
-             str(defaultParam.parameters.get("MAX_STEPS")),
+             timestamp_converter(defaultParam.parameters.get("MAX_STEPS")),
              str(defaultParam.parameters.get("EVACUATION").get("SHARE_INFO_CHANCE")),
              str(defaultParam.parameters.get("EVACUATION").get("DISTANCE")),
              ],
@@ -40,7 +43,7 @@ data_default_config = OrderedDict(
              "Number of CPUs be used for pathfinding",
              "Used when calculating the centroid for buildings",
              "Each step is one second",
-             "This is simulating for 7 weeks",
+             "Simulation duration for one cycle",
              "Agents have 80% chance of sharing information",
              "if they have a distance less than 10"
              ]
