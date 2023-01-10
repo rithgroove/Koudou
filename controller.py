@@ -172,7 +172,7 @@ class Controller():
 
         # activity
         header = ["time", "time_stamp","agent_id","profession","location",
-                  "current_node_id","household_id","home_node_id","activy_name"]
+                  "current_node_id","household_id","home_node_id","activy_name", "event_id"]
         self.logger.add_csv_file("activity_history.csv", header)
 
         # new infections
@@ -183,7 +183,7 @@ class Controller():
 
         # infection transition
         header = ["time", "time_stamp","disease_name","agent_id","agent_profession",
-                  "agent_location","agent_node_id","current_state","next_state"]
+                  "agent_location","agent_node_id","current_state","next_state", "event_id"]
         self.logger.add_csv_file("disease_transition.csv", header)
 
         # evacuation
@@ -228,13 +228,14 @@ class Controller():
 
         # agent position
         summarized_attr = self.sim.summarized_attribute("location")
+        log_data = {}
+        log_data["time"] = self.sim.ts.get_hour_min_str()
+        log_data["time_stamp"] = self.sim.ts.step_count
+            
         for k in summarized_attr.keys():
-            log_data = {}
-            log_data["time"] = self.sim.ts.get_hour_min_str()
-            log_data["time_stamp"] = self.sim.ts.step_count
-            log_data["location"]   = k
-            log_data["count"]      = summarized_attr[k]
-            self.logger.write_csv_data("agent_position_summary.csv", log_data)
+            log_data[k]   = summarized_attr[k]
+
+        self.logger.write_csv_data("agent_position_summary.csv", log_data)
 
         ###########################################################################
         # STEP

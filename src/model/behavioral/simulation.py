@@ -139,5 +139,5 @@ class Simulation:
 		summary = {}
 		for agent in self.agents:
 			key = agent.get_attribute(attribute_name)
-			summary[key] = summary[key] + 1 if key in summary else 0
+			summary[key] = summary[key] + 1 if key in summary else 1
 		return summary

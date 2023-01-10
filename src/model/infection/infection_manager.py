@@ -45,7 +45,8 @@ def initializate_disease_on_population(disease: Disease, initialization: Dict, p
     infected_ags = rng.choice(population, qtd, replace = False)
     for ag in infected_ags:
         ag.set_attribute(disease.name, initialization["state"])
-    logger.write_log(str(qtd) + " agents infected to " + disease.name)
+        logger.write_log("Agent" + str(ag.agent_id) + " changed to state " + initialization["state"] + " of " + disease.name)
+    
 
 def infection_step(step_size: int, kd_map: Map, population: List[Agent], infection_module: Infection, rng,logger,ts):
     # next state of the infected agents
@@ -80,7 +81,7 @@ def infected_next_stage(step_size, ag: Agent, disease: Disease, rng, logger,ts):
                 data["agent_node_id"] = ag.get_attribute("current_node_id")
                 data["current_state"] = current_state
                 data["next_state"] = next_state
-                logger.write_csv_data("disease_transition.csv", data)
+                logger.write_csv_data("disease_transition.csv", data, id=True)
                 break
             previous_chances += chance
 
