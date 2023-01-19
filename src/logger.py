@@ -14,6 +14,7 @@ class Logger():
         os.makedirs(self.path, exist_ok=True)
         self.lvl_dic = {"all": 1, "debug": 2, "info": 3, "warn": 4, "error": 5, "fatal": 6, "off": 7}
         self.level = self.lvl_dic[level]
+        self.event_id = 0
 
     def write_log(self, data, level="debug", filename="log.txt"):
         if (self.lvl_dic[level] >= self.level):
@@ -31,13 +32,19 @@ class Logger():
         if header is not None:
             self.files[filename].write(header)
 
-    def write_csv_data(self, filename, data):
+    def write_csv_data(self, filename, data, id = False):
         header = self.headers[filename]
         temp = ""
         for x in header:
             if temp != "":
                 temp += ","
-            temp += f"{data[x]}"
+            if x in data:
+                temp += f"{data[x]}"
+            else:
+                temp += str(0)
+        if id:
+            self.event_id += 1
+            temp += str(self.event_id)
         self.files[filename].write(temp+"\n")
 
     def add_csv_file(self, filename, header):
