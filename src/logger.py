@@ -8,7 +8,7 @@ class Logger():
         self.exp_name = exp_name
         folder_name = time.asctime().split(" ")
         folder_name = "_".join(folder_name[1:])
-        self.path     = os.path.join("results", exp_name, time.asctime().replace(" ", "_"))
+        self.path     = os.path.join("results", exp_name, time.asctime().replace(" ", "_").replace(":",""))
         self.files    = {}
         self.headers = {}
         os.makedirs(self.path, exist_ok=True)
