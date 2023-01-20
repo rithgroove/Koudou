@@ -77,8 +77,8 @@ def pie_chart_return(value):
     fig = px.pie(counts_pd,
                  names="location",
                  values="counts",
-                 # 不同颜色：RdBu、Peach
-                 color_discrete_sequence=px.colors.sequential.Peach  # 只需要改变最后的RdBu即可
+                 # Different color: RdBu、Peach
+                 color_discrete_sequence=px.colors.sequential.Peach
                  )
     colors = ['gold', 'mediumturquoise', 'darkorange', 'lightgreen', 'cyan']
     fig.update_traces(
@@ -91,6 +91,6 @@ def pie_chart_return(value):
         height=300,
         # width=80,
         showlegend=True,
-        margin=go.layout.Margin(l=0, r=0, b=0, t=15, pad=0),  # pad参数是刻度与标签的距离
+        margin=go.layout.Margin(l=0, r=0, b=0, t=15, pad=0),
     )
     return fig

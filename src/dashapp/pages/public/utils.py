@@ -341,6 +341,26 @@ def pie_return_html(counts_dict):
     )
     return fig
 
+
+def bar_return_html(counts_dict):
+    x = list(counts_dict.keys())
+    y = list(counts_dict.values())
+
+    # Use the hovertext kw argument for hover text
+    fig = go.Figure(data=[go.Bar(x=x, y=y,
+                                 hovertext=list(counts_dict.keys()))])
+    # Customize aspect
+    fig.update_traces(marker_color='rgb(158,202,225)', marker_line_color='rgb(8,48,107)',
+                      marker_line_width=1.5, opacity=0.6)
+    fig.update_layout(
+        height=300,
+        # width=80,
+        margin=go.layout.Margin(l=0, r=0, b=0, t=0, pad=0),  # pad参数是刻度与标签的距离
+    )
+    return fig
+
+
+
 # ---------------- comparison infection ------------------
 def facts_return_html(model):
     df_new_infection = model.new_infection

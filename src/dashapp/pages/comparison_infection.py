@@ -268,14 +268,85 @@ tab3_content = dbc.Card(
     className="mt-3",
 )
 
++MA_tab1_content = dbc.Card(
+    dbc.CardBody(
+        [
+            html.Div(
+                className='container-fluid',
+                children=[
+                ]
+            ),
+        ]
+    ),
+    className="mt-3",
+)
+
+MA_tab2_content = dbc.Card(
+    dbc.CardBody(
+        [
+            html.Div(
+                className='container-fluid',
+                children=[
+                ]
+            ),
+        ]
+    ),
+    className="mt-3",
+)
+
+MA_tab3_content = dbc.Card(
+    dbc.CardBody(
+        [
+            html.Div(
+                className='container-fluid',
+                children=[
+                ]
+            ),
+        ]
+    ),
+    className="mt-3",
+)
+
+MA_tab4_content = dbc.Card(
+    dbc.CardBody(
+        [
+            html.Div(
+                className='container-fluid',
+                children=[
+                ]
+            ),
+        ]
+    ),
+    className="mt-3",
+)
+
+tab4_content = dbc.Card(
+    dbc.CardBody(
+        [
+            html.Div(
+                children=[
+                    dbc.Tabs(
+                        [
+                            dbc.Tab(MA_tab1_content, label="Model One"),
+                            dbc.Tab(MA_tab2_content, label="Model Two"),
+                            dbc.Tab(MA_tab3_content, label="Model Three"),
+                            dbc.Tab(MA_tab4_content, label="Effectiveness for Masks"),
+                        ], style={'marginTop': '5px'}
+                    )
+                ]
+            ),
+        ]
+    ),
+    className="mt-3",
+)
+
 tabs = dbc.Tabs(
     [
         dbc.Tab(tab1_content, label="Facts"),
         dbc.Tab(tab2_content, label="Infection Rate"),
-        dbc.Tab(tab3_content, label="Infection for Agent"),
-        dbc.Tab(
-            "This tab's content is never seen", label="To be developed", disabled=True
-        ),
+        dbc.Tab(tab3_content, label="Agent Behavior Tracking"),
+        dbc.Tab(tab4_content, label="Mask Analysis"),
+        dbc.Tab("tab4_content", label="To be developed", disabled=True),
     ], style={'marginTop': '5px'}
 )
 
