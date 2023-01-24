@@ -23,6 +23,7 @@ class Behavior:
 					temp_activity["household_id"] = agent.get_attribute("household_id")
 					temp_activity["home_node_id"] = agent.get_attribute("home_node_id")
 					temp_activity["activy_name"] = act.name
+					temp_activity["mask_behavior"] = agent.get_attribute("mask_wearing_type")
 					logger.write_csv_data("activity_history.csv", temp_activity, id=True)
 					agent.previous_activity = act.name
 				actions = act.generate_actions(agent,kd_map,ts,rng)

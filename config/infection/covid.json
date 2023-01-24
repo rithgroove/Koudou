@@ -64,5 +64,34 @@
                 "probability": 0.0
             }
         }
+    },
+    "precautionary_measures": {
+        "mask": {
+            "infection_rate": {
+                "no_mask": 1.0,
+                "surgical_mask": 0.8,
+                "n95_mask":  0.5
+            },
+            "self_infected_masked": {
+                "surgical_to_n95": 0.5,
+                "no_change": 0.5
+            },
+            "self_infected_unmasked": {
+                "no_to_surgical": 0.4,
+                "no_to_n95": 0.1,
+                "no_change": 0.5
+            },
+            "around_infected": {
+                "no_to_surgical": 0.4,
+                "no_to_n95": 0.05,
+                "surgical_to_n95": 0.05,
+                "no_change": 0.5
+            }
+        },
+        "pcr_test": {
+            "true": 0.8,
+            "false_negative": 0.1,
+            "false_positive": 0.1
+        }
     }
 }

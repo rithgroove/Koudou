@@ -177,18 +177,20 @@ class Controller():
 
         # activity
         header = ["time", "time_stamp","agent_id","profession","location",
-                  "current_node_id","household_id","home_node_id","activy_name", "event_id"]
+                  "current_node_id","household_id","home_node_id","activy_name", "event_id", "mask_behavior"]
         self.logger.add_csv_file("activity_history.csv", header)
 
         # new infections
         header = ["time", "time_stamp","type","disease_name","agent_id",
                   "agent_profession","agent_location","agent_node_id",
-                  "source_id","source_profession","source_location","source_node_id"]
+                  "source_id","source_profession","source_location","source_node_id",
+                  "current_mask", "next_mask"]
         self.logger.add_csv_file("new_infection.csv", header)
 
         # infection transition
         header = ["time", "time_stamp","disease_name","agent_id","agent_profession",
-                  "agent_location","agent_node_id","current_state","next_state", "event_id"]
+                  "agent_location","agent_node_id","current_state","next_state", "event_id",
+                  "mask_behavior"]
         self.logger.add_csv_file("disease_transition.csv", header)
 
         header = ["time_stamp","disease_name","agent_id","agent_profession",

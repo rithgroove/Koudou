@@ -162,6 +162,9 @@ class GeneratorAttribute:
 			profession["min_start_hour"] = int(attr["min_start_hour"])
 			profession["max_start_hour"] = int(attr["max_start_hour"])
 			profession["weight"] = int(attr["weight"])
+			profession['no_mask'] = float(attr['no_mask'])
+			profession['surgical_mask'] = float(attr['surgical_mask'])
+			profession['n95_mask'] = float(attr['n95_mask'])
 			self.max_weight += profession["weight"]
 			profession["off_map"] = attr["off_map"]
 			profession["schedule"] = []
@@ -290,7 +293,22 @@ class GeneratorAttribute:
 			if rnd < cumulative:
 				temp = prof
 				break
-		
+
+		# add mask_wearing attribute (random)
+		no_mask_level = temp['no_mask']
+		surgical_mask_level = no_mask_level + temp['surgical_mask']
+		# n95_mask_level = surgical_mask_level + temp['n95_mask']
+		rnd = rng.uniform(0.0, 1.0, 1)[0]
+		if rnd < no_mask_level:
+			agent.add_attribute(Attribute('if_wear_mask', False, 'bool'))
+			agent.add_attribute(Attribute('mask_wearing_type', 'no_mask', 'string'))
+		elif rnd < surgical_mask_level:
+			agent.add_attribute(Attribute('if_wear_mask', True, 'bool'))
+			agent.add_attribute(Attribute('mask_wearing_type', 'surgical_mask', 'string'))
+		else:
+			agent.add_attribute(Attribute('if_wear_mask', True, 'bool'))
+			agent.add_attribute(Attribute('mask_wearing_type', 'n95_mask', 'string'))
+
 		#calculate start time, end time, etc
 		start_time = self.rng.integers(temp["min_start_hour"],temp["max_start_hour"]+1,1)[0]
 		workhour = self.rng.integers(temp["min_workhour"],temp["max_workhour"]+1,1)[0]
