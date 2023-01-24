@@ -316,6 +316,7 @@ class GeneratorAttribute:
 		#---------------------------sorting done-----------------------------
 
 		#get random workplace
+		logger.write_log("get random business : " + temp["place"])
 		business = kd_map.get_random_business(temp["place"], 1, self.rng)[0]
 		
 		# generate profession related attribute

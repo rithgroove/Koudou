@@ -32,6 +32,7 @@ class Logger():
     def write_csv_data(self, filename, data):
         header = self.headers[filename]
         temp = ""
+        self.write_log("Write CSV Data : " + filename + str(header))
         for x in header:
             if temp != "":
                 temp += ","
