@@ -1,6 +1,6 @@
 import os
 import dash
-from dash import dash_table, callback, dcc, Input, Output, html, State
+from dash import callback, dcc, Input, Output, State
 from .public.css import *
 from .public.data import *
 from .public.utils import *

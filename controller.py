@@ -145,19 +145,24 @@ class Controller():
             # todo: we shouldnt pass thw whole simulator, just the necessary things
             # i guess just agents, but Im not changing this to avoid bugs
             self.logger.write_log("--------------------Loading Disease Module--------------------")
-            self.sim.modules.append(
-                InfectionModule(parameters = self.d_param["DISEASES"],
-                                kd_sim     = self.sim,
-                                rng        = self.rng,
-                                logger     = self.logger))
+            infec_model = InfectionModule(
+                parameters = self.d_param["DISEASES"],
+                kd_sim     = self.sim,
+                rng        = self.rng,
+                logger     = self.logger
+            )
+            self.sim.modules.append(infec_model)
             self.logger.write_log("--------------------Finished Loading Disease Module--------------------")
                                 
 
         if self.d_param["EVACUATION"]:
             self.logger.write_log("--------------------Loading Evacuation Module--------------------")
-            self.sim.modules.append(
-                EvacuationModule(distance = self.d_param["EVACUATION"]["DISTANCE"],
-                                 share_information_chance = self.d_param["EVACUATION"]["SHARE_INFO_CHANCE"]))
+            evac_module = EvacuationModule(
+                distance=self.d_param["EVACUATION"]["DISTANCE"],
+                share_information_chance=self.d_param["EVACUATION"]["SHARE_INFO_CHANCE"], 
+                logger = self.logger,
+            )
+            self.sim.modules.append(evac_module)
             self.logger.write_log("--------------------Finished Loading Disease Module--------------------")
 
     ## LOGGER
@@ -175,7 +180,7 @@ class Controller():
 
         # activity
         header = ["time", "time_stamp","agent_id","profession","location",
-                  "current_node_id","household_id","home_node_id","activy_name"]
+                  "current_node_id","household_id","home_node_id","activy_name", "event_id"]
         self.logger.add_csv_file("activity_history.csv", header)
 
         # new infections
@@ -186,10 +191,9 @@ class Controller():
 
         # infection transition
         header = ["time", "time_stamp","disease_name","agent_id","agent_profession",
-                  "agent_location","agent_node_id","current_state","next_state"]
+                  "agent_location","agent_node_id","current_state","next_state", "event_id"]
         self.logger.add_csv_file("disease_transition.csv", header)
 
-        # infection transition
         header = ["time_stamp","disease_name","agent_id","agent_profession",
                   "agent_location","agent_node_id","symptom", "state"]
         self.logger.add_csv_file("symptom.csv", header)
@@ -236,14 +240,14 @@ class Controller():
 
         # agent position
         summarized_attr = self.sim.summarized_attribute("location")
-        self.logger.write_log("Location Keys : " + str(summarized_attr.keys()))
+        log_data = {}
+        log_data["time"] = self.sim.ts.get_hour_min_str()
+        log_data["time_stamp"] = self.sim.ts.step_count
+        
         for k in summarized_attr.keys():
-            log_data = {}
-            log_data["time"] = self.sim.ts.get_hour_min_str()
-            log_data["time_stamp"] = self.sim.ts.step_count
-            log_data["location"]   = k
-            log_data["count"]      = summarized_attr[k]
-            self.logger.write_csv_data("agent_position_summary.csv", log_data)
+            log_data[k]   = summarized_attr[k]
+
+        self.logger.write_csv_data("agent_position_summary.csv", log_data)
 
         ###########################################################################
         # STEP

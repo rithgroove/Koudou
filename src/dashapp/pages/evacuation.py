@@ -5,9 +5,19 @@ from .public.css import *
 
 dash.register_page(__name__)
 
-layout = html.Div(style=style_title,
+layout = html.Div(style=style_data_table,
     children=[
-        html.H2(children="Evacuation Analysis"),
+        html.Div(
+            children=[
+                html.Span('Evacuation Analysis', className="badge bg-dark", style=style_badge2),
+                html.H3(style=style_title, id='datetime-text'),
+                dcc.Interval(
+                    id='datetime',
+                    interval=20 * 1000,
+                    n_intervals=0
+                )
+            ]
+        ),
         html.Div([
             html.Div(style=style_title, children=[
                 html.Label('Agent ID  '),
