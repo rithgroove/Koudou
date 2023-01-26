@@ -77,6 +77,7 @@ def create_symptoms(step_size, ag: Agent, disease: Disease, rng, logger,ts):
                 data["agent_node_id"] = ag.get_attribute("current_node_id")
                 data["symptom"] = symptom
                 data["state"] = "symptomatic"
+                data['mask_state'] = ag.get_attribute('mask_wearing_type')
                 logger.write_csv_data("symptom.csv", data)
 
 def remove_symptoms(ag: Agent, disease: Disease, rng, logger, ts):
@@ -92,6 +93,7 @@ def remove_symptoms(ag: Agent, disease: Disease, rng, logger, ts):
             data["agent_node_id"] = ag.get_attribute("current_node_id")
             data["symptom"] = symptom
             data["state"] = "asymptomatic"
+            data['mask_state'] = ag.get_attribute('mask_wearing_type')
             logger.write_csv_data("symptom.csv", data)
 
 # To reduce the rate of infection

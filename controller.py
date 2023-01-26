@@ -165,6 +165,10 @@ class Controller():
     def init_logger(self):
         self.logger = Logger(exp_name=self.d_param["EXP_NAME"], level=self.d_param["LOG_LEVEL"])
 
+        # mask
+        header = ["time", "time_stamp", "no_mask", "surgical_mask", "n95_mask"]
+        self.logger.add_csv_file("mask_summary.csv", header)
+
         # health
         header = ["time", "time_stamp","susceptible","exposed",
                   "asymptomatic","symptomatic","severe","recovered"]
@@ -177,7 +181,7 @@ class Controller():
 
         # activity
         header = ["time", "time_stamp","agent_id","profession","location",
-                  "current_node_id","household_id","home_node_id","activy_name", "event_id", "mask_behavior"]
+                  "current_node_id","household_id","home_node_id","activy_name", "mask_behavior", "event_id"]
         self.logger.add_csv_file("activity_history.csv", header)
 
         # new infections
@@ -189,16 +193,16 @@ class Controller():
 
         # infection transition
         header = ["time", "time_stamp","disease_name","agent_id","agent_profession",
-                  "agent_location","agent_node_id","current_state","next_state", "event_id",
-                  "mask_behavior"]
+                  "agent_location","agent_node_id","current_state","next_state", "mask_behavior", "event_id"]
         self.logger.add_csv_file("disease_transition.csv", header)
 
         header = ["time_stamp","disease_name","agent_id","agent_profession",
-                  "agent_location","agent_node_id","symptom", "state"]
+                  "agent_location","agent_node_id","symptom", "state", "mask_state"]
         self.logger.add_csv_file("symptom.csv", header)
 
         # evacuation
-        header = ["time", "time_stamp","evacuated","unevacuated_ERI","unevacuated_no_ERI"]
+        # header = ["time", "time_stamp","evacuated","unevacuated_ERI","unevacuated_no_ERI"]
+        header = ["time_stamp", "ag_id","evac_point_id","evac_occupation","evac_capacity", "total_evacuated"]
         self.logger.add_csv_file("evacuation.csv", header)
 
         # time stamp?
@@ -236,6 +240,16 @@ class Controller():
         log_data["time"] = self.sim.ts.get_hour_min_str()
         log_data["time_stamp"] = self.sim.ts.step_count
         self.logger.write_csv_data("infection_summary.csv", log_data)
+
+        # mask summary
+        summarized_mask_attr = self.sim.summarized_attribute("mask_wearing_type")
+        mask_log_data = {}
+        mask_header = ["time", "time_stamp", "no_mask", "surgical_mask", "n95_mask"]
+        for h in mask_header:
+            mask_log_data[h] = summarized_mask_attr[h] if h in summarized_mask_attr else 0
+        mask_log_data["time"] = self.sim.ts.get_hour_min_str()
+        mask_log_data["time_stamp"] = self.sim.ts.step_count
+        self.logger.write_csv_data("mask_summary.csv", mask_log_data)
 
         # agent position
         summarized_attr = self.sim.summarized_attribute("location")

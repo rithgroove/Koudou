@@ -36,6 +36,9 @@ class Logger():
         header = self.headers[filename]
         temp = ""
         for x in header:
+            if x is 'event_id':
+                temp += ","
+                continue
             if temp != "":
                 temp += ","
             if x in data:
