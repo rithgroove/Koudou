@@ -78,10 +78,10 @@ class Map():
         results = rng.choice(arr, qtd, replace=False)
         return results
 
-    def get_closest_evacuation_center(self,coordinate, explored_places):
+    def get_closest_evacuation_center(self,coordinate, explored_places, home_id):
         explored_evac_center = explored_places.split(",")
         distance = sys.float_info.max
-        place = None
+        place = self.d_nodes[home_id]
         for evac_place_id in self.d_evacuation_centers:
             temp_place = self.d_evacuation_centers[evac_place_id]
             node = self.d_nodes[temp_place.centroid]

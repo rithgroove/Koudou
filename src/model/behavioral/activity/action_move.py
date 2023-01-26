@@ -34,7 +34,11 @@ class ActionMove(Action):
         if destination_string == "!evac":
             # print(f"agent {self.agent.agent_id}'s' go to evac")
             node = kd_map.d_nodes[self.origin]
-            self.target = kd_map.get_closest_evacuation_center(node.coordinate,agent.get_attribute("explored_evac"))
+            self.target = kd_map.get_closest_evacuation_center(
+                node.coordinate,
+                agent.get_attribute("explored_evac"),
+                agent.get_attribute("home_node_id")
+            )
             agent.set_attribute("target_evac",self.target.centroid)
             self.destination = self.target.centroid
             self.target_type = "Evacuation Point"
