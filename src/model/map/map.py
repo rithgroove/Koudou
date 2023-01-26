@@ -81,7 +81,7 @@ class Map():
     def get_closest_evacuation_center(self,coordinate, explored_places, home_id):
         explored_evac_center = explored_places.split(",")
         distance = sys.float_info.max
-        place = self.d_nodes[home_id]
+        place = None
         for evac_place_id in self.d_evacuation_centers:
             temp_place = self.d_evacuation_centers[evac_place_id]
             node = self.d_nodes[temp_place.centroid]
@@ -89,6 +89,11 @@ class Map():
             if temp_place.centroid not in explored_places and temp_distance < distance:
                 place = self.d_evacuation_centers[evac_place_id]
                 distance = temp_distance
+        if place == None:
+            for p in self.d_places.values():
+                if p.centroid == home_id:
+                    place = p
+                    break
         return place
 
     def get_random_connected_nodes(self,node_id, last_visited,rng):
