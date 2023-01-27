@@ -73,13 +73,13 @@
                 "n95_mask":  0.5
             },
             "self_infected_masked": {
-                "surgical_to_n95": 0.5,
-                "no_change": 0.5
+                "surgical_to_n95": 0.1,
+                "no_change": 0.9
             },
             "self_infected_unmasked": {
-                "no_to_surgical": 0.4,
-                "no_to_n95": 0.1,
-                "no_change": 0.5
+                "no_to_surgical": 0.2,
+                "no_to_n95": 0,
+                "no_change": 0.8
             },
             "around_infected": {
                 "no_to_surgical": 0.4,

@@ -268,7 +268,7 @@ tab3_content = dbc.Card(
     className="mt-3",
 )
 
-+MA_tab1_content = dbc.Card(
+MA_tab1_content = dbc.Card(
     dbc.CardBody(
         [
             html.Div(
