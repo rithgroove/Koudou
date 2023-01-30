@@ -34,7 +34,7 @@ navbar = dbc.NavbarSimple(
             in_navbar=True,
             label="Simulation Analysis",
         ),
-        dbc.NavItem(dbc.NavLink("Model Verification", href="/verification")),
+        # dbc.NavItem(dbc.NavLink("Model Verification", href="/verification")),
         dbc.NavItem(dbc.NavLink("Upload", href="/upload")),
         # dbc.DropdownMenu(
         #     children=[
