@@ -69,17 +69,17 @@
         "mask": {
             "infection_rate": {
                 "no_mask": 1.0,
-                "surgical_mask": 0.8,
-                "n95_mask":  0.5
+                "surgical_mask": 0.34,
+                "n95_mask":  0.17
             },
             "self_infected_masked": {
-                "surgical_to_n95": 0.1,
-                "no_change": 0.9
+                "surgical_to_n95": 0,
+                "no_change": 1
             },
             "self_infected_unmasked": {
-                "no_to_surgical": 0.2,
+                "no_to_surgical": 0,
                 "no_to_n95": 0,
-                "no_change": 0.8
+                "no_change": 1
             },
             "around_infected": {
                 "no_to_surgical": 0.4,

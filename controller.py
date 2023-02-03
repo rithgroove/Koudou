@@ -201,7 +201,6 @@ class Controller():
         self.logger.add_csv_file("symptom.csv", header)
 
         # evacuation
-        # header = ["time", "time_stamp","evacuated","unevacuated_ERI","unevacuated_no_ERI"]
         header = ["time_stamp", "ag_id","evac_point_id","evac_occupation","evac_capacity", "total_evacuated"]
         self.logger.add_csv_file("evacuation.csv", header)
 
