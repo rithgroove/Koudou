@@ -115,13 +115,11 @@ class EvacuationModule(Module):
 
 
                 else:
-                    new_target = kd_map.get_closest_evacuation_center(agent.coordinate,agent.get_attribute("explored_evac"))
-
-                    # TODO: check what to do if there is not available evacuation palces anymore
-                    if new_target is None:
-                        new_target = agent.get_attribute("home_node_id").lower()
-                    else:
-                        new_target = new_target.centroid
+                    new_target = kd_map.get_closest_evacuation_center(
+                        agent.coordinate,
+                        agent.get_attribute("explored_evac"),
+                        agent.get_attribute("home_node_id")    
+                    )
 
                     agent.set_attribute("target_evac", new_target)
                     self.log_ag_refused_evac(
