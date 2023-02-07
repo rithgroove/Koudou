@@ -28,6 +28,7 @@ def df_timestamp_converter(df):
         df.loc[i, 'time_stamp'] = timestamp_converter(df.loc[i, 'time_stamp'])
     return df
 
+# To make the time-series shorter for the efficiency to draw line chart
 def preprocess_linear_data(df):
     temp_list = []
     for i in range(0, len(df), 10):
@@ -271,6 +272,12 @@ def parse_contents(contents, filename, date, f):
                 f.infection_transition = df
             elif 'new_infection.' in filename:
                 f.new_infection = df
+            elif 'evac_refused_entry.' in filename:
+                f.evac_refused_entry = df
+            elif 'mask_summary.' in filename:
+                f.mask_summary = df
+            elif 'symptom' in filename:
+                f.symptom = df
             else:
                 return html.Div(['CSV file is not found .'])
         elif 'txt' in filename:
@@ -281,7 +288,6 @@ def parse_contents(contents, filename, date, f):
                 html_list.append(html.H5(log_data_lines[i]))
             f.log = html_list
     except Exception as e:
-        print('[Error Log]: ', e)
         return html.Div([
             'There was an error processing this file, please refer to terminal.'
         ])

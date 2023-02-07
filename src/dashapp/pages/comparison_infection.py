@@ -119,7 +119,6 @@ IA_tab1_content = dbc.Card(
                                         dbc.Input(id="IA1-input-random-agent-id", placeholder="Random Agent ID"),
                                     ], style=style_random_bottom
                                 ),
-
                                 html.H5([dbc.Badge("new_infection.csv:", className="ms-1"),
                                          ' The information when the agent first get exposed.'], style=style_title),
                                 dcc.Graph(style=style_data_align_4, id='IA1-random-new-infection-figure'),
@@ -168,7 +167,6 @@ IA_tab2_content = dbc.Card(
                                         dbc.Input(id="IA2-input-random-agent-id", placeholder="Random Agent ID"),
                                     ], style=style_random_bottom
                                 ),
-
                                 html.H5([dbc.Badge("new_infection.csv:", className="ms-1"),
                                          ' The information when the agent first get exposed.'], style=style_title),
                                 dcc.Graph(style=style_data_align_4, id='IA2-random-new-infection-figure'),
@@ -217,7 +215,6 @@ IA_tab3_content = dbc.Card(
                                         dbc.Input(id="IA3-input-random-agent-id", placeholder="Random Agent ID"),
                                     ], style=style_random_bottom
                                 ),
-
                                 html.H5([dbc.Badge("new_infection.csv:", className="ms-1"),
                                          ' The information when the agent first get exposed.'], style=style_title),
                                 dcc.Graph(style=style_data_align_4, id='IA3-random-new-infection-figure'),
@@ -268,12 +265,66 @@ tab3_content = dbc.Card(
     className="mt-3",
 )
 
-+MA_tab1_content = dbc.Card(
+
+# Mask Analysis for Model One
+MA_tab1_content = dbc.Card(
     dbc.CardBody(
         [
             html.Div(
                 className='container-fluid',
                 children=[
+                    html.Div(
+                        className='container-fluid',
+                        children=[
+                            html.Div(
+                                className='row',
+                                children=[
+                                    html.Div(className='col-sm-4', children=[
+                                        html.H5("Model One"),
+                                        dcc.Graph(style=style_title, id="MBA1-time-series-chart"),
+                                        html.Br(),
+                                        html.P(style=style_title, children="Select Cases"),
+                                        dcc.Checklist(
+                                            style=style_title,
+                                            id="MBA1-ticker",
+                                            options=["no_mask", "surgical_mask", "n95_mask"],
+                                            value=["no_mask", "surgical_mask", "n95_mask"],
+                                            inline=True
+                                        ),
+                                        html.Hr(),
+                                    ]),
+                                    html.Div(className='col-sm-4', children=[
+                                        html.H5("Model Two"),
+                                        dcc.Graph(style=style_title, id="MBA2-time-series-chart"),
+                                        html.Br(),
+                                        html.P(style=style_title, children="Select Cases"),
+                                        dcc.Checklist(
+                                            style=style_title,
+                                            id="MBA2-ticker",
+                                            options=["no_mask", "surgical_mask", "n95_mask"],
+                                            value=["no_mask", "surgical_mask", "n95_mask"],
+                                            inline=True
+                                        ),
+                                        html.Hr(),
+                                    ]),
+                                    html.Div(className='col-sm-4', children=[
+                                        html.H5("Model Three"),
+                                        dcc.Graph(style=style_title, id="MBA3-time-series-chart"),
+                                        html.Br(),
+                                        html.P(style=style_title, children="Select Cases"),
+                                        dcc.Checklist(
+                                            style=style_title,
+                                            id="MBA3-ticker",
+                                            options=["no_mask", "surgical_mask", "n95_mask"],
+                                            value=["no_mask", "surgical_mask", "n95_mask"],
+                                            inline=True
+                                        ),
+                                        html.Hr(),
+                                    ])
+                                ]
+                            ),
+                        ]
+                    ),
                 ]
             ),
         ]
@@ -281,38 +332,20 @@ tab3_content = dbc.Card(
     className="mt-3",
 )
 
-MA_tab2_content = dbc.Card(
-    dbc.CardBody(
-        [
-            html.Div(
-                className='container-fluid',
-                children=[
-                ]
-            ),
-        ]
-    ),
-    className="mt-3",
-)
-
-MA_tab3_content = dbc.Card(
-    dbc.CardBody(
-        [
-            html.Div(
-                className='container-fluid',
-                children=[
-                ]
-            ),
-        ]
-    ),
-    className="mt-3",
-)
-
+# Mask Analysis for Effectiveness for Masks
 MA_tab4_content = dbc.Card(
     dbc.CardBody(
         [
             html.Div(
                 className='container-fluid',
                 children=[
+                    html.H4([dbc.Badge('Infection by Location under Different Mask-wearing Scenarios', id='LMGBC-ticker')]),
+                    dcc.Graph(id="location-mask-grouped-bar-chart"),
+                    # html.H4([dbc.Badge('Analysis among Evacuation', id='')]),
+                    # #
+                    # dcc.Graph(id=''),
+                    # #
+                    # dcc.Graph(id=''),
                 ]
             ),
         ]
@@ -327,10 +360,8 @@ tab4_content = dbc.Card(
                 children=[
                     dbc.Tabs(
                         [
-                            dbc.Tab(MA_tab1_content, label="Model One"),
-                            dbc.Tab(MA_tab2_content, label="Model Two"),
-                            dbc.Tab(MA_tab3_content, label="Model Three"),
-                            dbc.Tab(MA_tab4_content, label="Effectiveness for Masks"),
+                            dbc.Tab(MA_tab1_content, label="Mask-wearing Cases"),
+                            dbc.Tab(MA_tab4_content, label="Effectiveness of Mask-wearing"),
                         ], style={'marginTop': '5px'}
                     )
                 ]
@@ -359,6 +390,14 @@ layout = html.Div(style=style_data_align_0, children=[
     ),
 ])
 
+@callback(
+    Output("location-mask-grouped-bar-chart", "figure"),
+    Input("LMGBC-ticker", "value")
+)
+def location_mask_grouped_bar_chart(ticker):
+    fig = get_infection_by_location_figure(ModelOne(), ModelTwo(), ModelThree())
+    return fig
+
 
 @callback(
     Output("IP1-time-series-chart", "figure"),
@@ -381,6 +420,29 @@ def IP2_display_time_series(ticker):
 def IP3_display_time_series(ticker):
     f = ModelThree()
     return IP_return_time_series(f, ticker)
+
+
+@callback(
+    Output("MBA1-time-series-chart", "figure"),
+    Input("MBA1-ticker", "value"))
+def IP1_display_time_series(ticker):
+    f = ModelOne()
+    return MBA_return_time_series(f, ticker)
+
+@callback(
+    Output("MBA2-time-series-chart", "figure"),
+    Input("MBA2-ticker", "value"))
+def IP2_display_time_series(ticker):
+    f = ModelTwo()
+    return MBA_return_time_series(f, ticker)
+
+
+@callback(
+    Output("MBA3-time-series-chart", "figure"),
+    Input("MBA3-ticker", "value"))
+def IP3_display_time_series(ticker):
+    f = ModelThree()
+    return MBA_return_time_series(f, ticker)
 
 
 @callback(

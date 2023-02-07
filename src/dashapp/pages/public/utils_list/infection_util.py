@@ -2,6 +2,7 @@ import parameters.default as defaultParam
 import numpy as np
 from collections import Counter
 from dash import html
+import plotly.graph_objects as go
 
 def single_fact_calculator(df_disease_transition, current_state, next_state):
     list = []
@@ -28,14 +29,13 @@ def single_fact_calculator(df_disease_transition, current_state, next_state):
 
 def calculate_facts(df_new_infection, df_disease_transition):
     p1 = np.mean(df_new_infection['time_stamp'])
-
     list_p2 = []
     for i in range(len(df_disease_transition)):
         if df_disease_transition.loc[i, 'current_state'] == 'exposed' and df_disease_transition.loc[
             i, 'next_state'] == 'asymptomatic':
             ts_end = df_disease_transition.loc[i, 'time_stamp']
             agent_id = df_disease_transition.loc[i, 'agent_id']
-            ts_start = df_new_infection.loc[df_new_infection['agent_id'] == agent_id].iloc[0, 0]
+            ts_start = df_new_infection.loc[df_new_infection['agent_id'] == agent_id].iloc[0, 1]
             ts_diff = ts_end - ts_start
             list_p2.append(ts_diff)
     p2 = np.mean(list_p2)
@@ -75,7 +75,12 @@ def calculate_facts(df_new_infection, df_disease_transition):
             list_location.append(df_disease_transition.loc[i, 'agent_location'])
     result_counter2 = Counter(list_location)
 
-    return p1, p2, p3, p4, p5, p6, p7, p8, total_agents, p9, l9, result_counter1, result_counter2
+    list_location = []
+    for i in range(len(df_new_infection)):
+        list_location.append(df_new_infection.loc[i, 'agent_location'])
+    result_counter3 = Counter(list_location)
+
+    return p1, p2, p3, p4, p5, p6, p7, p8, total_agents, p9, l9, result_counter1, result_counter2, result_counter3
 
 
 def build_infection_agent_list(new_infection):
@@ -131,3 +136,53 @@ def text_color():
 def get_data_by_interval(start, end, df):
     df = df.loc[(df['time_stamp'] >= start) & (df['time_stamp'] <= end)]
     return df
+
+
+def get_location_value(unique_locations, result_counter):
+    return_list = []
+    for key in unique_locations:
+        if key in result_counter.keys():
+            return_list.append(result_counter[key])
+        else:
+            return_list.append(0)
+    return return_list
+
+def get_infection_by_location_figure(f1, f2, f3):
+    f1_new_infection = f1.new_infection
+    f2_new_infection = f2.new_infection
+    f3_new_infection = f3.new_infection
+    list_location1 = []
+    for i in range(len(f1_new_infection)):
+        list_location1.append(f1_new_infection.loc[i, 'agent_location'])
+    result_counter1 = dict(Counter(list_location1))
+    list_location2 = []
+    for i in range(len(f2_new_infection)):
+        list_location2.append(f2_new_infection.loc[i, 'agent_location'])
+    result_counter2 = dict(Counter(list_location2))
+    list_location3 = []
+    for i in range(len(f3_new_infection)):
+        list_location3.append(f3_new_infection.loc[i, 'agent_location'])
+    result_counter3 = dict(Counter(list_location3))
+    unique_locations = list(set(list_location1+list_location2+list_location3))
+    model_one_value = get_location_value(unique_locations, result_counter1)
+    model_two_value = get_location_value(unique_locations, result_counter2)
+    model_three_value = get_location_value(unique_locations, result_counter3)
+    fig = go.Figure(data=[
+        go.Bar(name='Model One', x=unique_locations, y=model_one_value),
+        go.Bar(name='Model Two', x=unique_locations, y=model_two_value),
+        go.Bar(name='Model Three', x=unique_locations, y=model_three_value),
+    ])
+    fig.update_layout(
+        barmode='group',
+        plot_bgcolor='#E6E6FA',
+        height=600,
+        showlegend=True,
+        margin=go.layout.Margin(l=0, r=0, b=0, t=0, pad=0),
+        legend=dict(
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        )
+    )
+    return fig

@@ -35,6 +35,28 @@ class ModelOne(object):
     def disease_transition(self, file_df):
         ModelOne._disease_transition = file_df
 
+    # evac_log.txt
+    _evac_log = []
+
+    @property
+    def evac_log(self):
+        return ModelOne._evac_log
+
+    @evac_log.setter
+    def evac_log(self, file_df):
+        ModelOne._evac_log = file_df
+
+    # evac_refused_entry.csv
+    _evac_refused_entry = pd.NA
+
+    @property
+    def evac_refused_entry(self):
+        return ModelOne._evac_refused_entry
+
+    @evac_refused_entry.setter
+    def evac_refused_entry(self, file_df):
+        ModelOne._evac_refused_entry = file_df
+
     # evacuation.csv
     _evacuation = pd.NA
 
@@ -57,6 +79,30 @@ class ModelOne(object):
     def infection_summary(self, file_df):
         file_df = preprocess_linear_data(file_df)
         ModelOne._infection_summary = file_df
+
+    # mask_summary.csv
+    _mask_summary = pd.NA
+
+    @property
+    def mask_summary(self):
+        return ModelOne._mask_summary
+
+    @mask_summary.setter
+    def mask_summary(self, file_df):
+        file_df = preprocess_linear_data(file_df)
+        ModelOne._mask_summary = file_df
+
+    # symptom.csv
+    _symptom = pd.NA
+
+    @property
+    def symptom(self):
+        return ModelOne._symptom
+
+    @symptom.setter
+    def symptom(self, file_df):
+        file_df = preprocess_linear_data(file_df)
+        ModelOne._symptom = file_df
 
     # infection_transition.csv
     _infection_transition = pd.NA
@@ -90,6 +136,17 @@ class ModelOne(object):
     @log.setter
     def log(self, file_df):
         ModelOne._log = file_df
+
+    # time.txt
+    _time = []
+
+    @property
+    def time(self):
+        return ModelOne._time
+
+    @time.setter
+    def time(self, file_df):
+        ModelOne._time = file_df
 
 
 class ModelTwo(object):
@@ -182,6 +239,65 @@ class ModelTwo(object):
     def log(self, file_df):
         ModelTwo._log = file_df
 
+    # time.txt
+    _time = []
+
+    @property
+    def time(self):
+        return ModelTwo._time
+
+    @time.setter
+    def time(self, file_df):
+        ModelTwo._time = file_df
+
+    # evac_log.txt
+    _evac_log = []
+
+    @property
+    def evac_log(self):
+        return ModelTwo._evac_log
+
+    @evac_log.setter
+    def evac_log(self, file_df):
+        ModelTwo._evac_log = file_df
+
+    # evac_refused_entry.csv
+    _evac_refused_entry = pd.NA
+
+    @property
+    def evac_refused_entry(self):
+        return ModelTwo._evac_refused_entry
+
+    @evac_refused_entry.setter
+    def evac_refused_entry(self, file_df):
+        ModelTwo._evac_refused_entry = file_df
+
+    # mask_summary.csv
+    _mask_summary = pd.NA
+
+    @property
+    def mask_summary(self):
+        return ModelTwo._mask_summary
+
+    @mask_summary.setter
+    def mask_summary(self, file_df):
+        file_df = preprocess_linear_data(file_df)
+        ModelTwo._mask_summary = file_df
+
+    # symptom.csv
+    _symptom = pd.NA
+
+    @property
+    def symptom(self):
+        return ModelTwo._symptom
+
+    @symptom.setter
+    def symptom(self, file_df):
+        file_df = preprocess_linear_data(file_df)
+        ModelTwo._symptom = file_df
+
+
+
 
 class ModelThree(object):
     #  activity_history.csv
@@ -272,3 +388,61 @@ class ModelThree(object):
     @log.setter
     def log(self, file_df):
         ModelThree._log = file_df
+
+    # time.txt
+    _time = []
+
+    @property
+    def time(self):
+        return ModelThree._time
+
+    @time.setter
+    def time(self, file_df):
+        ModelThree._time = file_df
+
+    # evac_log.txt
+    _evac_log = []
+
+    @property
+    def evac_log(self):
+        return ModelThree._evac_log
+
+    @evac_log.setter
+    def evac_log(self, file_df):
+        ModelThree._evac_log = file_df
+
+    # evac_refused_entry.csv
+    _evac_refused_entry = pd.NA
+
+    @property
+    def evac_refused_entry(self):
+        return ModelThree._evac_refused_entry
+
+    @evac_refused_entry.setter
+    def evac_refused_entry(self, file_df):
+        ModelThree._evac_refused_entry = file_df
+
+    # mask_summary.csv
+    _mask_summary = pd.NA
+
+    @property
+    def mask_summary(self):
+        return ModelThree._mask_summary
+
+    @mask_summary.setter
+    def mask_summary(self, file_df):
+        file_df = preprocess_linear_data(file_df)
+        ModelThree._mask_summary = file_df
+
+    # symptom.csv
+    _symptom = pd.NA
+
+    @property
+    def symptom(self):
+        return ModelThree._symptom
+
+    @symptom.setter
+    def symptom(self, file_df):
+        file_df = preprocess_linear_data(file_df)
+        ModelThree._symptom = file_df
+

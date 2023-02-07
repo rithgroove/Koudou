@@ -10,7 +10,7 @@ from .infection_util import *
 def facts_return_html(model):
     df_new_infection = model.new_infection
     df_disease_transition = model.disease_transition
-    p1, p2, p3, p4, p5, p6, p7, p8, total_agents, p9, l9, l10, l11 = calculate_facts(df_new_infection, df_disease_transition)
+    p1, p2, p3, p4, p5, p6, p7, p8, total_agents, p9, l9, l10, l11, l12 = calculate_facts(df_new_infection, df_disease_transition)
     return html.Div(style=style_data_align_4, children=[
         dbc.Badge("Parameter 1", className="ms-1"),
         html.H5("Avg time when first get exposed:"),
@@ -47,6 +47,10 @@ def facts_return_html(model):
         html.H5("Most frequent locations that make agents transfer from asymptomatic to symptomatic: "),
         html.H5("The locations are lists by their frequency from high to low: "),
         html.H5(str(l11)),
+        dbc.Badge("Parameter 12", className="ms-1"),
+        html.H5("Most frequent locations that the agents get exposed: "),
+        html.H5("The locations are lists by their frequency from high to low: "),
+        html.H5(str(l12)),
     ])
 
 def IA_return_random_new_infection_figure(model, n_clicks):
@@ -64,9 +68,9 @@ def IA_return_random_new_infection_figure(model, n_clicks):
 
     agent_pd = df_timestamp_converter(agent_pd)
     column_name_values = ['Agent ID', 'Time Stamp', 'Type', 'Disease', 'Profession',
-                          'Location', 'Source Profession', 'Source Location']
+                          'Location', 'Current Mask', 'Next Mask']
     column_name_list = ['agent_id', 'time_stamp', 'type', 'disease_name', 'agent_profession',
-                        'agent_location', 'source_profession', 'source_location']
+                        'agent_location', 'current_mask', 'next_mask']
 
     fig = make_subplots(
         rows=1, cols=1,
@@ -142,9 +146,9 @@ def IA_return_random_activity_history_list(model, random_id):
         table = get_data_by_interval(time_stamp_list[i], time_stamp_list[i + 1], activity_history_pd)
         agent_activity_html_list = []
         for j in range(len(table)):
-            behavioral_sentence = "At " + timestamp_converter(table.iloc[j, 0]) + ", the agent " + \
-                                  str(table.iloc[j, 1]) + " " + str(table.iloc[j, 7]) + ', the location is ' \
-                                  + table.iloc[j, 3] + '.'
+            behavioral_sentence = "At " + timestamp_converter(table.iloc[j, 1]) + ", the agent " + \
+                                  str(table.iloc[j, 2]) + " " + str(table.iloc[j, 8]) + ', the location is ' \
+                                  + table.iloc[j, 4] + '.'
             agent_activity_html_list.append(
                 html.Small(behavioral_sentence, className="text-muted"),
             )
@@ -179,9 +183,9 @@ def IA_return_random_activity_history_list(model, random_id):
     table = activity_history_pd.loc[(activity_history_pd['time_stamp'] >= time_stamp_list[len(time_stamp_list) - 1])]
     agent_activity_html_list = []
     for j in range(len(table)):
-        behavioral_sentence = "At " + timestamp_converter(table.iloc[j, 0]) + ", the agent " + \
-                              str(table.iloc[j, 1]) + " " + str(table.iloc[j, 7]) + ', the location is ' \
-                              + table.iloc[j, 3] + '.'
+        behavioral_sentence = "At " + timestamp_converter(table.iloc[j, 1]) + ", the agent " + \
+                              str(table.iloc[j, 2]) + " " + str(table.iloc[j, 8]) + ', the location is ' \
+                              + table.iloc[j, 4] + '.'
 
         agent_activity_html_list.append(
             html.Small(behavioral_sentence, className="text-muted"),
@@ -225,12 +229,8 @@ def IA_return_random_activity_history_table(model, random_id):
         agent_pd = agent_id_filter(df_activity_history, random_id)
 
     agent_pd = df_timestamp_converter(agent_pd)
-    column_name_values = [
-        'Time Stamp', 'Profession', 'Location', 'Household ID', 'Activity Name'
-    ]
-    column_name_list = [
-        'time_stamp', 'profession', 'location', 'household_id', 'activy_name'
-    ]
+    column_name_values = ['Time Stamp', 'Profession', 'Location', 'Household ID', 'Activity Name', 'Mask-wearing']
+    column_name_list = ['time_stamp', 'profession', 'location', 'household_id', 'activy_name', 'mask_behavior']
 
     fig = make_subplots(
         rows=1, cols=1,
@@ -271,9 +271,9 @@ def IA_return_random_disease_transition_table(model, random_id):
 
     agent_pd = df_timestamp_converter(agent_pd)
     column_name_values = ['Time Stamp', 'Disease', 'Profession', 'Location',
-                          'Current State', 'Next State']
+                          'Current State', 'Next State', 'Mask-wearing']
     column_name_list = ['time_stamp', 'disease_name', 'agent_profession', 'agent_location',
-                        'current_state', 'next_state']
+                        'current_state', 'next_state', 'mask_behavior']
 
     fig = make_subplots(
         rows=1, cols=1,
@@ -315,6 +315,25 @@ def IA_random_agent_infection(model, n_clicks):
 
 def IP_return_time_series(model, ticker):
     fig = px.line(model.infection_summary, x='time_stamp', y=ticker)
+    fig.update_layout(
+        plot_bgcolor='#E6E6FA',  # 图的背景颜色
+        # paper_bgcolor='#F8F8FF',  # 图像的背景颜色
+        height=500,
+        showlegend=True,
+        margin=go.layout.Margin(l=0, r=0, b=0, t=0, pad=0),  # pad参数是刻度与标签的距离
+        legend=dict(
+            #     orientation="h",  # 控制水平显示
+            yanchor="bottom",  # 分别设置xy轴的位置和距离大小
+            y=1.02,
+            xanchor="right",
+            x=1
+        )
+    )
+    return fig
+
+
+def MBA_return_time_series(model, ticker):
+    fig = px.line(model.mask_summary, x='time_stamp', y=ticker)
     fig.update_layout(
         plot_bgcolor='#E6E6FA',  # 图的背景颜色
         # paper_bgcolor='#F8F8FF',  # 图像的背景颜色
