@@ -1,6 +1,8 @@
 from dash import Dash
 import dash
 from pages.public.data import *
+import matplotlib.pyplot as plt
+plt.legend
 
 markdown_text = open('data/home/markdown_files/introduction.txt', encoding='utf-8').read()
 

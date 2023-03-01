@@ -1,6 +1,6 @@
 from platform import system
 
-def load_parameters(filename):
+def load_parameters(filename, seed):
     parameters = load_defaults()
 
     if filename is None:
@@ -17,6 +17,8 @@ def load_parameters(filename):
 
     for key in ctx["parameters"].keys():
         parameters[key] = ctx["parameters"][key]
+
+    parameters['SEED'] = seed
 
     return parameters
 
