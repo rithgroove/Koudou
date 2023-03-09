@@ -1,116 +1,78 @@
 import numpy as np
 
 class Draw():
-    def __init__(self):
-        pass
+    def __init__(self, canvas):
+        self.canvas = canvas
 
-class Transform():
-    def __init__(self):
-        self.mat = np.identity(3)
 
-    def reset(self):
-        self.mat = np.identity(3)
+    ## drawing methods
+    def draw_places(self, d_places, viewport):
+        for id, place in d_places.items():
+            place = place.render_info
 
-    def _rotate(self, theta):
-        cos = np.cos(theta)
-        sin = np.sin(theta)
+            path_trans = [viewport.apply(*c.get_lon_lat()) for c in place.coords]
+            path_flat = [e for c in path_trans for e in c]
+            clon, clat = viewport.apply(*place.center.get_lon_lat())
 
-        mrot = np.identity(3)
-        mrot[0][0] = cos
-        mrot[1][1] = cos
-        mrot[0][1] = -sin
-        mrot[1][0] = sin
+            w=viewport.s*0.000015
+            if "building" in place.tags.keys():
+                if len(path_flat)>=6:
+                    #print(f"drawing {id} {path_flat[:4]}")
+                    self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=w)
+                    r=viewport.s*0.000015
+                    self.canvas.create_oval(clon-r, clat-r, clon+r, clat+r, fill="black")
+                else:
+                    1#print("not renderable")
+            elif "natural" in place.tags.keys():
+                self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=w)
+            elif "leisure" in place.tags.keys():
+                self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=w)
+            elif "amenity" in place.tags.keys():
+                self.canvas.create_polygon(path_flat, outline=place.outline, fill=place.fill, width=w)
+            # elif 'highway' in place.tags.keys():
+            #     for (lon_a, lat_a), (lon_b, lat_b) in zip(path[:-1], path[1:]):
+            #         self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="grey", width=3)
+            else:#note: equivalent to "others" in epidemicon
+                #self.canvas.create_polygon(path_flat, outline=place.outline, fill="pink", width=2)
+                pass
+    def draw_roads(self, roads, d_nodes, viewport):
+        for road in roads:
+            lon_a, lat_a = viewport.apply(*road.coordinate.get_lon_lat())
 
-        self.mat = np.matmul(self.mat, mrot)
+            conn_tmp = np.array(road.connections) #maybe refactor all lists to numpy array?
+            conn_filtered = conn_tmp[conn_tmp<road.id] #dont draw twice
+            for conn_id in conn_filtered:
+                conn = d_nodes[conn_id]
+                lon_b, lat_b = viewport.apply(*conn.coordinate.get_lon_lat())
+                if "centroid" in conn.tags:
+                    self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="black", width=1)
+                else:
+                    self.canvas.create_line(lon_a, lat_a, lon_b, lat_b, fill="grey", width=3)
 
-    def rotate(self, px, py, theta):
-        self.translate(px, py)
-        self._rotate(theta)
-        self.translate(-px, -py)
+    def draw_agents(self, agent_list, viewport):
+        for agent in agent_list:
+            lon, lat = viewport.apply(*agent.coordinate.get_lon_lat())
+            r=viewport.s*0.00005
+            oval = self.canvas.create_oval(lon-r, lat-r, lon+r, lat+r, fill=agent.color, tag=agent.agent_id)
+            agent.oval = oval
 
-    def translate(self, dx, dy):
-        mtran = np.identity(3)
-        mtran[0][2] = dx
-        mtran[1][2] = dy
+    def move_agents(self, agent_list, viewport):
+        i=0
+        for agent in agent_list:
+            # world coordinate to view coordinate
+            lon, lat = viewport.apply(*agent.coordinate.get_lon_lat())
+            # currlon, currlat = viewport.apply(*agent.coordinate.get_lon_lat())
+            # prevlon, prevlat = viewport.apply(*agent.prev_coordinate.get_lon_lat())
 
-        self.mat = np.matmul(self.mat, mtran)
 
-    def scale(self, sx, sy):
-        mscl = np.identity(3)
-        mscl[0][0] = sx
-        mscl[1][1] = sy
+            # get distance
+            x1,y1,x2,y2 = self.canvas.coords(agent.oval)
+            x = x1 + ((x2-x1)/2)
+            y = y1 + ((y2-y1)/2)
 
-        self.mat = np.matmul(self.mat, mscl)
+            # move
+            self.canvas.move(agent.oval, (lon-x), (lat-y))
+            # self.canvas.move(agent.oval, (currlon-prevlon), (currlat-prevlat))
 
-    def apply(self, x, y):
-        return np.matmul(self.mat, [x, y, 1])[:2]
-
-    def iapply(self, x, y):
-        return list(map(int, np.matmul(self.mat, [x, y, 1])[:2]))
-
-class ViewPort():
-    def __init__(self, height, width, wmin, wmax, x=0, y=0, s=100000):
-        # todo proper python  get/set
-        self.x = x
-        self.y = y
-
-        self.height = height
-        self.width = width
-
-        self.wmin = wmin
-        self.wmax = wmax
-
-        self.s = s
-
-        self.__transform = Transform()
-        self.__compute()
-
-    def __compute(self):
-        self.__transform.reset()
-        # fit map
-        # cw = self.width/(self.wmax[1]-self.wmin[1])
-        # ch = self.height/(self.wmax[0]-self.wmin[0])
-        # self.__transform.scale(cw, -ch)
-        self.__transform.scale(self.s, -self.s)
-
-        #
-        self.__transform.translate(-self.wmin[0], -self.wmax[1])
-
-    def change_scale(self, s):
-        self.s = s
-        self.__compute()
-
-    def update_scale(self, s):
-        self.s += s
-        self.__compute()
-
-    def change_center(self, x, y):
-        self.x = x
-        self.y = y
-        self.__compute()
-
-    def update_center(self, dx, dy):
-        # deprecated
-        # tx = min(0, tx) #if(self.view_port[0] > 0):  self.view_port = (0, self.view_port[1])
-        # ty = min(0, ty) #if(self.view_port[1] > 0): self.view_port = (self.view_port[0], 0)
-        # deprecated, equivalent to
-        # tx = max(tx, -1*self.s*self.wmax[0] + self.width)
-        # ty = max(ty, -1*self.s*self.wmax[1] + self.height)
-
-        self.x = self.x - dx
-        self.y = self.y - dy
-        self.__compute()
-
-    def apply(self, x, y):
-        return self.__transform.apply(x, y)
-
-    def __deprecated_trans_lon(self, lon):
-        # trans_lon = lambda lon: (lon - self.canvasOrigin[0]) * self.scale + self.view_port[0]
-        return (lon - self.wmin[0])*self.s + self.x
-    def __deprecated_trans_lat(self, lat):
-        # trans_lat = lambda lat: (self.canvasSize[1]-(lat - self.canvasOrigin[1])) * self.scale + self.view_port[1]
-        return (self.wmax[1]-(lat-self.wmin[1])) * (self.s+self.y)
-
-class Camera():
-    def __init__(self):
-        self.transform = Transform()
+            # update color
+            self.canvas.itemconfig(agent.oval, fill=agent.color)

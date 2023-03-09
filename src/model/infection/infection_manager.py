@@ -8,7 +8,7 @@ from src.model.map.map import Map
 from .disease import Disease
 
 
-def initialize_infection(disease_files, population: List[Agent], rng):
+def initialize_infection(disease_files, population: List[Agent], rng, logger):
     diseases = []
 
     for file_name in disease_files:
@@ -25,12 +25,12 @@ def initialize_infection(disease_files, population: List[Agent], rng):
         )
         diseases.append(d)
 
-        initializate_disease_on_population(d, d_config["initialization"], population, rng)
+        initializate_disease_on_population(d, d_config["initialization"], population, rng, logger)
 
     return Infection(diseases)
 
 
-def initializate_disease_on_population(disease: Disease, initialization: Dict, population: List[Agent], rng):
+def initializate_disease_on_population(disease: Disease, initialization: Dict, population: List[Agent], rng, logger):
     for ag in population:
         new_attr = Attribute(disease.name, "susceptible")
         ag.add_attribute(new_attr)
@@ -45,6 +45,8 @@ def initializate_disease_on_population(disease: Disease, initialization: Dict, p
     infected_ags = rng.choice(population, qtd, replace = False)
     for ag in infected_ags:
         ag.set_attribute(disease.name, initialization["state"])
+        logger.write_log("Agent" + str(ag.agent_id) + " changed to state " + initialization["state"] + " of " + disease.name)
+    
 
 def infection_step(step_size: int, kd_map: Map, population: List[Agent], infection_module: Infection, rng,logger,ts):
     # next state of the infected agents
@@ -70,6 +72,7 @@ def infected_next_stage(step_size, ag: Agent, disease: Disease, rng, logger,ts):
             if rand_value < previous_chances + chance:
                 next_state = compartiment
                 data = {}
+                data["time"] = ts.get_hour_min_str()
                 data["time_stamp"] = ts.step_count
                 data["disease_name"] = disease.name
                 data["agent_id"] = ag.agent_id
@@ -78,7 +81,7 @@ def infected_next_stage(step_size, ag: Agent, disease: Disease, rng, logger,ts):
                 data["agent_node_id"] = ag.get_attribute("current_node_id")
                 data["current_state"] = current_state
                 data["next_state"] = next_state
-                logger.write_csv_data("disease_transition.csv", data)
+                logger.write_csv_data("disease_transition.csv", data, id=True)
                 break
             previous_chances += chance
 
@@ -100,6 +103,7 @@ def apply_time_scale(step_size, time_scale, chance):
 
 def log(infection_type,disease,infector,infectee,logger,ts):
     data = {}
+    data["time"] = ts.get_hour_min_str()
     data["time_stamp"] = ts.step_count
     data["type"] = infection_type
     data["disease_name"] = disease.name
@@ -278,4 +282,5 @@ def road_infection(step_size, kd_map: Map, infected_ag, ags_by_location, disease
         chance = apply_time_scale(step_size, scale, prob)
         if rng.uniform(0.0,1.0,1)[0] < chance :  # infect agent
             ag.set_attribute(disease.name, disease.starting_state)
-            log("on_the_road",disease, infected_ag,ag,logger,ts)   
+            log("on_the_road",disease, infected_ag,ag,logger,ts)
+
