@@ -6,7 +6,7 @@ parameters = {
 
 
     "SEED":            101512, # Seed used for reproducing experiments
-    "N_AGENTS":        4000, # Number of agents in the simulation, the more agents, the longer it will take to execute
+    "N_AGENTS":        5000, # Number of agents in the simulation, the more agents, the longer it will take to execute
     "THREADS":         8, # How many CPUs should be used for pathfinding
 
     "BUILDING_TAGS":  "config/map/tsukuba-tu-building-data.csv", # Path to the file that describes the tags to be created for untagged buildings
