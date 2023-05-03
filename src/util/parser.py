@@ -18,7 +18,8 @@ def load_parameters(filename, seed):
     for key in ctx["parameters"].keys():
         parameters[key] = ctx["parameters"][key]
 
-    parameters['SEED'] = seed
+    if seed is not None:
+        parameters['SEED'] = seed
 
     return parameters
 
@@ -27,7 +28,7 @@ def load_defaults():
 
         # EXPERIMENT
         "EXP_NAME": "default",
-        "SEED"    : 3333,
+        "SEED"    : 1111,
         "MAX_STEPS"    :   49*24*12,
 
 
