@@ -30,7 +30,7 @@ class Controller():
         self.sim: Simulation    = None
 
         self.thread_finished = True
-        self.rng = np.random.default_rng(seed=self.d_param["SEED"])
+        self.rng = np.random.default_rng(seed=int(self.d_param["SEED"]))
         self.step_length = self.d_param["STEP_LENGTH"]
 
         self.init_logger()
