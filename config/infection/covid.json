@@ -1,8 +1,18 @@
 {
     "name": "covid",
+    "symptoms": {
+        "cough": {
+            "scale": "per_day",
+            "probability": 0.5
+        },
+        "cold": {
+            "scale": "per_day",
+            "probability": 0.4
+        }
+    },
     "initialization": {
         "type": "absolute",
-        "value": 10,
+        "value": 5,
         "state": "asymptomatic"
     },
     "attributes": {
@@ -47,12 +57,41 @@
                 "scale": "per_day",
                 "probability": 0.23
             }
-        }
-,        "recovered": {
+        },
+        "recovered": {
             "susceptible": {
                 "scale": "per_day",
                 "probability": 0.0
             }
+        }
+    },
+    "precautionary_measures": {
+        "mask": {
+            "infection_rate": {
+                "no_mask": 1.0,
+                "surgical_mask": 0.34,
+                "n95_mask":  0.17
+            },
+            "self_infected_masked": {
+                "surgical_to_n95": 0,
+                "no_change": 1
+            },
+            "self_infected_unmasked": {
+                "no_to_surgical": 0,
+                "no_to_n95": 0,
+                "no_change": 1
+            },
+            "around_infected": {
+                "no_to_surgical": 0.4,
+                "no_to_n95": 0.05,
+                "surgical_to_n95": 0.05,
+                "no_change": 0.5
+            }
+        },
+        "pcr_test": {
+            "true": 0.8,
+            "false_negative": 0.1,
+            "false_positive": 0.1
         }
     }
 }

@@ -4,7 +4,7 @@ class Agent:
 	def __init__(self,agent_id):
 		self.agent_id = agent_id
 		self.attributes = {}
-		self.default_behavior = None
+		self.current_behavior = None
 		self.behaviors = {}
 		self.actions = []
 		self.active_action = None
@@ -19,6 +19,9 @@ class Agent:
 	def get_attribute(self,name):
 		return self.attributes[name].get_value
 
+	def has_attribute(self,name):
+		return name in self.attributes.keys()
+	
 	def update_attribute(self,attribute_name,value):
 		if (value.lower() == "max"):
 			self.attributes[attribute_name].set_max()
@@ -40,19 +43,18 @@ class Agent:
 
 	def force_reset(self):
 		if len(self.actions) > 0 and isinstance(self.actions[0],ActionMove):
-			temp = self.actions[0]
-			temp.force_reset()
-			self.actions = [temp]
+			self.actions[0].force_reset()
+			self.actions = self.actions[:1]
 		else:
 			self.actions = []
 
 	def change_behavior(self,behavior_name):
-		self.default_behavior = self.behaviors[behavior_name]
+		self.current_behavior = self.behaviors[behavior_name]
 
 	def __str__(self):
 		tempstring = "[Agent]\n"
 		tempstring += f" Agent ID           = {self.agent_id}\n"
-		tempstring += f" Current behavior   = {self.default_behavior.name}\n"
+		tempstring += f" Current behavior   = {self.current_behavior.name}\n"
 		tempstring += f" Current location   = (lat = {self.coordinate.lat}, lon {self.coordinate.lon})\n"
 		tempstring += f" Current Actions    = {len(self.actions)}\n"
 		tempstring += f" Current Activities = {self.previous_activity}\n"
@@ -69,7 +71,7 @@ class Agent:
 	def behavior_step(self,kd_sim,kd_map,ts,step_length,rng,logger):
 		# if idle check action
 		if len(self.actions) == 0:
-			return self.default_behavior.step(kd_sim,kd_map,ts,step_length,rng,self,logger) #get actions
+			return self.current_behavior.step(kd_sim,kd_map,ts,step_length,rng,self,logger) #get actions
 		return []
 
 	def action_step(self,kd_sim,kd_map,ts,step_length,rng,logger):

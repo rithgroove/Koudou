@@ -4,19 +4,47 @@ from src.model.behavioral.agent import Agent
 from src.util.time_stamp import TimeStamp
 import src.model.map.a_star as a_star
 class Simulation:
-	def __init__(self,config,kd_map,rng,agents_count,threads = 1, report = None):
+	def __init__(self,config,kd_map,rng,logger, agents_count,threads = 1, report = None):
 		self.agents: List[Agent] = []
-		attribute_generator = agent_manager.load_attributes_generator(config["attributes"],rng)
-		self.agents = agent_manager.generate_agents(kd_map,attribute_generator,agents_count)
-		self.conditions = agent_manager.load_conditions(config["condition"],rng)
+		self.logger = logger
+
+		logger.write_log("--------------------Loading Attribute Generator--------------------")
+		attribute_generator = agent_manager.load_attributes_generator(config["attributes"],rng, logger)
+		logger.write_log("--------------------Finished loading Attribute Genereator--------------------")
+
+		logger.write_log("--------------------Generating Attributes for Agents--------------------")
+		self.agents = agent_manager.generate_agents(kd_map,attribute_generator,agents_count, rng, logger)
+		logger.write_log("--------------------Finished Generating Attributes for Agents--------------------")
+
+		logger.write_log("--------------------Agent Profession Summary--------------------")
+		for profession in attribute_generator.professions:
+			count = 0
+			for ag in self.agents:
+				if ag.get_attribute("profession") == profession["name"]:
+					count += 1
+			logger.write_log(str(count) + " " + profession["name"] + " agents added to simulation")
+		logger.write_log("--------------------Agent Profession Summary--------------------")
+
+		logger.write_log("--------------------Adding Conditions--------------------")
+		self.conditions = agent_manager.load_conditions(config["condition"],rng, self.logger)
+		logger.write_log("--------------------Finished Adding Conditions--------------------")
+		
+		logger.write_log("--------------------Adding Behaviors and Activities--------------------")
 		self.behaviors = {}
 		for key in config["behaviors"]:
-			self.behaviors[key] = agent_manager.load_behavior(key, config["behaviors"][key], self.conditions, rng)
+			self.behaviors[key] = agent_manager.load_behavior(key, config["behaviors"][key], self.conditions, logger)
+		logger.write_log("--------------------Finished Adding Behaviors and Activities--------------------")
+
 		for x in self.agents:
 			x.behaviors = self.behaviors
-			x.default_behavior = self.behaviors[config["default_behavior"]]
+			x.current_behavior = self.behaviors[config["start_behavior"]]
+		self.logger.write_log("simulation.behaviors added to simulation.agents")
+
+		logger.write_log("--------------------Adding Simulation Attributes--------------------")
 		self.attributes = {}
-		attribute_generator.generate_attribute_for_simulation(self,kd_map)
+		attribute_generator.generate_attribute_for_simulation(self, self.logger)
+		logger.write_log("--------------------Finished Adding Simulation Attributes--------------------")
+
 		self.rng = rng
 		self.ts = TimeStamp(0)
 		self.threads = threads
@@ -25,6 +53,10 @@ class Simulation:
 		self.d_agents_by_location = {}
 		self.modules = []
 		self.pathfind_cache = {}
+		logger.write_log("--------------------Printing generator_attribute.py--------------------")
+		logger.write_log(str(attribute_generator))
+		logger.write_log("--------------------Finished Printing generator_attribute.py--------------------")
+
 
 	def add_attribute(self,attr):
 		self.attributes[attr.name] = attr
@@ -113,10 +145,8 @@ class Simulation:
 			x.generate_vector(self.kd_map, results[temp])
 
 	def summarized_attribute(self,attribute_name):
-		temp = {}
+		summary = {}
 		for agent in self.agents:
 			key = agent.get_attribute(attribute_name)
-			if key not in temp.keys():
-				temp[key] = 0
-			temp[key] += 1
-		return temp
+			summary[key] = summary[key] + 1 if key in summary else 1
+		return summary

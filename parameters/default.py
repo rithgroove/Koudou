@@ -6,39 +6,41 @@ parameters = {
 
 
     "SEED":            101512, # Seed used for reproducing experiments
-    "N_AGENTS":        750, # Number of agents in the simulation, the more agents, the longer it will take to execute
+    "N_AGENTS":        5000, # Number of agents in the simulation, the more agents, the longer it will take to execute
     "THREADS":         8, # How many CPUs should be used for pathfinding
 
     "BUILDING_TAGS":  "config/map/tsukuba-tu-building-data.csv", # Path to the file that describes the tags to be created for untagged buildings
     "BUSINESS":       "config/map/business.csv", # Path for the file that describes the open-hours for business
-    "GRID_SIZE":      20, # Grid size used when calculating the centroid for buildings, NOT recommended to change
+    "GRID_SIZE":      10, # Grid size used when calculating the centroid for buildings, NOT recommended to change
     "EVAC_CENTER" :   "config/map/evacuation_center.json", # Path for the file that describes where the evac centers should be
     "STEP_LENGTH" :   5, #Each step is one second,
-    "MAX_STEPS"    :   49*24*60*60, # This is simulating for 7 weeks (49 daysm 24 hours, 60 minutes, 60 seconds), 
-
+    "MAX_STEPS"    :   60*60*24*7*7, # This is simulating for 7 weeks (49 days 24 hours, 60 minutes, 60 seconds),
+    "LOG_LEVEL"     : "debug",
 
     "DISEASES": ["config/infection/covid.json"], # Path to the diseases that will be simualted, it will use this path and the config/infection/covid-infection.json
 
-    "EVACUATION": {"DISTANCE":10, "SHARE_INFO_CHANCE": 0.8}, # Agents have 80% cahnce of sharing infor if thgey have a distance less than 10
+    "EVACUATION": {"DISTANCE":10, "SHARE_INFO_CHANCE": 0.8}, # Agents have 80% cahnce of sharing infor if they have a distance less than 10
 
     "SIM_CONFIG":{
         "condition" : ["config/behavioral/condition.csv",
                        "config/evacuation/condition_evac.csv",
                        "config/infection/condition_infection.csv"],
 
-        "default_behavior" : "normal",
+        "start_behavior" : "normal",
 
         "attributes" : {
             "basic"      : ["config/behavioral/attributes/attribute_basic.csv",
                             "config/evacuation/attributes/attribute_basic_evac.csv"],
-            "option"     : ["config/behavioral/attributes/attribute_option.csv"],
-            "updateable" : ["config/behavioral/attributes/attribute_updateable.csv"],
+            "option"     : ["config/behavioral/attributes/attribute_option.csv",
+                            "config/evacuation/attributes/attribute_option_evac.csv"],
+            "updateable" : ["config/evacuation/attributes/attribute_updateable.csv"],
             "schedule"   : ["config/behavioral/attributes/attribute_schedule.csv"],
             "profession" : ["config/behavioral/profession.csv"]
         },
         "behaviors" :{
             "normal"         : "config/behavioral/behavior/behavior_normal.csv",
             "evacuate"       : "config/evacuation/behavior/behavior_evacuate.csv",
+            "evacuated"       : "config/evacuation/behavior/behavior_evacuated.csv",
             "self_isolation" : "config/infection/behavior/behavior_symptomatic.csv",
             "severe"         : "config/infection/behavior/behavior_severe.csv"
         }

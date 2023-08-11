@@ -17,8 +17,7 @@ class Attribute:
 
     def set_value(self,value):
         try:
-            temp_value = cast(value,self.typing)
-            self.value = temp_value
+            self.value = cast(value,self.typing)
         except ValueError as e:
             if ("[Casting] " in str(e)):
                 self._unknown_type(self.typing)
@@ -28,8 +27,7 @@ class Attribute:
 
     def update_value(self,value):
         if self.typing == "int" or self.typing == "integer" or self.typing == "float":
-            temp = cast(value,self.typing)
-            self.value += temp
+            self.value += cast(value,self.typing)
         else:
             tempstring = "[Attribute] this attribute cannot be updated:\n"
             tempstring += self._get_object_details()

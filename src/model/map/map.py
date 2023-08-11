@@ -63,19 +63,22 @@ class Map():
         return self.d_residences[key]
 
     def get_random_business(self, business_type, qtd, rng, time_stamp=None, only_open=False, only_closed=False):
-        arr = [b for b in self.d_businesses.values()]
+        
+        condition = lambda b: b.type == business_type
         if only_open:
-            arr = [b for b in arr if b.is_open(time_stamp)]
+            condition = lambda b: b.type == business_type and b.is_open(time_stamp)
         elif only_closed:
-            arr = [b for b in arr if not b.is_open(time_stamp)]
+            condition = lambda b: b.type == business_type and not b.is_open(time_stamp)
 
-        arr = [b for b in arr if b.type == business_type]
+        arr = [b for b in self.d_businesses.values() if condition(b)]
+
         if (len(arr) <= qtd):
             return arr
+
         results = rng.choice(arr, qtd, replace=False)
         return results
 
-    def get_closest_evacuation_center(self,coordinate, explored_places):
+    def get_closest_evacuation_center(self,coordinate, explored_places, home_id):
         explored_evac_center = explored_places.split(",")
         distance = sys.float_info.max
         place = None
@@ -86,6 +89,13 @@ class Map():
             if temp_place.centroid not in explored_places and temp_distance < distance:
                 place = self.d_evacuation_centers[evac_place_id]
                 distance = temp_distance
+
+        # TODO: check what to do if there is not available evacuation palces anymore
+        if place == None:
+            for p in self.d_places.values():
+                if p.centroid == home_id:
+                    place = p
+                    break
         return place
 
     def get_random_connected_nodes(self,node_id, last_visited,rng):

@@ -14,6 +14,7 @@ class Behavior:
 			if act.check_conditions(agent,kd_sim, kd_map, ts,rng):
 				if agent.previous_activity != act.name:
 					temp_activity = {}
+					temp_activity["time"] = ts.get_hour_min_str()
 					temp_activity["time_stamp"] = ts.step_count
 					temp_activity["agent_id"] = agent.agent_id
 					temp_activity["profession"] = agent.get_attribute("profession")
@@ -22,7 +23,8 @@ class Behavior:
 					temp_activity["household_id"] = agent.get_attribute("household_id")
 					temp_activity["home_node_id"] = agent.get_attribute("home_node_id")
 					temp_activity["activy_name"] = act.name
-					logger.write_csv_data("activity_history.csv", temp_activity)
+					temp_activity["mask_behavior"] = agent.get_attribute("mask_wearing_type")
+					logger.write_csv_data("activity_history.csv", temp_activity, id=True)
 					agent.previous_activity = act.name
 				actions = act.generate_actions(agent,kd_map,ts,rng)
 				agent.actions.extend(actions)

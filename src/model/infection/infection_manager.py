@@ -8,7 +8,7 @@ from src.model.map.map import Map
 from .disease import Disease
 
 
-def initialize_infection(disease_files, population: List[Agent], rng):
+def initialize_infection(disease_files, population: List[Agent], rng, logger):
     diseases = []
 
     for file_name in disease_files:
@@ -17,34 +17,37 @@ def initialize_infection(disease_files, population: List[Agent], rng):
         
         d = Disease(
             d_config["name"],
+            d_config["symptoms"],
             d_config["attributes"],
             d_config["transition_states"],
             d_config["infection_file"],
             d_config["infectious_states"],
-            d_config["infected_starting_state"]
+            d_config["infected_starting_state"],
+            d_config["precautionary_measures"]
         )
+        logger.write_log(str(d))
         diseases.append(d)
-
-        initializate_disease_on_population(d, d_config["initialization"], population, rng)
+        initializate_disease_on_population(d, d_config["initialization"], population, rng, logger)
 
     return Infection(diseases)
 
 
-def initializate_disease_on_population(disease: Disease, initialization: Dict, population: List[Agent], rng):
+def initializate_disease_on_population(disease: Disease, initialization: Dict, population: List[Agent], rng, logger):
     for ag in population:
         new_attr = Attribute(disease.name, "susceptible")
         ag.add_attribute(new_attr)
 
 
-    qtd = 0
+    
     if initialization["type"] == "absolute":
         qtd = initialization["value"]
     elif initialization["type"] == "percentage":
         qtd = len(population) * initialization["value"]
-    
     infected_ags = rng.choice(population, qtd, replace = False)
     for ag in infected_ags:
         ag.set_attribute(disease.name, initialization["state"])
+        logger.write_log("Agent" + str(ag.agent_id) + " changed to state " + initialization["state"] + " of " + disease.name)
+    
 
 def infection_step(step_size: int, kd_map: Map, population: List[Agent], infection_module: Infection, rng,logger,ts):
     # next state of the infected agents
@@ -57,19 +60,95 @@ def infection_step(step_size: int, kd_map: Map, population: List[Agent], infecti
     for disease in infection_module.diseases.values():
         disease_transmission_verbose(step_size, kd_map, population, disease, rng, logger,ts)
 
-    
+def create_symptoms(step_size, ag: Agent, disease: Disease, rng, logger,ts):
+    for symptom, sympt_attr in disease.symptoms.items():
+        if (not ag.has_attribute(symptom)):
+            symptom_chance = apply_time_scale(step_size, sympt_attr["scale"], sympt_attr["probability"])
+            rand_value = rng.uniform(0.0,1.0,1)[0]
+            if rand_value < symptom_chance:
+                new_attr = Attribute(symptom, "symptomatic")
+                ag.add_attribute(new_attr)
+                data = {}
+                data["time_stamp"] = ts.step_count
+                data["disease_name"] = disease.name
+                data["agent_id"] = ag.agent_id
+                data["agent_profession"] = ag.get_attribute("profession")
+                data["agent_location"] = ag.get_attribute("location")
+                data["agent_node_id"] = ag.get_attribute("current_node_id")
+                data["symptom"] = symptom
+                data["state"] = "symptomatic"
+                data['mask_state'] = ag.get_attribute('mask_wearing_type')
+                logger.write_csv_data("symptom.csv", data)
+
+def remove_symptoms(ag: Agent, disease: Disease, rng, logger, ts):
+    for symptom in disease.symptoms:
+        if (ag.has_attribute(symptom)):
+            ag.update_attribute(symptom, "asymptomatic")
+            data = {}
+            data["time_stamp"] = ts.step_count
+            data["disease_name"] = disease.name
+            data["agent_id"] = ag.agent_id
+            data["agent_profession"] = ag.get_attribute("profession")
+            data["agent_location"] = ag.get_attribute("location")
+            data["agent_node_id"] = ag.get_attribute("current_node_id")
+            data["symptom"] = symptom
+            data["state"] = "asymptomatic"
+            data['mask_state'] = ag.get_attribute('mask_wearing_type')
+            logger.write_csv_data("symptom.csv", data)
+
+# To reduce the rate of infection
+def mask_infection_chance(ag: Agent, disease: Disease):
+    if disease.precautionary_measures.get('mask', 'measure_not_found') is 'measure_not_found':
+        return 1
+    mask_type = ag.get_attribute('mask_wearing_type')
+    return disease.precautionary_measures.get('mask').get('infection_rate').get(mask_type)
+
+# To determine agent's mask wearing behavior when disease state changed
+def mask_behavior_determine(ag: Agent, disease: Disease, rng):
+    if disease.precautionary_measures.get('mask', 'measure_not_found') is 'measure_not_found':
+        return ag
+    if_wear_mask = ag.get_attribute('if_wear_mask')
+    mask_wearing_type = ag.get_attribute('mask_wearing_type')
+    if if_wear_mask and mask_wearing_type == 'surgical_mask':  # wear mask has two option if it is surgical mask: surgical to n95
+        rnd = rng.uniform(0.0, 1.0, 1)[0]
+        stn95_chance = disease.precautionary_measures.get('mask').get('self_infected_masked').get('surgical_to_n95')
+        if rnd < stn95_chance:  # true for chance behavior, false for no chance
+            ag.set_attribute('mask_wearing_type', 'n95_mask')
+    elif not if_wear_mask:  # not wear mask has three options: no change / no to n95 / no to surgical
+        rnd = rng.uniform(0.0, 1.0, 1)[0]
+        nts_chance = disease.precautionary_measures.get('mask').get('self_infected_unmasked').get('no_to_surgical')
+        ntn95_chance = nts_chance + disease.precautionary_measures.get('mask').get('self_infected_unmasked').get('no_to_n95')
+        if rnd < nts_chance:  # from no masking to surgical mask
+            ag.set_attribute('if_wear_mask', True)
+            ag.set_attribute('mask_wearing_type', 'surgical_mask')
+        elif rnd < ntn95_chance:  # from no masking to n95 mask
+            ag.set_attribute('if_wear_mask', True)
+            ag.set_attribute('mask_wearing_type', 'n95_mask')
+    else:  # already wear n95 mask
+        return ag
+    return ag
+
+# To add false testing results of PCR
+def false_PCR_test():
+    pass
 
 def infected_next_stage(step_size, ag: Agent, disease: Disease, rng, logger,ts):
     current_state = ag.get_attribute(disease.name)
+    if (current_state == "symptomatic"):
+        create_symptoms(step_size, ag, disease, rng, logger, ts)
+    elif (current_state == "recovered"):
+        remove_symptoms(ag, disease, rng, logger, ts)
     next_state = current_state
     if current_state in disease.transitions:
         rand_value = rng.uniform(0.0,1.0,1)[0]
         previous_chances = 0
+        # mask_measure_chance = mask_infection_chance(ag, disease)
         for compartiment, attr in disease.transitions[current_state].items():
             chance = apply_time_scale(step_size, attr["scale"], attr["probability"])
             if rand_value < previous_chances + chance:
                 next_state = compartiment
                 data = {}
+                data["time"] = ts.get_hour_min_str()
                 data["time_stamp"] = ts.step_count
                 data["disease_name"] = disease.name
                 data["agent_id"] = ag.agent_id
@@ -78,7 +157,8 @@ def infected_next_stage(step_size, ag: Agent, disease: Disease, rng, logger,ts):
                 data["agent_node_id"] = ag.get_attribute("current_node_id")
                 data["current_state"] = current_state
                 data["next_state"] = next_state
-                logger.write_csv_data("disease_transition.csv", data)
+                data["mask_behavior"] = ag.get_attribute("mask_wearing_type")
+                logger.write_csv_data("disease_transition.csv", data, id=True)
                 break
             previous_chances += chance
 
@@ -98,8 +178,9 @@ def apply_time_scale(step_size, time_scale, chance):
         return chance*step_size/(60*60*24)
 
 
-def log(infection_type,disease,infector,infectee,logger,ts):
+def log(infection_type,disease,infector,infectee,logger,ts, old_mask_behavior):
     data = {}
+    data["time"] = ts.get_hour_min_str()
     data["time_stamp"] = ts.step_count
     data["type"] = infection_type
     data["disease_name"] = disease.name
@@ -114,6 +195,8 @@ def log(infection_type,disease,infector,infectee,logger,ts):
     data["agent_workplace_type"] = infectee.get_attribute("workplace_type")
     data["agent_workplace_id"] = infectee.get_attribute("workplace_id")
     data["agent_current_activity"] = infectee.previous_activity
+    data["current_mask"] = old_mask_behavior
+    data["next_mask"] = infectee.get_attribute("mask_wearing_type")
     if(infector is None):
         data["source_id"] = "None"
         data["source_profession"] = "None"
@@ -191,7 +274,7 @@ def disease_transmission_verbose(step_size: int, kd_map: Map, population: List[A
         susceptible_ags = []
         if loc in susceptible_ags_by_location.keys():
             susceptible_ags = susceptible_ags_by_location[loc]
-
+        # infect susceptible agents when they stay with infected agents at the same node
         for infector in infected_ag:
             if kd_map.is_businesses_node(loc):
                 business_infection(step_size, infector, susceptible_ags, disease, rng, logger, ts)
@@ -210,9 +293,12 @@ def business_infection(step_size, infector:Agent, ag_same_location: List[Agent],
     for ag in ag_same_location:
         if ag.get_attribute(disease.name) != "susceptible": #Already infected
             continue
-        if rng.uniform(0.0,1.0,1)[0] < chance: # infect agent
+        mask_measure_chance = mask_infection_chance(ag, disease)
+        if rng.uniform(0.0,1.0,1)[0] < chance * mask_measure_chance: # infect agent
+            old_mask_behavior = ag.get_attribute("mask_wearing_type")
+            ag = mask_behavior_determine(ag, disease, rng)
             ag.set_attribute(disease.name, disease.starting_state)
-            log("business",disease,infector,ag,logger,ts)    
+            log("business",disease,infector,ag,logger,ts, old_mask_behavior)
 
 def residence_infection(step_size,infector:Agent, ag_same_location: List[Agent], disease, rng, logger,ts):
     infection_attr = disease.infection_method["residences"]
@@ -228,9 +314,12 @@ def residence_infection(step_size,infector:Agent, ag_same_location: List[Agent],
             continue
         if ag.get_attribute("household_id") != infector.get_attribute("household_id"): #needs to be in the same household
             continue
-        if rng.uniform(0.0,1.0,1)[0] < chance:  # infect agent
+        mask_measure_chance = mask_infection_chance(ag, disease)
+        if rng.uniform(0.0,1.0,1)[0] < chance * mask_measure_chance:  # infect agent
+            old_mask_behavior = ag.get_attribute("mask_wearing_type")
+            ag = mask_behavior_determine(ag, disease, rng)
             ag.set_attribute(disease.name, disease.starting_state)
-            log("residential",disease, infector,ag,logger,ts)     
+            log("residential",disease, infector,ag,logger,ts, old_mask_behavior)
 
 def off_map_infection(step_size, ag_same_location: List[Agent], disease, rng, logger,ts):
     infection_attr = disease.infection_method["off_map"]
@@ -238,9 +327,12 @@ def off_map_infection(step_size, ag_same_location: List[Agent], disease, rng, lo
     prob = infection_attr["probability"]
     chance = apply_time_scale(step_size, scale, prob)
     for ag in ag_same_location:
-        if rng.uniform(0.0,1.0,1)[0] < chance:  # infect agent
+        mask_measure_chance = mask_infection_chance(ag, disease)
+        if rng.uniform(0.0,1.0,1)[0] < chance * mask_measure_chance:  # infect agent
+            old_mask_behavior = ag.get_attribute("mask_wearing_type")
+            ag = mask_behavior_determine(ag, disease, rng)
             ag.set_attribute(disease.name, disease.starting_state)
-            log("off_map",disease, None,ag,logger,ts)     
+            log("off_map",disease, None,ag,logger,ts, old_mask_behavior)
 
 def other_infection(step_size, infector:Agent, ag_same_location: List[Agent], disease, rng, logger,ts):
     infection_attr = disease.infection_method["other"]
@@ -251,9 +343,12 @@ def other_infection(step_size, infector:Agent, ag_same_location: List[Agent], di
     for ag in ag_same_location:
         if ag.get_attribute(disease.name) != "susceptible":  # Already infected
             continue
-        if rng.uniform(0.0,1.0,1)[0] < chance:  # infect agent
+        mask_measure_chance = mask_infection_chance(ag, disease)
+        if rng.uniform(0.0,1.0,1)[0] < chance * mask_measure_chance:  # infect agent
+            old_mask_behavior = ag.get_attribute("mask_wearing_type")
+            ag = mask_behavior_determine(ag, disease, rng)
             ag.set_attribute(disease.name, disease.starting_state)
-            log("other",disease, infector,ag,logger,ts)   
+            log("other",disease, infector,ag,logger,ts, old_mask_behavior)
   
 def road_infection(step_size, kd_map: Map, infected_ag, ags_by_location, disease, rng, logger,ts):
     infection_attr = disease.infection_method["roads"]
@@ -275,7 +370,11 @@ def road_infection(step_size, kd_map: Map, infected_ag, ags_by_location, disease
             continue
         dist = ag.coordinate.calculate_distance(coor.lat,coor.lon)
         prob = cc_prob + gradient*dist
+        mask_measure_chance = mask_infection_chance(ag, disease)
         chance = apply_time_scale(step_size, scale, prob)
-        if rng.uniform(0.0,1.0,1)[0] < chance :  # infect agent
+        if rng.uniform(0.0,1.0,1)[0] < chance * mask_measure_chance:  # infect agent
+            old_mask_behavior = ag.get_attribute("mask_wearing_type")
+            ag = mask_behavior_determine(ag, disease, rng)
             ag.set_attribute(disease.name, disease.starting_state)
-            log("on_the_road",disease, infected_ag,ag,logger,ts)   
+            log("on_the_road",disease, infected_ag,ag,logger,ts, old_mask_behavior)
+

@@ -1,0 +1,5 @@
+## Welcome to the simulator dashboard!
+This dashboard is used for presenting simulator model configurations, and analysis.
+
+
+This Dashboard is built with [Dash Plotly](https://plotly.com/dash ) & [GitHub](https://github.com/plotly/dash ), and [Bootstrap - Bootswatch](https://bootswatch.com/).
